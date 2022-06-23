@@ -1,5 +1,6 @@
 const archive = require("./archive");
 const auth = require("./auth");
+const auth2 = require("./auth2");
 const chat = require("./chat");
 const contactUs = require("./contact-us");
 const discord = require("./discord");
@@ -14,6 +15,7 @@ const twitch = require("./twitch");
 module.exports = {
     archive,
     auth,
+    auth2,
     chat,
     contactUs,
     discord,

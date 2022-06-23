@@ -22,6 +22,7 @@ app.use('/', (req, res, next) => {
 });
 
 app.use('/auth', routes.auth);
+app.use('/auth2', routes.auth2);
 app.use('/contact-us', routes.contactUs)
 
 app.use('/', (req, res, next) => {
