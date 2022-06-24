@@ -21,6 +21,15 @@ const config = require("../../config.json");
 const EntryFile = require("./EntryFile");
 const FILE_ENDPOINT = config.api_domain + "file/";
 
+const createCrossbanButton = user => {
+    const crossbanButton = new MessageButton()
+            .setCustomId("cb-" + user.id)
+            .setLabel("Crossban " + user.display_name)
+            .setStyle("DANGER");
+
+    return crossbanButton;
+}
+
 class Entry {
     /**
      * Eight character unique ID for this entry
@@ -166,6 +175,37 @@ class Entry {
     }
 
     /**
+     * Generates a crossban button row for this entry
+     * @returns {Promise<MessageActionRow>}
+     */
+    createCrossbanRow() {
+        return new Promise(async (resolve, reject) => {
+            let row = new MessageActionRow();
+            
+            for (let i = 0; i < this.users.length; i++) {
+                let user = this.users[i];
+
+                try {
+                    if (user.type === "twitch" && user.user) {
+                        row.addComponents(createCrossbanButton(await user.resolveUser()));
+                    } else if (user.type === "identity") {
+                        const identity = await user.resolveUser();
+                        if (identity) {
+                            identity.twitchUsers.forEach(tuser => {
+                                row.addComponents(createCrossbanButton(tuser));
+                            })
+                        }
+                    }
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+
+            resolve(row);
+        });
+    }
+
+    /**
      * Edits all messages attached to this Entry with any new information received.
      * @returns {Promise<void>}
      */
@@ -202,7 +242,7 @@ class Entry {
                         global.client.discord.channels.fetch(messageObj.channel_id).then(channel => {
                             channel.messages.fetch(messageObj.id).then(async message => {
                                 let content = ((message.content && message.content.length > 0) ? message.content : " ");
-                                message.edit({content: content, embeds: [newEmbed]}).then(() => {}, console.error);
+                                message.edit({content: content, embeds: [newEmbed], components: [await this.createCrossbanRow()]}).then(() => {}, console.error);
                             }, console.error);
                         });
                     }
@@ -650,7 +690,7 @@ class Entry {
             con.query("delete from archive__messages where archive_id = ? and (reason = 'public-record' or reason = 'sort');", [this.id], async err => {
                 if (err) {console.error(err);return;}
 
-                channel.send({content: ' ', embeds: [await this.discordEmbed()]}).then(message => {
+                channel.send({content: ' ', embeds: [await this.discordEmbed()], components: [await this.createCrossbanRow()]}).then(message => {
 
                     con.query("insert into archive__logs (archive_id, initiated_by, old_value, new_value, action) values (?, ?, ?, ?, 'move');", [
                         this.id,
