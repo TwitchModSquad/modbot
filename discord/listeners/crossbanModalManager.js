@@ -112,7 +112,7 @@ const listener = {
                             continue;
                         }
                     } else {
-                        await global.client.ban.ban(channel.display_name.toLowerCase(), user.display_name.toLowerCase(), url);
+                        await global.client.ban.ban(channel.display_name.toLowerCase(), user.display_name.toLowerCase(), reason);
                     }
 
                     successes += `\n${channel.display_name}`;
