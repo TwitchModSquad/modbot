@@ -91,6 +91,7 @@ const listener = {
                     }
                 }
             } catch (err) {
+                console.error(err);
                 handleError(err, "editReply");
                 return;
             }
