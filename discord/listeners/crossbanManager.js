@@ -102,25 +102,19 @@ const listener = {
                     new TextInputComponent()
                         .setCustomId("reason")
                         .setLabel("Ban Reason")
+                        .setPlaceholder("This reason is sent to Twitch and is viewable by the user")
                         .setStyle("SHORT")
                         .setMinLength(3)
                         .setMaxLength(64)
                         .setRequired(false),
-                    new SelectMenuComponent()
+                    new TextInputComponent()
                         .setCustomId("include-thumbprint")
-                        .setPlaceholder("Include thumbprint (reason suffix: 'TMS #" + user.id + "')")
-                        .addOptions(
-                            {
-                                label: "Yes",
-                                value: "true",
-                                emoji: "☑️",
-                            },
-                            {
-                                label: "No",
-                                value: "false",
-                                emoji: "🚫",
-                            }
-                        )
+                        .setLabel("Include Thumbprint (yes/no)")
+                        .setDefaultValue("Yes")
+                        .setStyle("SHORT")
+                        .setMinLength(2)
+                        .setMaxLength(3)
+                        .setRequired(false)
                 );
     
                 showModal(modal, {

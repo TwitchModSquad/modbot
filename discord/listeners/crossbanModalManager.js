@@ -50,9 +50,14 @@ const listener = {
 
 
         let reason = modal.getTextInputValue("reason");
-        const thumbprint = modal.getSelectMenuValues("include-thumbprint");
+        let thumbprint = modal.getTextInputValue("include-thumbprint");
 
         if (reason === null) reason = "";
+        if (thumbprint) {
+            thumbprint = thumbprint.toLowerCase() !== "no"
+        } else {
+            thumbprint = true;
+        }
         
        
         if (modal.customId.startsWith("cb-ban-")) {
@@ -69,8 +74,8 @@ const listener = {
             try {
                 user = await api.Twitch.getUserById(twitchId, false, true);
 
-                if (thumbprint && thumbprint.indexOf("true") != -1) {
-                    let thumbprintString = "#" + user.id;
+                if (thumbprint) {
+                    let thumbprintString = "tms#" + user.id;
                     if (reason.length == 0) {
                         reason = thumbprintString;
                     } else {
@@ -95,6 +100,8 @@ const listener = {
                 handleError(err, "editReply");
                 return;
             }
+
+            console.log(reason);
 
             let successes = "";
             let errors = "";
