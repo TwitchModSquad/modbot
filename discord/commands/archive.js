@@ -368,93 +368,177 @@ const command = {
         } else if (subcommand === "search") {
             let query = interaction.options.getString("query", true);
 
+            let twitchResults = "";
+            let discordResults = "";
+            let rawResults = "";
+
             let entries = [];
 
-            const add = newEntries => {
-                newEntries.forEach(entry => {
-                    if (!entries.includes(entry))
-                        entries = [
-                            ...entries,
-                            entry.archive_id,
-                        ];
-                });
-            }
+            const directTwitchQuery = await con.pquery("select id from twitch__user where id = ? or display_name = ?;", [query, query]);
+            let fuzzyTwitchQuery = [];
 
-            try {
-                const twitchEntries = await con.pquery("select archive__users.archive_id from twitch__username join archive__users on archive__users.value = twitch__username.id where twitch__username.id = ? or twitch__username.display_name = ?;", [query, query]);
-                add(twitchEntries);
-            } catch(e) {
-                console.error(e);
-            }
+            const directDiscordQuery = await con.pquery("select id from discord__user where id = ? or name = ?;", [query, query]);
+            let fuzzyDiscordQuery = [];
 
-            try {
-                const discordEntries = await con.pquery("select archive__users.archive_id from discord__user join archive__users on archive__users.value = discord__user.id where discord__user.id = ? or discord__user.name = ?;", [query, query]);
-                add(discordEntries);
-            } catch(e) {
-                console.error(e);
-            }
-
-            try {
-                let split = query.split("#");
-                if (split.length === 2) {
-                    const userValueEntries = await con.pquery("select archive__users.archive_id from discord__user join archive__users on archive__users.value = discord__user.id where discord__user.name = ? and discord__user.discriminator = ?;", [split[0], split[1]]);
-                    add(userValueEntries);
-                }
-            } catch(e) {
-                console.error(e);
-            }
-
-            try {
-                const userValueEntries = await con.pquery("select archive_id from archive__users where value = ?;", [query]);
-                add(userValueEntries);
-            } catch(e) {
-                console.error(e);
-            }
-
-            try {
-                const messageEntries = await con.pquery("select archive_id from archive__messages where id = ? or archive_id = ?;", [query, query]);
-                add(messageEntries);
-            } catch (e) {
-                console.error(e);
-            }
+            const directRawQuery = await con.pquery("select value from archive__users where value = ?;", query);
+            let fuzzyRawQuery = [];
             
-            let embeds = [];
+            if (query.length > 3) {
+                fuzzyTwitchQuery = await con.pquery("select id from twitch__user where soundex(display_name) = soundex(?) or display_name like ? limit 20;", [query, query + "%"]);
+                fuzzyDiscordQuery = await con.pquery("select id from discord__user where soundex(name) = soundex(?) or name like ? limit 20;", [query, query + "%"]);
+                fuzzyRawQuery = await con.pquery("select value from archive__users where value = ?;", query);
+            }
 
-            for (let i = 0; i < entries.length; i++) {
+            let twitchQueries = directTwitchQuery.map(x => x.id);
+            let discordQueries = directDiscordQuery.map(x => x.id);
+            let rawQueries = directRawQuery.map(x => x.value);
+
+            fuzzyTwitchQuery.forEach(q => {
+                if (!twitchQueries.includes(q.id)) {
+                    twitchQueries = [
+                        ...twitchQueries,
+                        q.id
+                    ]
+                }
+            });
+
+            fuzzyDiscordQuery.forEach(q => {
+                if (!discordQueries.includes(q.id)) {
+                    discordQueries = [
+                        ...discordQueries,
+                        q.id
+                    ]
+                }
+            });
+
+            fuzzyRawQuery.forEach(q => {
+                if (!rawQueries.includes(q.value)) {
+                    rawQueries = [
+                        ...rawQueries,
+                        q.value
+                    ]
+                }
+            });
+
+            for (let ti = 0; ti < twitchQueries.length; ti++) {
+                const id = twitchQueries[ti];
                 try {
-                    let entry = await api.Archive.getEntryById(entries[i]);
-                    console.log(entry);
-                    embeds = [
-                        ...embeds,
-                        await entry.discordEmbed(),
-                    ];
+                    const user = await api.Twitch.getUserById(id);
+                    const twitchEntries = await con.pquery("select archive_id from archive__users where type = 'twitch' and user and value = ?;", [id]);
+
+                    twitchResults += `\n${user.display_name} [${user.id}]`;
+
+                    for (let ei = 0; ei < twitchEntries.length; ei++) {
+                        const archiveId = twitchEntries[ei].archive_id;
+                        if (!entries.find(e => e.id === archiveId)) {
+                            entries = [
+                                ...entries,
+                                await api.Archive.getEntryById(archiveId),
+                            ];
+                        }
+                    }
                 } catch (e) {
                     console.error(e);
                 }
             }
 
-            if (embeds.length === 0) {
-                embeds = [
-                    new MessageEmbed()
-                        .setTitle("No records found!")
-                        .setDescription("No archive entries were found with the query: `" + query + "`")
-                        .setFooter({text: "For more detailed user information, try searching for this user with the /user command.", iconURL: "https://twitchmodsquad.com/assets/images/logo.webp"})
-                        .setColor(0x36b55c)
-                ]
+            for (let di = 0; di < discordQueries.length; di++) {
+                const id = discordQueries[di];
+                try {
+                    const user = await api.Discord.getUserById(id);
+                    const discordEntries = await con.pquery("select archive_id from archive__users where type = 'discord' and user and value = ?;", [id]);
+
+                    discordResults += `\n${user.name}#${user.discriminator} [${user.id}]`;
+
+                    for (let ei = 0; ei < discordEntries.length; ei++) {
+                        const archiveId = discordEntries[ei].archive_id;
+                        if (!entries.find(e => e.id === archiveId)) {
+                            entries = [
+                                ...entries,
+                                await api.Archive.getEntryById(archiveId),
+                            ];
+                        }
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
             }
 
-            if (interaction.channel.id === config.channels.archive_name_checker) {
-                interaction.reply({content: ' ', embeds: embeds}).then(async() => {
-                    if (entries.length === 1) {
-                        const message = await interaction.fetchReply();
-                        con.query("insert into archive__messages (id, guild_id, channel_id, archive_id, reason) values (?, ?, ?, ?, 'query');", [message.id, message.guild.id, message.channel.id, entries[0]], err => {
-                            if (err) console.error(err);
-                        });
+            for (let di = 0; di < discordQueries.length; di++) {
+                const id = discordQueries[di];
+                try {
+                    const user = await api.Discord.getUserById(id);
+                    const discordEntries = await con.pquery("select archive_id from archive__users where type = 'discord' and user and value = ?;", [id]);
+
+                    discordResults += `\n${user.name}#${user.discriminator} [${user.id}]`;
+
+                    for (let ei = 0; ei < discordEntries.length; ei++) {
+                        const archiveId = discordEntries[ei].archive_id;
+                        if (!entries.find(e => e.id === archiveId)) {
+                            entries = [
+                                ...entries,
+                                await api.Archive.getEntryById(archiveId),
+                            ];
+                        }
                     }
-                });
-            } else {
-                interaction.reply({content: ' ', embeds: embeds, ephemeral: true});
+                } catch (e) {}
             }
+
+            for (let ri = 0; ri < rawQueries.length; ri++) {
+                const id = rawQueries[ri];
+                try {
+                    const discordEntries = await con.pquery("select archive_id from archive__users where value = ?;", [id]);
+
+                    rawResults += `\n${id}`;
+
+                    for (let ei = 0; ei < discordEntries.length; ei++) {
+                        const archiveId = discordEntries[ei].archive_id;
+                        if (!entries.find(e => e.id === archiveId)) {
+                            entries = [
+                                ...entries,
+                                await api.Archive.getEntryById(archiveId),
+                            ];
+                        }
+                    }
+                } catch (e) {}
+            }
+
+            const embed = new MessageEmbed()
+                .setTitle("Archive Search Results")
+                .setColor(0x36b55c);
+
+            if (entries.length > 0) {
+                let entryResults = "";
+                for (let e = 0; e < entries.length; e++) {
+                    const entry = entries[e];
+                    let message;
+                    try {
+                        message = await entry.getPublicRecordMessage();
+                    } catch (e) {}
+
+                    if (message) {
+                        entryResults += `\n[${entry.offense}](${message.url})`;
+                    } else {
+                        entryResults += `\n${entry.offense} (No public record found)`;
+                    }
+                }
+                embed.addField("Ban Entries", entryResults);
+            }
+            
+            if (twitchResults !== "")
+                embed.addField("Twitch Results", "```"+twitchResults+"```");
+    
+            if (discordResults !== "")
+                embed.addField("Discord Results", "```"+discordResults+"```");
+
+            if (rawResults !== "")
+                embed.addField("Raw Results", "```"+rawResults+"```")
+
+            if (twitchResults === "" && discordResults === "" && rawResults === "") {
+                embed.setDescription("**Nothing was found on this user!**\nThis means we don't have any record of this user in participating Twitch channels, and there's no ban archive involving them.")
+            }
+
+            interaction.reply({content: ' ', embeds: [embed], ephemeral: interaction.channel.id !== config.channels.archive_name_checker});
         }
     }
 };
