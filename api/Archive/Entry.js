@@ -253,6 +253,31 @@ class Entry {
     }
 
     /**
+     * Returns the pulic record Discord message for this archive entry
+     * @returns {Promise<Message>}
+     */
+     getPublicRecordMessage() {
+        return new Promise((resolve, reject) => {
+            con.query("select id, channel_id from archive__messages where archive_id = ? and reason = 'public-record';", [this.id], (err, res) => {
+                if (!err) {
+                    if (res.length > 0) {
+                        let row = res[0];
+                        global.client.discord.channels.fetch(row.channel_id).then(channel => {
+                            channel.messages.fetch(row.id).then(message => {
+                                resolve(message);
+                            }, reject)
+                        }, reject);
+                    } else {
+                        reject("No public record found for this archive entry!");
+                    }
+                } else {
+                    reject(err);
+                }
+            });
+        });
+    }
+
+    /**
      * Sets a new owner for this entry.
      * @param {Identity} newOwner 
      * @param {FullIdentity} executor 
