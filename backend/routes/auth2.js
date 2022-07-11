@@ -140,5 +140,138 @@ router.get("/twitch", async (req, res) => {
         res.redirect(api.Authentication.Twitch.TWITCH_URL);
     }
 });
+
+router.get("/discord", async (req, res) => {
+    const { query, cookies } = req;
+	const { code } = query;
+
+    let session = undefined;
+
+    if (cookies?.session) {
+        try {
+            session = await api.getSession(cookies.session);
+        } catch (err) {}
+    }
+    
+    if (session === undefined) {
+        res.redirect(api.Authentication.Twitch.TWITCH_URL);
+        return;
+    }
+
+	if (code) {
+		try {
+			const oauthData = await discord.getToken(code);
+            const user = await discord.getUser(oauthData.token_type, oauthData.access_token);
+
+            if (user.hasOwnProperty("message") && user.message === "401: Unauthorized")  {
+                res.redirect(DISCORD_URL);
+                return;
+            }
+            
+            let dus = new DiscordUser(
+                    user.id,
+                    null,
+                    user.username,
+                    user.discriminator,
+                    user.avatar
+                );
+
+            if (session.identity.discordAccounts.length === 0 && invitee !== null) {
+                con.query("insert into invite__uses (invited, invitee) values (?,?) on duplicate key update invitee = ?;", [session.identity.id, invitee, invitee]);
+            }
+
+            if (!session.identity.discordAccounts.find(x => x.id === dus.id)) {
+                session.identity.discordAccounts = [...session.identity.discordAccounts, dus];
+            }
+
+            session = await session.post();
+
+            let partnered = false;
+            let affiliate = false;
+            let partneredModerator = false;
+            let affiliateModerator = false;
+
+            for (let ri = 0; ri < session.identity.twitchAccounts.length; ri++) {
+                let twitchAccount = session.identity.twitchAccounts[ri];
+
+                let followers = await twitchAccount.refreshFollowers();
+
+                if (twitchAccount.affiliation === "partner") {
+                    partnered = true;
+                } else if (twitchAccount.affiliation === "affiliate" && followers >= FOLLOWER_REQUIREMENT) {
+                    affiliate = true;
+                }
+
+                let streamers = await twitchAccount.refreshStreamers();
+
+                for (let si = 0; si < streamers.length; si++) {
+                    let streamer = streamers[si];
+
+                    followers = await streamer.refreshFollowers();
+                    
+                    if (streamer.affiliation === "partner") {
+                        partneredModerator = true;
+                    } else if (streamer.affiliation === "affiliate" && followers >= FOLLOWER_REQUIREMENT) {
+                        affiliateModerator = true;
+                    }
+                }
+            }
+
+            let resolvedRoles = [];
+
+            if (partnered) {
+                resolvedRoles = [
+                    ...resolvedRoles,
+                    config.partnered.streamer
+                ];
+            }
+            if (affiliate) {
+                resolvedRoles = [
+                    ...resolvedRoles,
+                    config.affiliate.streamer
+                ];
+            }
+            if (partneredModerator) {
+                resolvedRoles = [
+                    ...resolvedRoles,
+                    config.partnered.moderator
+                ];
+            }
+            if (affiliateModerator) {
+                resolvedRoles = [
+                    ...resolvedRoles,
+                    config.affiliate.moderator
+                ];
+            }
+
+            if (resolvedRoles.length > 0) {
+                session.identity.authenticated = true;
+                await session.identity.post();
+
+                global.client.discord.guilds.fetch(config.modsquad_discord).then(guild => {
+                    guild.members.add(dus.id, {accessToken: oauthData.access_token, roles: resolvedRoles}).then(member => {
+                        redirect(req, res);
+                    }).catch((err) => {
+                        console.error(err);
+                        res.json({success: false, error: "Could not add user to Discord"});
+                    });
+                }).catch((err) => {
+                    console.error(err);
+                    res.json({success: false, error: "Could not obtain guild"});
+                });
+            } else {
+                res.status(401)
+                res.json({success: false, error: "Did not meet join criteria. If you believe this is in error, send this page to @Twijn#8888 on Discord.", session: session});
+            }
+		} catch (error) {
+			// NOTE: An unauthorized token will not throw an error;
+			// it will return a 401 Unauthorized response in the try block above
+			console.error(error);
+            res.json({success: false, error: "An error occurred"});
+		}
+	} else {
+        res.redirect(api.Authentication.Discord.DISCORD_URL);
+    }
+});
  
 module.exports = router;
