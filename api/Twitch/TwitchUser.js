@@ -418,6 +418,17 @@ class TwitchUser extends User {
     }
 
     /**
+     * Gets a list of active Twitch communities for this user
+     * 
+     * @returns {Promise<TwitchUser>}
+     */
+    getActiveCommunities() {
+        return new Promise((resolve, reject) => {
+            
+        });
+    }
+
+    /**
      * Gets TMS short link to user's page
      * @returns {string}
      */
@@ -448,6 +459,7 @@ class TwitchUser extends User {
 
             const streamers = await this.getStreamers();
             const mods = await this.getMods();
+            const activeCommunities = await this.getActiveCommunities();
 
             if (streamers.length > 0) {
                 let streamerStr = "";
