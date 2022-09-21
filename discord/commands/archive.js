@@ -448,10 +448,12 @@ const command = {
                 }
             }
 
+            let discordUsers = [];
             for (let di = 0; di < discordQueries.length; di++) {
                 const id = discordQueries[di];
                 try {
                     const user = await api.Discord.getUserById(id);
+                    discordUsers = [...discordUsers, user];
                     const discordEntries = await con.pquery("select archive_id from archive__users where type = 'discord' and user and value = ?;", [id]);
 
                     discordResults += `\n${user.name}#${user.discriminator} [${user.id}]`;
@@ -529,12 +531,29 @@ const command = {
                     .setMinValues(1)
                     .setMaxValues(1);
 
+            const discordUserSelect = new MessageSelectMenu()
+                    .setCustomId("archive-search-discord")
+                    .setPlaceholder("View Discord Information")
+                    .setMinValues(1)
+                    .setMaxValues(1);
+
             twitchUsers.forEach(user => {
                 twitchUserSelect.addOptions({value: ""+user.id, label: user.display_name});
             })
+            
+            discordUsers.forEach(user => {
+                discordUserSelect.addOptions({value: ""+user.id, label: user.name});
+            });
+
+            let rows = [];
 
             const row = new MessageActionRow()
                 .addComponents(twitchUserSelect);
+
+            const discordUserRow = new MessageActionRow()
+                .addComponents(discordUserSelect);
+
+            if (twitchUsers.length > 0) 
 
             interaction.reply({content: ' ', embeds: [embed], components: [row], ephemeral: interaction.channel.id !== config.channels.archive_name_checker});
         }

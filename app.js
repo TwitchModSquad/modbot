@@ -24,10 +24,10 @@ const updateEntryUsernames = require("./interval/updateEntryUsernames");
 updateUsers();
 updateTwitchUsernames();
 updateDiscordUsernames();
-updateEntryUsernames();
+setTimeout(updateEntryUsernames, 5000);
 
 setInterval(updateUsers, 10000);
 setInterval(updateTwitchUsernames, 60000);
 setInterval(updateDiscordUsernames, 60000);
 setInterval(updateLiveChannels, 15000);
-setInterval(updateEntryUsernames, 15000);
+setInterval(updateEntryUsernames, 10800000); // 3 hours
