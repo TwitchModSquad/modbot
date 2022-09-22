@@ -4,7 +4,7 @@ const {MessageEmbed} = require("discord.js");
 const config = require("../config.json");
 
 module.exports = () => {
-    con.query("select distinct value, type, archive_id from archive__users where type = 'discord' or type = 'twitch';", async (err, res) => {
+    con.query("select distinct value, type, archive_id from archive__users where (type = 'discord' or type = 'twitch') and user and date_add(last_updated, interval 2 day) < now();", async (err, res) => {
         if (err) {
             console.error(err);
             return;
