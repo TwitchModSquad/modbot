@@ -4,6 +4,7 @@ const Twitch = require("./Twitch/");
 const Discord = require("./Discord/");
 const SessionService = require("./Session/");
 const Archive = require("./Archive/");
+const Authentication = require("./Authentication/");
 
 const FullIdentity = require("./FullIdentity");
 
@@ -33,6 +34,12 @@ class API {
      * @type {Archive}
      */
     Archive = new Archive();
+
+    /**
+     * Base Authentication API
+     * @type {Authentication}
+     */
+    Authentication = new Authentication();
 
     /**
      * Returns the FullIdentity for an ID
