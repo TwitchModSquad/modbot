@@ -3,8 +3,6 @@ const con = require("../database");
 const {MessageEmbed} = require("discord.js");
 const config = require("../config.json");
 
-const voidError = err => {if (err) console.error(err);}
-
 module.exports = () => {
     con.query("select distinct value, type, archive_id from archive__users where type = 'discord' or type = 'twitch';", async (err, res) => {
         if (err) {
@@ -45,9 +43,9 @@ module.exports = () => {
                     let user = await api.Twitch.getUserById(helixUser.id, true);
     
                     if (helixUser.displayName.toLowerCase() !== user.display_name.toLowerCase()) {
-                        con.query("update twitch__username set last_seen = now() where id = ? and display_name = ?;", [user.id, user.display_name], voidError);
-                        con.query("insert into twitch__username (id, display_name) values (?, ?) on duplicate key update display_name = ?;", [user.id, helixUser.displayName, helixUser.displayName], voidError);
-                        con.query("update twitch__user set display_name = ? where id = ?;", [helixUser.displayName, user.id], voidError);
+                        await con.pquery("update twitch__username set last_seen = now() where id = ? and display_name = ?;", [user.id, user.display_name]);
+                        await con.pquery("insert into twitch__username (id, display_name) values (?, ?) on duplicate key update display_name = ?;", [user.id, helixUser.displayName, helixUser.displayName]);
+                        await con.pquery("update twitch__user set display_name = ? where id = ?;", [helixUser.displayName, user.id]);
 
                         const embed = new MessageEmbed()
                             .setTitle("Twitch Name Change")
@@ -56,12 +54,28 @@ module.exports = () => {
                             .addField("Old Username", "```\n" + user.display_name + "```", true)
                             .addField("New Username", "```\n" + helixUser.displayName + "```", true)
                             .setColor(0x772ce8);
+                        
+                        user = await api.Twitch.getUserById(helixUser.id, true);
 
                         let archiveEntriesString = "";
                         let archiveEntries = res.filter(x => x.value == helixUser.id && x.type === "twitch");
                         
+                        for (let i = 0; i < archiveEntries.length; i++) {
+                            try {
+                                const entry = await api.Archive.getEntryById(archiveEntries[i].archive_id);
+                                const message = await entry.getPublicRecordMessage();
+                                
+                                archiveEntriesString += `\n[${entry.offense}](${message.url})`;
 
-                        user = await api.Twitch.getUserById(helixUser.id, true);
+                                entry.refreshMessages();
+                            } catch (err) {
+                                console.error(err);
+                            }
+                        }
+
+                        if (archiveEntriesString !== "")
+                            embed.addField("Archive Entries", archiveEntriesString);
+
                         nameChangeChannel.send({content: " ", embeds: [embed]});
                     }
                 });
@@ -90,9 +104,9 @@ module.exports = () => {
             let retrievedUser = await global.client.discord.users.fetch(id);
 
             if (user.name.toLowerCase() !== retrievedUser.username.toLowerCase() || user.discriminator !== retrievedUser.discriminator) {
-                con.query("update discord__username set last_seen = now() where id = ? and name = ? and discriminator = ?;", [user.id, user.name, user.discriminator], voidError);
-                con.query("insert into discord__username (id, name, discriminator) values (?, ?, ?) on duplicate key update name = ?, discriminator = ?;", [user.id, retrievedUser.username, retrievedUser.discriminator, retrievedUser.username, retrievedUser.discriminator], voidError);
-                con.query("update discord__user set name = ?, discriminator = ? where id = ?;", [retrievedUser.username, retrievedUser.discriminator, retrievedUser.id], voidError);
+                await con.pquery("update discord__username set last_seen = now() where id = ? and name = ? and discriminator = ?;", [user.id, user.name, user.discriminator]);
+                await con.pquery("insert into discord__username (id, name, discriminator) values (?, ?, ?) on duplicate key update name = ?, discriminator = ?;", [user.id, retrievedUser.username, retrievedUser.discriminator, retrievedUser.username, retrievedUser.discriminator]);
+                await con.pquery("update discord__user set name = ?, discriminator = ? where id = ?;", [retrievedUser.username, retrievedUser.discriminator, retrievedUser.id]);
 
                 const embed = new MessageEmbed()
                     .setTitle("Discord Name Change")
@@ -103,6 +117,26 @@ module.exports = () => {
                     .setColor(0x772ce8);
 
                 user = await api.Discord.getUserById(id, true);
+
+                let archiveEntriesString = "";
+                let archiveEntries = res.filter(x => x.value == retrievedUser.id && x.type === "discord");
+                
+                for (let i = 0; i < archiveEntries.length; i++) {
+                    try {
+                        const entry = await api.Archive.getEntryById(archiveEntries[i].archive_id);
+                        const message = await entry.getPublicRecordMessage();
+                        
+                        archiveEntriesString += `\n[${entry.offense}](${message.url})`;
+
+                        entry.refreshMessages();
+                    } catch (err) {
+                        console.error(err);
+                    }
+                }
+
+                if (archiveEntriesString !== "")
+                    embed.addField("Archive Entries", archiveEntriesString);
+                
                 nameChangeChannel.send({content: " ", embeds: [embed]});
             }
         });
