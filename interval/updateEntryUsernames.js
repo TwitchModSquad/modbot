@@ -150,5 +150,7 @@ module.exports = () => {
                 console.error(err);
             }
         });
+
+        con.query("update archive__users set last_updated = now() where user;");
     });
 };
