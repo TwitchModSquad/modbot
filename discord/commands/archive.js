@@ -495,6 +495,8 @@ const command = {
                 .setTitle("Archive Search Results")
                 .setColor(0x36b55c);
 
+            let embeds = [embed];
+
             if (entries.length > 0) {
                 let entryResults = "";
                 for (let e = 0; e < entries.length; e++) {
@@ -510,7 +512,14 @@ const command = {
                         entryResults += `\n${entry.offense} (No public record found)`;
                     }
                 }
-                embed.addField("Ban Entries", entryResults);
+
+                embeds = [
+                    ...embeds,
+                    new MessageEmbed()
+                        .setTitle("Archive Entries")
+                        .setDescription(entryResults)
+                        .setColor(0xff4d4d),
+                ];
             }
             
             if (twitchResults !== "")
@@ -547,15 +556,16 @@ const command = {
 
             let rows = [];
 
-            const row = new MessageActionRow()
+            const twitchUserRow = new MessageActionRow()
                 .addComponents(twitchUserSelect);
 
             const discordUserRow = new MessageActionRow()
                 .addComponents(discordUserSelect);
 
-            if (twitchUsers.length > 0) 
+            if (twitchUsers.length > 0) rows = [...rows, twitchUserRow];
+            if (discordUsers.length > 0) rows = [...rows, discordUserRow];
 
-            interaction.reply({content: ' ', embeds: [embed], components: [row], ephemeral: interaction.channel.id !== config.channels.archive_name_checker});
+            interaction.reply({content: ' ', embeds: embeds, components: rows, ephemeral: interaction.channel.id !== config.channels.archive_name_checker});
         }
     }
 };

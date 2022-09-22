@@ -424,7 +424,7 @@ class TwitchUser extends User {
      */
     getActiveCommunities() {
         return new Promise((resolve, reject) => {
-            
+            resolve([]); // TODO: ADD SOMETHING
         });
     }
 

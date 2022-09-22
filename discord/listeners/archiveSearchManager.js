@@ -1,30 +1,32 @@
-const {Modal, TextInputComponent, SelectMenuComponent, showModal} = require("discord-modals");
-const Discord = require("discord.js");
-const api = require("../../api/index");
-const config = require("../../config.json");
-const con = require("../../database");
-
-let crossbanable = [];
-api.Twitch.getUserById(config.twitch.id, false, true).then(tmsUser => {
-    tmsUser.refreshStreamers().then(streamers => {
-        streamers.forEach(streamer => {
-            crossbanable = [
-                ...crossbanable,
-                streamer.id
-            ];
-        });
-    }).catch(console.error);
-}).catch(console.error);
+const api = require("../../api/");
 
 const listener = {
-    name: 'crossbanManager',
+    name: 'archiveSearchManager',
     eventName: 'interactionCreate',
     eventType: 'on',
-    storedCrossBanChannels: [],
-    storedCrossBanUser: [],
     async listener (interaction) {
-        if (interaction.isSelectMenu() && interaction.component.customId === "archive-search-twitch") {
-            
+        if (interaction.isSelectMenu()) {
+            if (interaction.component.customId === "archive-search-twitch") {
+                let embeds = [];
+                for (let i = 0; i < interaction.values.length; i++) {
+                    const user = await api.Twitch.getUserById(interaction.values[i]);
+                    embeds = [
+                        ...embeds,
+                        await user.discordEmbed()
+                    ];
+                }
+                interaction.reply({content: ' ', ephemeral: true, embeds: embeds});
+            } else if (interaction.component.customId === "archive-search-discord") {
+                let embeds = [];
+                for (let i = 0; i < interaction.values.length; i++) {
+                    const user = await api.Discord.getUserById(interaction.values[i]);
+                    embeds = [
+                        ...embeds,
+                        await user.discordEmbed()
+                    ];
+                }
+                interaction.reply({content: ' ', ephemeral: true, embeds: embeds});
+            }
         }
     }
 };
