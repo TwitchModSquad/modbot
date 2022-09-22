@@ -1,4 +1,4 @@
-const {MessageEmbed} = require("discord.js");
+const {MessageEmbed, MessageSelectMenu, MessageActionRow} = require("discord.js");
 const {Modal, TextInputComponent, showModal} = require("discord-modals");
 const api = require("../../api/index");
 const con = require("../../database");
@@ -391,7 +391,7 @@ const command = {
 
             let twitchQueries = directTwitchQuery.map(x => x.id);
             let discordQueries = directDiscordQuery.map(x => x.id);
-            let rawQueries = directRawQuery.map(x => x.value);
+            let rawQueries = [];
 
             fuzzyTwitchQuery.forEach(q => {
                 if (!twitchQueries.includes(q.id)) {
@@ -411,19 +411,25 @@ const command = {
                 }
             });
 
-            fuzzyRawQuery.forEach(q => {
+
+            const iterateRaw = q => {
                 if (!rawQueries.includes(q.value)) {
                     rawQueries = [
                         ...rawQueries,
                         q.value
                     ]
                 }
-            });
+            }
 
+            directRawQuery.forEach(iterateRaw);
+            fuzzyRawQuery.forEach(iterateRaw);
+
+            let twitchUsers = [];
             for (let ti = 0; ti < twitchQueries.length; ti++) {
                 const id = twitchQueries[ti];
                 try {
                     const user = await api.Twitch.getUserById(id);
+                    twitchUsers = [...twitchUsers, user];
                     const twitchEntries = await con.pquery("select archive_id from archive__users where type = 'twitch' and user and value = ?;", [id]);
 
                     twitchResults += `\n${user.display_name} [${user.id}]`;
@@ -442,10 +448,12 @@ const command = {
                 }
             }
 
+            let discordUsers = [];
             for (let di = 0; di < discordQueries.length; di++) {
                 const id = discordQueries[di];
                 try {
                     const user = await api.Discord.getUserById(id);
+                    discordUsers = [...discordUsers, user];
                     const discordEntries = await con.pquery("select archive_id from archive__users where type = 'discord' and user and value = ?;", [id]);
 
                     discordResults += `\n${user.name}#${user.discriminator} [${user.id}]`;
@@ -464,35 +472,15 @@ const command = {
                 }
             }
 
-            for (let di = 0; di < discordQueries.length; di++) {
-                const id = discordQueries[di];
-                try {
-                    const user = await api.Discord.getUserById(id);
-                    const discordEntries = await con.pquery("select archive_id from archive__users where type = 'discord' and user and value = ?;", [id]);
-
-                    discordResults += `\n${user.name}#${user.discriminator} [${user.id}]`;
-
-                    for (let ei = 0; ei < discordEntries.length; ei++) {
-                        const archiveId = discordEntries[ei].archive_id;
-                        if (!entries.find(e => e.id === archiveId)) {
-                            entries = [
-                                ...entries,
-                                await api.Archive.getEntryById(archiveId),
-                            ];
-                        }
-                    }
-                } catch (e) {}
-            }
-
             for (let ri = 0; ri < rawQueries.length; ri++) {
                 const id = rawQueries[ri];
                 try {
-                    const discordEntries = await con.pquery("select archive_id from archive__users where value = ?;", [id]);
+                    const rawEntries = await con.pquery("select archive_id from archive__users where value = ?;", [id]);
 
                     rawResults += `\n${id}`;
 
-                    for (let ei = 0; ei < discordEntries.length; ei++) {
-                        const archiveId = discordEntries[ei].archive_id;
+                    for (let ei = 0; ei < rawEntries.length; ei++) {
+                        const archiveId = rawEntries[ei].archive_id;
                         if (!entries.find(e => e.id === archiveId)) {
                             entries = [
                                 ...entries,
@@ -534,11 +522,40 @@ const command = {
             if (rawResults !== "")
                 embed.addField("Raw Results", "```"+rawResults+"```")
 
-            if (twitchResults === "" && discordResults === "" && rawResults === "") {
+            if (twitchResults === "" && discordResults === "" && rawResults === "")
                 embed.setDescription("**Nothing was found on this user!**\nThis means we don't have any record of this user in participating Twitch channels, and there's no ban archive involving them.")
-            }
 
-            interaction.reply({content: ' ', embeds: [embed], ephemeral: interaction.channel.id !== config.channels.archive_name_checker});
+            const twitchUserSelect = new MessageSelectMenu()
+                    .setCustomId("archive-search-twitch")
+                    .setPlaceholder("View Twitch Information")
+                    .setMinValues(1)
+                    .setMaxValues(1);
+
+            const discordUserSelect = new MessageSelectMenu()
+                    .setCustomId("archive-search-discord")
+                    .setPlaceholder("View Discord Information")
+                    .setMinValues(1)
+                    .setMaxValues(1);
+
+            twitchUsers.forEach(user => {
+                twitchUserSelect.addOptions({value: ""+user.id, label: user.display_name});
+            })
+            
+            discordUsers.forEach(user => {
+                discordUserSelect.addOptions({value: ""+user.id, label: user.name});
+            });
+
+            let rows = [];
+
+            const row = new MessageActionRow()
+                .addComponents(twitchUserSelect);
+
+            const discordUserRow = new MessageActionRow()
+                .addComponents(discordUserSelect);
+
+            if (twitchUsers.length > 0) 
+
+            interaction.reply({content: ' ', embeds: [embed], components: [row], ephemeral: interaction.channel.id !== config.channels.archive_name_checker});
         }
     }
 };
