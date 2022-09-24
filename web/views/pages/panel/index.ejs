@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>TMS Panel - Homepage</title>
+
+    <%- include("../../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/panel.css">
+    <link rel="stylesheet" href="/assets/css/sidebar.css">
+</head>
+<body>
+    <%- include("../../partials/panel/header") %>
+
+    <div class="sidebar-container">
+        <%- include("../../partials/panel/sidebar", {page: "home"}) %>
+        <main>
+            <div class="container container-md">
+                <section class="col-6">
+                    <h2><i class="fa-solid fa-user"></i>Profile <span class="badge"><%= twitchAccounts.length + discordAccounts.length %></span></h2>
+    
+                    <div class="max-height-375">
+                        <h3>Twitch Accounts</h3>
+                        <% twitchAccounts.forEach(account => { %>
+                            <div class="twitch-user"><img src="<%= account.profile_image_url %>" /><div class="user-info"><div class="user-name"><%= account.display_name %></div><div class="user-stats"><%= account.id %> <span class="bullet">&bullet;</span> <%= account.follower_count %>&nbsp;follower<%= account.follower_count == 1 ? "" : "s"%> <span class="bullet">&bullet;</span> <%= account.view_count %>&nbsp;view<%= account.view_count == 1 ? "" : "s" %></div></div></div>
+                        <% }) %>
+                        
+                        <h3>Discord Accounts</h3>
+                        <% discordAccounts.forEach(account => { %>
+                            <div class="discord-user"><img src="<%= account.avatar_url %>" /><div class="user-info"><div class="user-name"><%= account.name %><span class="discriminator">#<%= account.discriminator %></span></div><div class="user-stats"><%= account.id %></div></div></div>
+                        <% }) %>
+                    </div>
+                </section>
+                <section class="col-6">
+                    <h2><i class="fa-sharp fa-solid fa-signal-stream"></i>Authorized Streamers <span class="badge"><%= streamers.length %></span></h2>
+
+                    <div class="max-height-375">
+                        <% streamers.forEach(account => { %>
+                            <div class="identity"><img src="<%= account.avatar_url %>" /><div class="user-info"><div class="user-name"><%= account.name %></div><div class="user-stats"><%= account.id %> <span class="bullet">&bullet;</span> <%= account.twitchAccounts.length %>&nbsp;twitch account<%= account.twitchAccounts.length == 1 ? "" : "s"%> <span class="bullet">&bullet;</span> <%= account.discordAccounts.length %>&nbsp;discord account<%= account.discordAccounts.length == 1 ? "" : "s"%></div></div></div>
+                        <% }) %>
+                    </div>
+                </section>
+            </div>
+
+            <%- include("../../partials/footer") %>
+        </main>
+    </div>
+    
+    <%- include("../../partials/js") %>
+
+    <script src="/assets/js/panel.js"> </script>
+</body>
+</html>

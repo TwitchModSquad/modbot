@@ -1,0 +1,48 @@
+.sidebar {
+    width: 16em;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: calc(100vh - 3.3rem);
+    background-color: var(--secondary-background-color);
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+    border-right: 1px solid var(--primary-background-color);
+    transition: 0.4s left;
+}
+
+main {
+    margin-left: 16em;
+    transition: 0.4s margin-left;
+}
+
+.sidebar-collapse .sidebar {
+    left: -16em;
+}
+
+.sidebar-collapse main {
+    margin-left: 0;
+}
+
+.sidebar nav a {
+    padding: 1em;
+    display: block;
+    background-color: rgba(0,0,0,0);
+    color: var(--secondary-text-color);
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.sidebar nav a:hover,
+.sidebar nav a:focus {
+    background-color: rgba(0,0,0,0.05);
+    color: var(--primary-text-color);
+}
+
+.sidebar nav a.active {
+    background-color: rgba(0,0,0,0.1);
+    color: var(--primary-text-color);
+}
+
+.sidebar nav a i {
+    margin-right: 0.8em;
+}

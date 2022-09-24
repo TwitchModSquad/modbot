@@ -6,9 +6,9 @@ const STREAMER_SCOPES = "user:read:email moderator:manage:banned_users moderatio
 
 class TwitchAuthentication {
 
-    TWITCH_URL = `https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=${config.twitch.client_id}&redirect_uri=${encodeURIComponent(config.api_domain + "auth2/twitch")}&scope=${encodeURIComponent(NORMAL_SCOPES)}`;
-    TWITCH_STREAMER_URL = `https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=${config.twitch.client_id}&redirect_uri=${encodeURIComponent(config.api_domain + "auth2/twitch")}&scope=${encodeURIComponent(STREAMER_SCOPES)}`;
-    TWITCH_REDIRECT = config.api_domain + "auth2/twitch";
+    TWITCH_URL = `https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=${config.twitch.client_id}&redirect_uri=${encodeURIComponent(config.api_domain + "auth/twitch")}&scope=${encodeURIComponent(NORMAL_SCOPES)}`;
+    TWITCH_STREAMER_URL = `https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=${config.twitch.client_id}&redirect_uri=${encodeURIComponent(config.api_domain + "auth/twitch")}&scope=${encodeURIComponent(STREAMER_SCOPES)}`;
+    TWITCH_REDIRECT = config.api_domain + "auth/twitch";
     
     /**
      * Given an oauth code from the redirected Twitch request, requests a refresh token and client token from Twitch

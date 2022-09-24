@@ -5,8 +5,8 @@ const SCOPES = "guilds.join identify";
 
 class DiscordAuthentication {
 
-    DISCORD_URL = `https://discord.com/api/oauth2/authorize?client_id=${config.discord_auth.client_id}&redirect_uri=${encodeURIComponent(config.api_domain + "auth2/discord")}&response_type=code&scope=${encodeURIComponent(SCOPES)}`;
-    DISCORD_REDIRECT = config.api_domain + "auth2/discord";
+    DISCORD_URL = `https://discord.com/api/oauth2/authorize?client_id=${config.discord_auth.client_id}&redirect_uri=${encodeURIComponent(config.api_domain + "auth/discord")}&response_type=code&scope=${encodeURIComponent(SCOPES)}`;
+    DISCORD_REDIRECT = config.api_domain + "auth/discord";
 
     async getToken(code) {
         const oauthResult = await fetch('https://discord.com/api/oauth2/token', {

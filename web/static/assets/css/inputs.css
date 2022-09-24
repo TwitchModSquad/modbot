@@ -1,0 +1,10 @@
+select {
+    background-color: var(--secondary-background-color);
+    border: 1px solid var(--tertiary-background-color);
+    color: var(--primary-text-color);
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+    padding: .8em;
+    border-radius: .6em;
+    margin: 1em;
+    margin-bottom: 0;
+}

@@ -1,0 +1,47 @@
+.discord-user, .twitch-user, .identity {
+    border: .1em solid rgba(255,255,255,0.05);
+    background-color: rgba(255,255,255,0.025);
+    border-radius: .75em;
+    padding: .6em .8em;
+    margin: .6em;
+    display: flex;
+    box-shadow: var(--shadow);
+}
+
+.discord-user img, .twitch-user img, .identity img {
+    border: .2em solid red;
+    width: 3em;
+    height: 3em;
+    border-radius: 1.9em;
+    margin-right: .75em;
+}
+
+.discord-user img {
+    border-color: var(--secondary-discord-color);
+}
+
+.twitch-user img {
+    border-color: var(--secondary-twitch-color);
+}
+
+.identity img {
+    border-color: var(--secondary-tms-color);
+}
+
+.user-info .user-name {
+    font-size: 1.2rem;
+    font-weight: 300;
+}
+
+.user-info .user-name .discriminator {
+    color: var(--secondary-text-color);
+}
+
+.user-info .user-stats {
+    font-size: .8rem;
+    color: var(--secondary-text-color);
+}
+
+.user-info .user-stats .bullet {
+    color: var(--tertiary-text-color);
+}

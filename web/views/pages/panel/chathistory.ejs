@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>TMS Panel - Chat History</title>
+
+    <%- include("../../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/panel.css">
+    <link rel="stylesheet" href="/assets/css/sidebar.css">
+    <link rel="stylesheet" href="/assets/css/inputs.css">
+</head>
+<body>
+    <%- include("../../partials/panel/header") %>
+
+    <div class="sidebar-container">
+        <%- include("../../partials/panel/sidebar", {page: "chat-history"}) %>
+        <main>
+            <form action="GET" class="container container-sm">
+                <select name="streamer" id="streamer" class="col-6">
+                    <option value="xxx" disabled="disabled" selected="selected">Select a Streamer</option>
+                    <option value="all">All streamers</option>
+                    <% streamers.forEach(streamer => { %>
+                        <option value="<%= streamer.streamer_id %>"><%= streamer.display_name %> (<%= streamer.chat_count %>)</option>
+                    <% }) %>
+                </select>
+                <select name="user" id="user" class="col-6">
+                    <option value="xxx" disabled="disabled" selected="selected">Select a User</option>
+                    <option value="all">All users</option>
+                    <% chatters.forEach(chatter => { %>
+                        <option value="<%= chatter.chatter_id %>"><%= chatter.display_name %> (<%= chatter.chat_count %>)</option>
+                    <% }) %>
+                </select>
+            </form>
+            <section>
+                <h2><i class="fa-solid fa-comments"></i>Chat History</h2>
+            </section>
+        </main>
+    </div>
+    
+    <%- include("../../partials/js") %>
+
+    <script src="/assets/js/panel.js"> </script>
+</body>
+</html>
