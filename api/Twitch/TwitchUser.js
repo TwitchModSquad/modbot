@@ -180,7 +180,7 @@ class TwitchUser extends User {
                             if (data.hasOwnProperty("channels") && data.channels.length > 0) {
 
                                 if (thisUser.identity === null) {
-                                    let identity = new FullIdentity(null, thisUser.display_name, false, [thisUser], []);
+                                    let identity = new FullIdentity(null, thisUser.display_name, false, false, false, [thisUser], []);
                                     await identity.post();
                                 }
 
@@ -194,7 +194,7 @@ class TwitchUser extends User {
 
                                         let identity;
                                         if (!user.identity?.id) {
-                                            identity = new FullIdentity(null, user.display_name, false, [user], []);
+                                            identity = new FullIdentity(null, user.display_name, false, false, false, [user], []);
                                         } else {
                                             identity = await global.api.getFullIdentity(user.identity.id);
                                         }
@@ -283,7 +283,7 @@ class TwitchUser extends User {
             }
 
             if (this.identity === null) {
-                let identity = new FullIdentity(null, this.display_name, false, [this], []);
+                let identity = new FullIdentity(null, this.display_name, false, false, false, [this], []);
                 await identity.post();
             }
 
@@ -297,7 +297,7 @@ class TwitchUser extends User {
 
                     for (let y = 0; y < users.length; y++) {
                         if (users[y].identity === null) {
-                            let identity = new FullIdentity(null, users[y].display_name, false, [users[y]], []);
+                            let identity = new FullIdentity(null, users[y].display_name, false, false, false, [users[y]], []);
                             await identity.post();
                         }
 

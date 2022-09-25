@@ -77,7 +77,7 @@ class Twitch {
      */
     getUserById(id, bypassCache = false, requestIfUnavailable = false) {
         return this.userCache.get(id, (resolve, reject) => {
-            con.query("select twitch__user.*, identity.name as identity_name, identity.authenticated from twitch__user left join identity on twitch__user.identity_id = identity.id where twitch__user.id = ?;", [id], (err, res) => {
+            con.query("select twitch__user.*, identity.name as identity_name, identity.authenticated, identity.admin, identity.mod from twitch__user left join identity on twitch__user.identity_id = identity.id where twitch__user.id = ?;", [id], (err, res) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -85,7 +85,7 @@ class Twitch {
                         let row = res[0];
                         resolve(new TwitchUser(
                             row.id,
-                            row.identity_id === null ? null : new Identity(row.identity_id, row.identity_name, row.authenticated),
+                            row.identity_id === null ? null : new Identity(row.identity_id, row.identity_name, row.authenticated, row.admin, row.mod),
                             row.display_name,
                             row.email,
                             row.profile_image_url,

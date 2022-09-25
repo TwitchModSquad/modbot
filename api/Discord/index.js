@@ -52,7 +52,7 @@ class Discord {
      */
     getUserById(id, overrideCache = false, requestIfUnavailable = false) {
         return this.userCache.get(id, (resolve, reject) => {
-            con.query("select discord__user.*, identity.name as identity_name, identity.authenticated from discord__user left join identity on discord__user.identity_id = identity.id where discord__user.id = ?;", [id], (err, res) => {
+            con.query("select discord__user.*, identity.name as identity_name, identity.authenticated, identity.admin, identity.mod from discord__user left join identity on discord__user.identity_id = identity.id where discord__user.id = ?;", [id], (err, res) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -60,7 +60,7 @@ class Discord {
                         let row = res[0];
                         resolve(new DiscordUser(
                             row.id,
-                            row.identity_id === null ? null : new Identity(row.identity_id, row.identity_name, row.authenticated),
+                            row.identity_id === null ? null : new Identity(row.identity_id, row.identity_name, row.authenticated, row.admin, row.mod),
                             row.name,
                             row.discriminator,
                             row.avatar

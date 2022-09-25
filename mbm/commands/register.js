@@ -62,7 +62,7 @@ const command = {
                     if (identity?.id) {
                         identity = await global.api.getFullIdentity(identity.id);
                     } else {
-                        identity = new FullIdentity(null, representsTwitch.display_name, false, [representsTwitch], [representsDiscord])
+                        identity = new FullIdentity(null, representsTwitch.display_name, false, false, false, [representsTwitch], [representsDiscord])
                         identity = await identity.post();
                     }
 
