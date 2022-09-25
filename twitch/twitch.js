@@ -407,11 +407,13 @@ const handle = {
             let streamer = (await api.Twitch.getUserByName(channel.replace("#", ""), true))[0];
             let user = (await api.Twitch.getUserByName(tags.username, true))[0];
     
-            con.query("insert into twitch__chat (id, streamer_id, user_id, message, color, timesent) values (?, ?, ?, ?, ?, ?);", [
+            con.query("insert into twitch__chat (id, streamer_id, user_id, message, emotes, badges, color, timesent) values (?, ?, ?, ?, ?, ?, ?, ?);", [
                 tags.id,
                 streamer.id,
                 user.id,
                 message,
+                tags["emotes-raw"],
+                tags["badges-raw"],
                 tags["color"],
                 tags["tmi-sent-ts"],
             ], err => {
