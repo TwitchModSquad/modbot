@@ -22,7 +22,7 @@ module.exports = () => {
         for (let i = 0; i < res.length; i++) {
             let row = res[i];
             try {
-                await con.pquery("insert into twitch__chat_chatters (chatter_id, streamer_id, chat_count, last_active) values (?, ?, ?, ?) on duplicate key update chat_count = ?, last_active = ?;", [row.streamer_id, row.chat_count, row.chat_count]);
+                await con.pquery("insert into twitch__chat_chatters (chatter_id, streamer_id, chat_count, last_active) values (?, ?, ?, ?) on duplicate key update chat_count = ?, last_active = ?;", [row.chatter_id, row.streamer_id, row.chat_count, row.last_active, row.chat_count, row.last_active]);
             } catch(err) {
                 global.api.Logger.warning(err);
             }
