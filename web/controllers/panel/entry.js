@@ -7,7 +7,8 @@ router.get("/:id", async (req, res) => {
     try {
         let entry = await api.Archive.getEntryById(req.params.id);
         for (let i = 0; i < entry.users.length; i++) {
-            entry.users[i].resolvedUser = await entry.users[i].resolveUser();
+            if (entry.users[i].user)
+                entry.users[i].resolvedUser = await entry.users[i].resolveUser();
         }
         res.render("pages/panel/entry", {session: req.session, entry: entry});
     } catch (err) {
