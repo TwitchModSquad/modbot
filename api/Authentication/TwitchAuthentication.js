@@ -1,6 +1,8 @@
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 const config = require("../../config.json");
 
+const con = require("../../database");
+
 const NORMAL_SCOPES = "user:read:email moderator:manage:banned_users";
 const STREAMER_SCOPES = "user:read:email moderator:manage:banned_users moderation:read";
 const ADD_MODERATOR_SCOPES = "user:read:email channel:manage:moderators";
@@ -106,6 +108,13 @@ class TwitchAuthentication {
                     resolve(oauthData.access_token);
                 } else {
                     global.api.Logger.severe(oauthData);
+
+                    if (oauthData?.message === "Invalid refresh token") {
+                        con.query("update twitch__user set refresh_token = null, scopes = null where refresh_token = ?;", [refresh_token], err => {
+                            if (err) global.api.Logger.warning(err);
+                        });
+                    }
+
                     reject("Unable to request access token, reason: " + oauthData?.message);
                 }
             }, reject);
