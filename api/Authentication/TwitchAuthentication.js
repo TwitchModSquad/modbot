@@ -89,7 +89,7 @@ class TwitchAuthentication {
     /**
      * Utilizes a refresh token to obtain an access token for a user.
      * @param {string} refresh_token 
-     * @returns 
+     * @returns {Promise<string>}
      */
     getAccessToken(refresh_token) {
         return new Promise(async (resolve, reject) => {
