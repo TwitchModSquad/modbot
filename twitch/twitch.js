@@ -28,6 +28,8 @@ let timeoutList = [];
 
 let bannedPerMinute = {};
 
+let refreshTokens = {};
+
 // Refresh the bans per minute stat for each watched channel every second
 setInterval(() => {
     for (const [streamer, timestampList] of Object.entries(bannedPerMinute)) {
@@ -35,6 +37,22 @@ setInterval(() => {
         bannedPerMinute[streamer] = timestampList.filter(ts => now - ts < 60000);
     }
 }, 1000);
+
+function resetRefreshTokens() {
+    let newTable = {};
+
+    con.query("select id, refresh_token from twitch__user where scopes like '%moderation:read%';", (err, res) => {
+        if (!err) {
+            res.forEach(row => {
+                newTable[row.id] = row.refresh_token;
+            });
+            refreshTokens = newTable;
+        } else api.Logger.warning(err);
+    });
+}
+
+setInterval(resetRefreshTokens, 60000);
+resetRefreshTokens();
 
 // Load a list of bans from the database
 con.query("select * from twitch__ban where active = true;", (err, res) => {
@@ -200,12 +218,16 @@ const addBan = async (channel, userid, username, reason, timebanned) => {
      and continue without printing a rate limit message.
     */
     if (bannedPerMinute[channel].length <= 30) {
-        con.query("insert into twitch__ban (timebanned, streamer_id, user_id) values (?, ?, ?);", [
-            timebanned,
-            streamer_id,
-            userid
-        ]);
-
+        try {
+            await con.pquery("insert into twitch__ban (timebanned, streamer_id, user_id) values (?, ?, ?);", [
+                timebanned,
+                streamer_id,
+                userid
+            ]);
+        } catch (err) {
+            api.Logger.warning(err);
+        }
+    
         bannedList = [
             ...bannedList,
             {
@@ -239,6 +261,47 @@ const addBan = async (channel, userid, username, reason, timebanned) => {
                             .setColor(0xe83b3b)
                             .setFooter({text: "Bans per Minute: " + bannedPerMinute[channel].length});
 
+                    // Utilize the streamer refresh token to get the ban reason and moderator name
+                    if (refreshTokens.hasOwnProperty(streamer_id)) {
+                        try {
+                            let accessToken = await api.Authentication.Twitch.getAccessToken(refreshTokens[streamer_id]);
+                            let bans = await api.Twitch.TwitchAPI.getBans(streamer_id, userid, accessToken);
+
+                            let ban = null;
+                            let banDiff = 2500;
+
+                            bans.forEach(cban => {
+                                let timeDiff = Math.abs(timebanned - (new Date(cban.created_at)).getTime());
+                                if (banDiff > timeDiff) {
+                                    ban = cban;
+                                    banDiff = timeDiff;
+                                }
+                            });
+                            
+                            if (ban) {
+                                let moderator = await api.Twitch.getUserById(ban.moderator_id);
+
+                                let reason = "No reason provided";
+
+                                if (ban.reason && ban.reason.length > 0)
+                                    reason = ban.reason;
+
+                                embed.addField("Moderator", `\`\`\`${moderator.display_name}\`\`\``, true);
+                                embed.addField("Reason", `\`\`\`${reason}\`\`\``, true)
+                                
+                                con.query("update twitch__ban set moderator_id = ?, reason = ? where timebanned = ? and streamer_id = ? and user_id = ?;", [
+                                    moderator.id,
+                                    ban.reason,
+                                    timebanned,
+                                    streamer_id,
+                                    userid
+                                ]);
+                            }
+                        } catch (err) {
+                            api.Logger.warning(err);
+                        }
+                    }
+                    
                     // If the query returns results, parse the results and add them to the embed.
                     if (typeof(res) === "object") {
                         let logs = "";
