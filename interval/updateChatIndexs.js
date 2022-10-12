@@ -9,6 +9,8 @@ module.exports = () => {
                 if (err) global.api.Logger.warning(err);
             });
         });
+
+        global.api.Logger.info("Completed twitch__chat_streamers index");
     });
 
     con.query("select user_id, streamer_id, count(streamer_id) as chat_count, max(timesent) as last_active from twitch__chat group by streamer_id, user_id;", (err, res) => {
@@ -19,5 +21,7 @@ module.exports = () => {
                 if (err) global.api.Logger.warning(err);
             });
         });
+
+        global.api.Logger.info("Completed twitch__chat_chatters index");
     });
 };
