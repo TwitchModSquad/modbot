@@ -26,14 +26,14 @@ const SECONDS_TO_MILLISECONDS = 1000;
 const MINUTES_TO_MILLISECONDS = 60 * SECONDS_TO_MILLISECONDS;
 const   HOURS_TO_MILLISECONDS = 60 * MINUTES_TO_MILLISECONDS;
 
-updateChatIndexes();
+// updateChatIndexes();
 updateUsers();
 updateTwitchUsernames();
 updateDiscordUsernames();
 setTimeout(updateEntryUsernames, 5000);
 
-setInterval(updateChatIndexes, 1 * HOURS_TO_MILLISECONDS); // 15 minutes
-setInterval(updateUsers, 10 * SECONDS_TO_MILLISECONDS); // 10 seconds
+// setInterval(updateChatIndexes, 1 * HOURS_TO_MILLISECONDS);
+setInterval(updateUsers, 10 * SECONDS_TO_MILLISECONDS);
 setInterval(updateTwitchUsernames, 1 * MINUTES_TO_MILLISECONDS);
 setInterval(updateDiscordUsernames, 1 * MINUTES_TO_MILLISECONDS);
 setInterval(updateLiveChannels, 15 * SECONDS_TO_MILLISECONDS);
