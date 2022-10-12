@@ -1,0 +1,26 @@
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: .6em;
+    text-align: center;
+}
+
+th {
+    padding: .8em .6em;
+    font-weight: 700;
+}
+
+tr {
+    border-bottom: rgba(255,255,255,0.1) solid 1px;
+}
+
+thead tr {
+    border-bottom-width: 3px;
+}
+
+tbody tr:last-child {
+    border: none;
+}

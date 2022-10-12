@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>TMS Panel - Streamer Functions</title>
+
+    <%- include("../../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/panel.css">
+    <link rel="stylesheet" href="/assets/css/sidebar.css">
+    <link rel="stylesheet" href="/assets/css/button.css">
+</head>
+<body>
+    <%- include("../../partials/panel/header") %>
+
+    <div class="sidebar-container">
+        <%- include("../../partials/panel/sidebar", {page: "streamer-functions", session: session}) %>
+        <main>
+            <div class="container container-md">
+                <section class="col-6">
+                    <h2><i class="fa-solid fa-starfighter-twin-ion-engine-advanced"></i>Authorize Advanced Streamer Functions</h2>
+
+                    <p>Utilizing this feature will add the <code>moderation:read</code> scope to your refresh token, allowing TMS to retrieve more specific ban information, such as ban reasons and the moderator who executed the ban.</p>
+                    
+                    <p>View more information on what we can access utilizing this scope <a href="https://dev.twitch.tv/docs/authentication/scopes#twitch-api-scopes" target="__blank">here</a>.</p>
+
+                    <p>This scope can be removed at any time by managing your Twitch connections <a href="https://www.twitch.tv/settings/connections" target="__blank">here</a> and removing the <code>TMS Login</code> connection.</p>
+
+                    <a href="/api/auth/redirect/twitch-streamer"><button><i class="fa-solid fa-gears"></i>&nbsp;Authorize</button></a>
+                </section>
+                <section class="col-6">
+                    <h2><i class="fa-solid fa-user-plus"></i> Add <code>TwitchModSquad</code> as a Moderator</h2>
+
+                    <p>Currently, the only functionality this will provide is a backup means for banning users via Crossban buttons on Discord, if the linked moderator is not linked to TMS appropriately.</p>
+
+                    <p>Have ideas utilizing automatic bans, timeouts, or other chat management tools which could be implemented? Feel free to talk about them <a href="https://discord.com/channels/799728290147336222/933739729621504110" target="__blank">here</a>.</p>
+
+                    <a href="/api/auth/redirect/add-tms-mod"><button><i class="fa-solid fa-user-plus"></i>&nbsp;Add as Moderator</button></a>
+                </section>
+            </div>
+
+            <%- include("../../partials/footer") %>
+        </main>
+    </div>
+    
+    <%- include("../../partials/js") %>
+
+    <script src="/assets/js/panel.js"> </script>
+    <script src="/assets/js/entry.js"> </script>
+</body>
+</html>

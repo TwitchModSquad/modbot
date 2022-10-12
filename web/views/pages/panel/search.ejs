@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>TMS Panel - Homepage</title>
+
+    <%- include("../../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/panel.css">
+    <link rel="stylesheet" href="/assets/css/sidebar.css">
+    <link rel="stylesheet" href="/assets/css/inputs.css">
+</head>
+<body>
+    <%- include("../../partials/panel/header") %>
+
+    <div class="sidebar-container">
+        <%- include("../../partials/panel/sidebar", {page: "search", session: session}) %>
+        <main>
+            <form id="search-form" method="GET">
+                <div class="search-box">
+                    <input type="search" name="search" id="user-search" placeholder="Type to search through TMS user databases">
+                    <div class="search-box-results"><div class="none">Type at least 2 characters to get search results</div></div>
+                </div>
+            </form>
+
+            <%- include("../../partials/footer") %>
+        </main>
+    </div>
+    
+    <%- include("../../partials/js") %>
+
+    <script src="/assets/js/panel.js"> </script>
+    <script src="/assets/js/search.js"> </script>
+</body>
+</html>

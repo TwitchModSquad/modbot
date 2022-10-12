@@ -102,21 +102,21 @@ const listener = {
                                             try {
                                                 modal.deleteReply();
                                             } catch (err) {
-                                                console.error(err);
+                                                global.api.Logger.warning(err);
                                             }
                                         }, 20000);
                                     });
                                 }, err => {
-                                    console.error(err);
+                                    global.api.Logger.warning(err);
                                     thread.delete("Failed to send starting message.");
                                 });
                             }, err => {
-                                console.error(err);
+                                global.api.Logger.warning(err);
                                 thread.delete("Failed to add member to thread.");
                                 modal.reply("Failed to add member to thread.");
                             });
                         }, err => {
-                            console.error(err);
+                            global.api.Logger.warning(err);
                             modal.reply("Unable to create a thread in this channel.");
                         });
                     } else {

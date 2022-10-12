@@ -11,7 +11,7 @@ const listener = {
                 api.Discord.getUserById(interaction.member.id).then(user => {
                     if (user.identity?.id) {
                         con.query("select archive_id from archive__messages where id = ?;", [interaction.message.id], (err, res) => {
-                            if (err) {console.error(err);return;}
+                            if (err) {global.api.Logger.warning(err);return;}
         
                             if (res.length > 0) {
                                 api.Archive.getEntryById(res[0].archive_id).then(entry => {
@@ -24,7 +24,7 @@ const listener = {
 
                                         entry.move(channel, identity);
                                     }, err => {
-                                        console.error(err);
+                                        global.api.Logger.warning(err);
                                         interaction.reply("Could not resolve new channel");
                                     });
                                 }, err => {

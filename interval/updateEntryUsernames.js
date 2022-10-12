@@ -6,14 +6,14 @@ const config = require("../config.json");
 module.exports = () => {
     con.query("select distinct value, type, archive_id from archive__users where (type = 'discord' or type = 'twitch') and user and date_add(last_updated, interval 2 day) < now();", async (err, res) => {
         if (err) {
-            console.error(err);
+            global.api.Logger.warning(err);
             return;
         }
 
         const nameChangeChannel = await global.client.discord.channels.fetch(config.channels.archive_name_changes);
 
         if (!nameChangeChannel) {
-            console.error("could not find name change channel");
+            global.api.Logger.warning("could not find name change channel");
             return;
         }
 
@@ -70,7 +70,7 @@ module.exports = () => {
 
                                     entry.refreshMessages();
                                 } catch (err) {
-                                    console.error(err);
+                                    global.api.Logger.warning(err);
                                 }
                             }
 
@@ -80,12 +80,12 @@ module.exports = () => {
                             nameChangeChannel.send({content: " ", embeds: [embed]});
                         }
                     } catch (err) {
-                        console.error(helixUser?.id);
-                        console.error(err);
+                        global.api.Logger.warning(helixUser?.id);
+                        global.api.Logger.warning(err);
                     }
                 });
             } catch (err) {
-                console.error(err);
+                global.api.Logger.warning(err);
                 return;
             }
         };
@@ -136,7 +136,7 @@ module.exports = () => {
 
                             entry.refreshMessages();
                         } catch (err) {
-                            console.error(err);
+                            global.api.Logger.warning(err);
                         }
                     }
 
@@ -146,8 +146,8 @@ module.exports = () => {
                     nameChangeChannel.send({content: " ", embeds: [embed]});
                 }
             } catch (err) {
-                console.error(id);
-                console.error(err);
+                global.api.Logger.warning(id);
+                global.api.Logger.warning(err);
             }
         });
 

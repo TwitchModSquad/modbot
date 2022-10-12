@@ -33,7 +33,7 @@ const command = {
                     }
                 } catch (e) {}
             }, timeout);
-        }, console.error);
+        }, global.api.Logger.warning);
     },
     data: {
         name: 'archive'
@@ -444,7 +444,7 @@ const command = {
                         }
                     }
                 } catch (e) {
-                    console.error(e);
+                    global.api.Logger.warning(e);
                 }
             }
 
@@ -468,7 +468,7 @@ const command = {
                         }
                     }
                 } catch (e) {
-                    console.error(e);
+                    global.api.Logger.warning(e);
                 }
             }
 

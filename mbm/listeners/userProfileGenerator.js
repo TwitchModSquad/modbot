@@ -40,7 +40,7 @@ const process = async (message, regex, type) => {
                     ...obj,
                 ];
             } catch (err) {
-                console.error(err);
+                global.api.Logger.warning(err);
                 errorEmbeds = [
                     ...embeds,
                     notFoundEmbed(match[i])

@@ -113,7 +113,7 @@ class TwitchChat {
 
                             if (!userTable[Number(chatLog.user_id)]) userTable[Number(chatLog.user_id)] = await global.api.Twitch.getUserById(chatLog.user_id);
                         } catch (err) {
-                            console.error(err);
+                            global.api.Logger.warning(err);
                             return;
                         }
                     }

@@ -28,6 +28,8 @@ let timeoutList = [];
 
 let bannedPerMinute = {};
 
+let refreshTokens = {};
+
 // Refresh the bans per minute stat for each watched channel every second
 setInterval(() => {
     for (const [streamer, timestampList] of Object.entries(bannedPerMinute)) {
@@ -36,10 +38,26 @@ setInterval(() => {
     }
 }, 1000);
 
+function resetRefreshTokens() {
+    let newTable = {};
+
+    con.query("select id, refresh_token from twitch__user where scopes like '%moderation:read%';", (err, res) => {
+        if (!err) {
+            res.forEach(row => {
+                newTable[row.id] = row.refresh_token;
+            });
+            refreshTokens = newTable;
+        } else api.Logger.warning(err);
+    });
+}
+
+setInterval(resetRefreshTokens, 60000);
+resetRefreshTokens();
+
 // Load a list of bans from the database
 con.query("select * from twitch__ban where active = true;", (err, res) => {
     if (err) {
-        console.error(err);
+        global.api.Logger.warning(err);
         return;
     }
 
@@ -53,13 +71,13 @@ con.query("select * from twitch__ban where active = true;", (err, res) => {
         ]
     });
 
-    console.log("Loaded " + bannedList.length + " bans");
+    global.api.Logger.info("Loaded " + bannedList.length + " bans");
 });
 
 // Load a list of timeouts from the database
 con.query("select * from twitch__timeout where active = true;", (err, res) => {
     if (err) {
-        console.error(err);
+        global.api.Logger.warning(err);
         return;
     }
 
@@ -73,7 +91,7 @@ con.query("select * from twitch__timeout where active = true;", (err, res) => {
         ]
     });
 
-    console.log("Loaded " + timeoutList.length + " t/o's");
+    global.api.Logger.info("Loaded " + timeoutList.length + " t/o's");
 });
 
 /**
@@ -168,7 +186,7 @@ const addBan = async (channel, userid, username, reason, timebanned) => {
      also send an alert to the mod squad Discord if it can find the liveban text channel.
     */
     if (bannedPerMinute[channel].length > 60) {
-        console.log("More than 60 bans per minute in " + channel + ". Parting for 15 minutes.");
+        global.api.Logger.info("More than 60 bans per minute in " + channel + ". Parting for 15 minutes.");
 
         if (bannedPerMinute[channel].length === 61 && config.hasOwnProperty("liveban_channel")) {
             let dchnl = modSquadGuild.channels.cache.find(dchnl => dchnl.id == config.liveban_channel);
@@ -200,12 +218,16 @@ const addBan = async (channel, userid, username, reason, timebanned) => {
      and continue without printing a rate limit message.
     */
     if (bannedPerMinute[channel].length <= 30) {
-        con.query("insert into twitch__ban (timebanned, streamer_id, user_id) values (?, ?, ?);", [
-            timebanned,
-            streamer_id,
-            userid
-        ]);
-
+        try {
+            await con.pquery("insert into twitch__ban (timebanned, streamer_id, user_id) values (?, ?, ?);", [
+                timebanned,
+                streamer_id,
+                userid
+            ]);
+        } catch (err) {
+            api.Logger.warning(err);
+        }
+    
         bannedList = [
             ...bannedList,
             {
@@ -214,7 +236,7 @@ const addBan = async (channel, userid, username, reason, timebanned) => {
             }
         ]
     } else {
-        console.log(`Not logging ban in ${channel} due to exceeding BPM threshold (${bannedPerMinute[channel].length}>30)`);
+        global.api.Logger.info(`Not logging ban in ${channel} due to exceeding BPM threshold (${bannedPerMinute[channel].length}>30)`);
     }
 
     /* 
@@ -239,6 +261,47 @@ const addBan = async (channel, userid, username, reason, timebanned) => {
                             .setColor(0xe83b3b)
                             .setFooter({text: "Bans per Minute: " + bannedPerMinute[channel].length});
 
+                    // Utilize the streamer refresh token to get the ban reason and moderator name
+                    if (refreshTokens.hasOwnProperty(streamer_id)) {
+                        try {
+                            let accessToken = await api.Authentication.Twitch.getAccessToken(refreshTokens[streamer_id]);
+                            let bans = await api.Twitch.TwitchAPI.getBans(streamer_id, userid, accessToken);
+
+                            let ban = null;
+                            let banDiff = 2500;
+
+                            bans.forEach(cban => {
+                                let timeDiff = Math.abs(timebanned - (new Date(cban.created_at)).getTime());
+                                if (banDiff > timeDiff) {
+                                    ban = cban;
+                                    banDiff = timeDiff;
+                                }
+                            });
+                            
+                            if (ban) {
+                                let moderator = await api.Twitch.getUserById(ban.moderator_id);
+
+                                let reason = "No reason provided";
+
+                                if (ban.reason && ban.reason.length > 0)
+                                    reason = ban.reason;
+
+                                embed.addField("Moderator", `\`\`\`${moderator.display_name}\`\`\``, true);
+                                embed.addField("Reason", `\`\`\`${reason}\`\`\``, true)
+                                
+                                con.query("update twitch__ban set moderator_id = ?, reason = ? where timebanned = ? and streamer_id = ? and user_id = ?;", [
+                                    moderator.id,
+                                    ban.reason,
+                                    timebanned,
+                                    streamer_id,
+                                    userid
+                                ]);
+                            }
+                        } catch (err) {
+                            api.Logger.warning(err);
+                        }
+                    }
+                    
                     // If the query returns results, parse the results and add them to the embed.
                     if (typeof(res) === "object") {
                         let logs = "";
@@ -279,7 +342,7 @@ const addBan = async (channel, userid, username, reason, timebanned) => {
                             ];
                         });
                     } catch (err) {
-                        console.error(err);
+                        global.api.Logger.warning(err);
                     }
 
                     let longestChannelName = 7;
@@ -329,12 +392,12 @@ const addBan = async (channel, userid, username, reason, timebanned) => {
                             streamer_id,
                             userid
                         ]);
-                    }).catch(console.error);
+                    }).catch(global.api.Logger.warning);
                 });
             }
         }
     } else {
-        console.log(`Not notifying of ban in ${channel} due to exceeding BPM threshold (${bannedPerMinute[channel]}>5)`);
+        global.api.Logger.info(`Not notifying of ban in ${channel} due to exceeding BPM threshold (${bannedPerMinute[channel]}>5)`);
     }
 }
 
@@ -407,19 +470,21 @@ const handle = {
             let streamer = (await api.Twitch.getUserByName(channel.replace("#", ""), true))[0];
             let user = (await api.Twitch.getUserByName(tags.username, true))[0];
     
-            con.query("insert into twitch__chat (id, streamer_id, user_id, message, color, timesent) values (?, ?, ?, ?, ?, ?);", [
+            con.query("insert into twitch__chat (id, streamer_id, user_id, message, emotes, badges, color, timesent) values (?, ?, ?, ?, ?, ?, ?, ?);", [
                 tags.id,
                 streamer.id,
                 user.id,
                 message,
+                tags["emotes-raw"],
+                tags["badges-raw"],
                 tags["color"],
                 tags["tmi-sent-ts"],
             ], err => {
-                if (err) console.error(err);
+                if (err) global.api.Logger.warning(err);
             });
     
             if (await isBanned(channel, tags["user-id"])) {
-                console.log("Changing ban active state of " + tags["display-name"]);
+                global.api.Logger.info("Changing ban active state of " + tags["display-name"]);
     
                 con.query("update twitch__ban set active = false where streamer_id = ? and user_id = ?;", [
                     streamer.id,
@@ -430,7 +495,7 @@ const handle = {
             }
     
             if (await isTimedOut(channel, tags["user-id"])) {
-                console.log("Changing timeout active state of " + tags["display-name"]);
+                global.api.Logger.info("Changing timeout active state of " + tags["display-name"]);
     
                 con.query("update twitch__timeout set active = false where streamer_id = ? and user_id = ?;", [
                     streamer.id,
@@ -440,7 +505,7 @@ const handle = {
                 timeoutList = timeoutList.filter(torow => torow.streamer_id !== streamer.id && torow.user_id !== tags["user-id"]);
             }
         } catch (e) {
-            console.error(e);
+            global.api.Logger.warning(e);
         }
     },
     messageDeleted: (channel, username, deletedMessage, userstate) => {
@@ -457,7 +522,7 @@ const handle = {
 };
 
 con.query("select streamer_id, user_id from twitch__ban where active = true;", (err, res) => {
-    if (err) {console.error(err);return;}
+    if (err) {global.api.Logger.warning(err);return;}
 
     res.forEach(ban => {
         bannedList = [
@@ -471,7 +536,7 @@ con.query("select streamer_id, user_id from twitch__ban where active = true;", (
 });
 
 con.query("select streamer_id, user_id from twitch__timeout where active = true;", (err, res) => {
-    if (err) {console.error(err);return;}
+    if (err) {global.api.Logger.warning(err);return;}
 
     res.forEach(timeout => {
         timeoutList = [
@@ -534,10 +599,10 @@ const initializeClient = () => {
                     return;
                 }
 
-                console.error(`Error connecting to ${name}: ${err} - Will retry once.`);
+                global.api.Logger.warning(`Error connecting to ${name}: ${err} - Will retry once.`);
                 setTimeout(() => {
                     client.join(name).catch(err => {
-                        console.error(`Error connecting to ${name}: ${err} - Will not retry.`);
+                        global.api.Logger.warning(`Error connecting to ${name}: ${err} - Will not retry.`);
                     });
                 }, 200);
             });
@@ -569,7 +634,7 @@ const initializeClient = () => {
     ];
 
     const connectClient = () => {
-        console.log("Initializing client...");
+        global.api.Logger.info("Initializing client...");
         client.connect();
     }
 
@@ -583,7 +648,7 @@ const initializeClient = () => {
 
     const interval = setInterval(() => {
         if (client.readyState() === "OPEN") {
-            console.log("Client opened. Connecting clients.");
+            global.api.Logger.info("Client opened. Connecting clients.");
             clearInterval(interval);
 
             clientObj.addChannel = name => {
@@ -664,7 +729,7 @@ const partFromChannel = channel => {
     channel = channel.replace('#', "");
     for (let client of channels) {
         if (client.channels.includes(channel)) {
-            console.log("Parting channel " + channel);
+            global.api.Logger.info("Parting channel " + channel);
             client.client.part(channel);
             client.channels.splice(client.channels.indexOf(channel), 1);
         }
@@ -677,13 +742,13 @@ discordClient.guilds.fetch(config.modsquad_discord).then(guild => {
 });
 
 con.query("select distinct lower(twitch__user.display_name) as name from identity__moderator join identity on modfor_id = identity.id join twitch__user on twitch__user.identity_id = identity.id where identity__moderator.active = true;", (err, res) => {
-    if (err) {console.error(err);return;}
+    if (err) {global.api.Logger.warning(err);return;}
 
     res.forEach(streamer => {
         listenOnChannel(streamer.name);
     });
 
-    console.log("Startup completed!");
+    global.api.Logger.info("Startup completed!");
 });
 
 // Create a singular client object to execute bans

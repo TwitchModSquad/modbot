@@ -180,7 +180,7 @@ class TwitchUser extends User {
                             if (data.hasOwnProperty("channels") && data.channels.length > 0) {
 
                                 if (thisUser.identity === null) {
-                                    let identity = new FullIdentity(null, thisUser.display_name, false, [thisUser], []);
+                                    let identity = new FullIdentity(null, thisUser.display_name, false, false, false, [thisUser], []);
                                     await identity.post();
                                 }
 
@@ -194,7 +194,7 @@ class TwitchUser extends User {
 
                                         let identity;
                                         if (!user.identity?.id) {
-                                            identity = new FullIdentity(null, user.display_name, false, [user], []);
+                                            identity = new FullIdentity(null, user.display_name, false, false, false, [user], []);
                                         } else {
                                             identity = await global.api.getFullIdentity(user.identity.id);
                                         }
@@ -218,7 +218,7 @@ class TwitchUser extends User {
                                         con.query("insert into identity__moderator (identity_id, modfor_id, active) values (?, ?, ?) on duplicate key update active = ?;", [thisUser.identity.id, identity.id, active, active]);
                                     } catch (e) {
                                         if (e !== "No users were found!") {
-                                            console.error(e);
+                                            global.api.Logger.warning(e);
                                         }
                                     }
                                 }
@@ -229,7 +229,7 @@ class TwitchUser extends User {
                             }
                         } 
                     } catch (e) {
-                        console.error(e);
+                        global.api.Logger.warning(e);
                     }
                 });
             }).end();
@@ -277,13 +277,13 @@ class TwitchUser extends User {
         return new Promise(async (resolve, reject) => {
             if (!connected) {
                 while (!connected) {
-                    console.log("WAITING. Mod TMI client has not been activated. This may be a bug!");
+                    global.api.Logger.warning("WAITING. Mod TMI client has not been activated. This may be a bug!");
                     await sleep(500);
                 }
             }
 
             if (this.identity === null) {
-                let identity = new FullIdentity(null, this.display_name, false, [this], []);
+                let identity = new FullIdentity(null, this.display_name, false, false, false, [this], []);
                 await identity.post();
             }
 
@@ -297,7 +297,7 @@ class TwitchUser extends User {
 
                     for (let y = 0; y < users.length; y++) {
                         if (users[y].identity === null) {
-                            let identity = new FullIdentity(null, users[y].display_name, false, [users[y]], []);
+                            let identity = new FullIdentity(null, users[y].display_name, false, false, false, [users[y]], []);
                             await identity.post();
                         }
 
@@ -311,7 +311,7 @@ class TwitchUser extends User {
                         ...users,
                     ];
                 } catch (err) {
-                    console.log(mods[i]);
+                    global.api.Logger.warning(err);
                 }
             }
 
@@ -420,11 +420,31 @@ class TwitchUser extends User {
     /**
      * Gets a list of active Twitch communities for this user
      * 
-     * @returns {Promise<TwitchUser>}
+     * @returns {Promise<[{user: TwitchUser, chatCount: number, lastActive: number}]>}
      */
     getActiveCommunities() {
         return new Promise((resolve, reject) => {
-            resolve([]); // TODO: ADD SOMETHING
+            con.query("select * from twitch__chat_chatters where chatter_id = ? order by last_active desc;", [this.id], async (err, res) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+
+                let users = [];
+                for (let i = 0; i < res.length; i++) {
+                    let row = res[i];
+                    let user = await global.api.Twitch.getUserById(row.streamer_id);
+                    users = [
+                        ...users,
+                        {
+                            user: user,
+                            chatCount: row.chat_count,
+                            lastActive: row.last_active,
+                        }
+                    ]
+                }
+                resolve(users);
+            });
         });
     }
 

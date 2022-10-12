@@ -223,7 +223,7 @@ class DiscordGuild {
         return new Promise((resolve, reject) => {
             con.query("insert into discord__guild_user (guild_id, user_id) values (?, ?) on duplicate key update guild_id = ?;", [this.id, user.id, this.id], err => {
                 if (err) {
-                    console.error(err);
+                    global.api.Logger.warning(err);
                     reject(err);
                 } else resolve(this);
             });
@@ -239,7 +239,7 @@ class DiscordGuild {
         return new Promise((resolve, reject) => {
             con.query("delete from discord__guild_user where guild_id = ? and user_id = ?;", [this.id, user.id], err => {
                 if (err) {
-                    console.error(err);
+                    global.api.Logger.warning(err);
                     reject(err);
                 } else resolve(this);
             });
@@ -378,7 +378,7 @@ class DiscordGuild {
                             setting.type,
                             setting.value,
                             setting.type,
-                        ], (err) => {if (err) console.error(err);});
+                        ], (err) => {if (err) global.api.Logger.warning(err);});
                     })
                     resolve(this);
                     global.api.Discord.guildCache.remove(this.id);

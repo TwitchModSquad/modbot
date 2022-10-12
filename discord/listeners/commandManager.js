@@ -46,7 +46,7 @@ const listener = {
         try {
             cmd.execute(interaction);
         } catch (error) {
-            console.error(error);
+            global.api.Logger.warning(error);
             interaction.reply('***There was an error trying to execute that command!***');
         }
     }

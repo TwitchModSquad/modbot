@@ -83,7 +83,7 @@ const command = {
                 }
             }
         } catch (err) {
-            console.error(err);
+            global.api.Logger.warning(err);
             interaction.reply(errorEmbed("Invalid streamer was given: " + err))
             return;
         }
@@ -97,7 +97,7 @@ const command = {
                 }
             }
         } catch (err) {
-            console.error(err);
+            global.api.Logger.warning(err);
             interaction.reply(errorEmbed("Invalid user was given: " + err))
             return;
         }
@@ -139,7 +139,7 @@ const command = {
 
         con.query(`select * from twitch__chat ${queryWhere === "" ? "" : "where "}${queryWhere} order by timesent desc${limit ? " limit ?" : ""};`, queryObjs, async (err, res) => {
             if (err) {
-                console.error(err);
+                global.api.Logger.warning(err);
                 interaction.editReply(errorEmbed("An error occurred!"));
             }
 

@@ -23,7 +23,7 @@ const listener = {
                             con.query("insert into archive (id, owner_id, offense, description, time_submitted) values (?, ?, ?, ?, ?);", [id, user.identity.id, entry.offense, entry.description, new Date().getTime()], async err => {
                                 if (!err) {
                                     con.query("insert into archive__logs (archive_id, action, initiated_by) values (?, 'create', ?);", [id, user.identity.id], err => {
-                                        if (err) console.error(err);
+                                        if (err) global.api.Logger.warning(err);
                                     });
 
                                     for (let t = 0; t < entry.twitch.length; t++) {
@@ -67,10 +67,10 @@ const listener = {
                                                     file.local_path = DIRECTORY + file.name;
                                                 }
                                                 con.query("insert into archive__files (archive_id, local_path, remote_path, name, content_type, label) values (?, ?, ?, ?, ?, ?);", [id, file.local_path, file.remote_path, file.name, file.content_type, file.label], err => {
-                                                    if (err) console.error(err);
+                                                    if (err) global.api.Logger.warning(err);
                                                 });
                                             } catch (err) {
-                                                console.error(err);
+                                                global.api.Logger.warning(err);
                                             }
                                         });
                                     }
@@ -84,7 +84,7 @@ const listener = {
 
                                             interaction.member.send({content: "**You submitted a ban archive entry!**", embeds: [embed]}).then(message => {
                                                 con.query("insert into archive__messages (id, guild_id, channel_id, archive_id, reason) values (?, ?, ?, ?, 'receipt');", [message.id, interaction.member.guild.id, interaction.member.id, entry.id]);
-                                            }, console.error)
+                                            }, global.api.Logger.warning)
 
                                             guild.channels.fetch(config.channels.archive_sort).then(sortChannel => {
                                                 const selectMenu = new MessageSelectMenu()
@@ -102,11 +102,11 @@ const listener = {
 
                                                 sortChannel.send({content: " ", embeds: [embed], components: [row]}).then(message => {
                                                     con.query("insert into archive__messages (id, guild_id, channel_id, archive_id, reason) values (?, ?, ?, ?, 'sort');", [message.id, sortChannel.guild.id, sortChannel.id, entry.id]);
-                                                }, console.error);
-                                            }, console.error);
-                                        }, console.error);
+                                                }, global.api.Logger.warning);
+                                            }, global.api.Logger.warning);
+                                        }, global.api.Logger.warning);
                                     }, err => {
-                                        console.error(err);
+                                        global.api.Logger.warning(err);
                                     });
                                 } else
                                     interaction.reply("Error: " + err);

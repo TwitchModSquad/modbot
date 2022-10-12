@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>TMS Sign On Portal</title>
+
+    <%- include("../../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/signon.css">
+</head>
+<body>
+    <main>
+        <h1><img class="logo" src="/assets/images/logos/logo.webp" alt="Twitch Mod Squad Logo"> Twitch Mod Squad <span>sign-on</span></h1>
+        <p>Sign in or join Twitch Mod Squad!</p>
+        <div class="login">
+            <div id="twitch-accounts">
+                <% twitchAccounts.forEach(account => { %>
+                    <div class="twitch-user"><img src="<%= account.profile_image_url %>" /><div class="user-info"><div class="user-name"><%= account.display_name %></div><div class="user-stats"><%= account.id %> <span class="bullet">&bullet;</span> <%= account.follower_count %>&nbsp;follower<%= account.follower_count == 1 ? "" : "s"%> <span class="bullet">&bullet;</span> <%= account.view_count %>&nbsp;view<%= account.view_count == 1 ? "" : "s" %></div></div></div>
+                <% }) %>
+            </div>
+            <a class="twitch api-endpoint" href="/api/auth/redirect/twitch" data-endpoint-uri="api/auth/redirect/twitch"><i class="fa-brands fa-twitch"></i> <%= twitchAccounts.length === 0 ? "Log in via Twitch" : "Add another Twitch account" %></a>
+            <div id="discord-accounts">
+                <% discordAccounts.forEach(account => { %>
+                    <div class="discord-user"><img src="<%= account.avatar_url %>" /><div class="user-info"><div class="user-name"><%= account.name %><span class="discriminator">#<%= account.discriminator %></span></div><div class="user-stats"><%= account.id %></div></div></div>
+                <% }) %>
+            </div>
+            <% if (twitchAccounts.length > 0) { %>
+                <a class="discord api-endpoint" href="/api/auth/redirect/discord" data-endpoint-uri="api/auth/redirect/discord"><i class="fa-brands fa-discord"></i> <%= discordAccounts.length === 0 ? "Log in via Discord" : "Add another Discord account" %></a>
+            <% } %>
+            <% if (twitchAccounts.length > 0 && discordAccounts.length > 0) { %>
+                <a href="/panel/" class="complete"><img src="/assets/images/logos/logo_guy.png" alt="TMS Logo"> Complete Sign On</a>
+            <% } %>
+        </div>
+    </main>
+
+    <%- include("../../partials/footer") %>
+    
+    <%- include("../../partials/js") %>
+</body>
+</html>

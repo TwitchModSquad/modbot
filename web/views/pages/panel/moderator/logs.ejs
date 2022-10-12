@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>TMS Panel - Logs</title>
+
+    <%- include("../../../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/panel.css">
+    <link rel="stylesheet" href="/assets/css/sidebar.css">
+    <link rel="stylesheet" href="/assets/css/log.css">
+</head>
+<body>
+    <%- include("../../../partials/panel/header") %>
+
+    <div class="sidebar-container">
+        <%- include("../../../partials/panel/sidebar", {page: "moderator/logs", session: session}) %>
+        <main>
+            <section>
+                <h2>ModBot Logs</h2>
+
+                <% logs.forEach(log => { %>
+                    <div class="log log-<%= log.type.toLowerCase() %>">
+                        <div class="log-header">
+                            <span class="timestamp"><%- log.timestamp %></span>&nbsp;<span class="type">[<%= log.type %>]</span>
+                        </div>
+                        <div class="log-body">
+                            <%= log.message %>
+                        </div>
+                    </div>
+                <% }) %>
+            </section>
+
+            <%- include("../../../partials/footer") %>
+        </main>
+    </div>
+    
+    <%- include("../../../partials/js") %>
+
+    <script src="/assets/js/panel.js"> </script>
+</body>
+</html>

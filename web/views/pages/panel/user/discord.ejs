@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>TMS Panel - Discord User <%= user.name %>#<%= user.discriminator %></title>
+
+    <%- include("../../../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/panel.css">
+    <link rel="stylesheet" href="/assets/css/sidebar.css">
+    <link rel="stylesheet" href="/assets/css/user.css">
+    <link rel="stylesheet" href="/assets/css/punishment.css">
+    <link rel="stylesheet" href="/assets/css/table.css">
+</head>
+<body>
+    <%- include("../../../partials/panel/header") %>
+
+    <div class="sidebar-container">
+        <%- include("../../../partials/panel/sidebar", {page: "moderator/logs", session: session}) %>
+        <main>
+            <div class="container container-md">
+                <section class="<%= (locals.identity && locals.identity.twitchAccounts.length > 0 ? "col-8" : "col-12") %>">
+                    <h2><i class="fa-brands fa-discord"></i>Discord User: <code><%= user.name %>#<%= user.discriminator %></code></h2>
+    
+                    <div class="profile">
+                        <img class="profile-picture" src="<%= user.avatar_url %>" alt="<%= user.name %> profile image">
+                        <div class="profile-info">
+                            <h3><%= user.name %>#<%= user.discriminator %><% if (user.identity?.admin) { %><img src="/assets/images/badges/tms/admin.png" alt="tms administrator" title="TMS Administrator" /><% } %><% if (user.identity?.mod) { %><img src="/assets/images/badges/tms/mod.png" alt="tms moderator" title="TMS Moderator" /><% } %> <span class="id"><%= user.id %></span></h3>
+                            <div class="username"><strong>User Name:</strong> <%= user.name %></div>
+                            <div class="view-count"><strong>User Discriminator:</strong> <%= user.discriminator %></div>
+                        </div>
+                    </div>
+                </section>
+                <% if (locals.identity && locals.identity.twitchAccounts.length > 0) { %>
+                <section class="col-4">
+                    <h2><i class="fa-brands fa-discord"></i>Linked Twitch Users</h2>
+    
+                    <div class="max-height-375">
+                        <% identity.twitchAccounts.forEach(account => { %>
+                            <%- include("../../../partials/panel/user/twitch", {account: account}) %>
+                        <% }) %>
+                    </div>
+                </section>
+                <% } %>
+            </div>
+
+            <div class="container container-md">
+                <section class="col-12">
+                    <h2><i class="fa-solid fa-ban"></i>Bans <span class="badge">0</span></h2>
+                    
+                    <div class="max-height-375">
+                        We don't display Discord ban information yet! :(
+                    </div>
+                </section>
+            </div>
+
+            <div class="container container-md">
+                <section class="col-7">
+                    <h2><i class="fa-regular fa-timeline"></i>Active Guilds <span class="badge">0</span></h2>
+
+                    <div class="max-height-375">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Guild Represents</th>
+                                    <th>Guild Name</th>
+                                    <th>Guild Owner</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (guilds.length === 0) { %><tr><td colspan="4">No active guilds!</td></tr><% } %>
+                                <% guilds.forEach(guild => { %>
+                                    <%- include("../../../partials/panel/guild", {guild: guild}) %>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+                <section class="col-5">
+                    <h2><i class="fa-solid fa-box-archive"></i>Archive Entries <span class="badge"><%= entries.length %></span></h2>
+
+                    <div class="max-height-375">
+                        <% if (entries.length === 0) { %>No archive entries!<% } %>
+                        <% entries.forEach(entry => { %>
+                            <%- include("../../../partials/panel/entry", {entry: entry}) %>
+                        <% }) %>
+                    </div>
+                </section>
+            </div>
+
+            <%- include("../../../partials/footer") %>
+        </main>
+    </div>
+    
+    <%- include("../../../partials/js") %>
+
+    <script src="/assets/js/panel.js"> </script>
+</body>
+</html>

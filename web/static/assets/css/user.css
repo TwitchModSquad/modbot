@@ -1,0 +1,41 @@
+.profile {
+    display: flex;
+}
+
+.small-profile-picture {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    margin: 0 .3em;
+}
+
+.profile-picture {
+    width: 128px;
+    height: 128px;
+    border-radius: 64px;
+}
+
+.profile h3 {
+    font-size: 1.2rem;
+}
+
+.profile h3 .id {
+    display: inline-block;
+    font-weight: 300;
+    font-size: .8rem;
+    opacity: .7;
+    margin-left: .2em;
+    margin-bottom: .8em;
+}
+
+.profile h3 img {
+    width: 1.2rem;
+    height: 1.2rem;
+    margin-left: .4em;
+}
+
+.profile-info {
+    margin-left: 1em;
+    font-size: .9rem;
+}

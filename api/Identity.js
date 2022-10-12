@@ -26,15 +26,33 @@ class Identity {
     authenticated;
 
     /**
+     * Whether the user is a TMS administrator
+     * 
+     * @type {boolean}
+     */
+    admin;
+
+    /**
+     * Whether the user is a TMS moderator
+     * 
+     * @type {boolean}
+     */
+    mod;
+
+    /**
      * Constructor for the Identity class.
      * @param {number} id 
      * @param {string} name 
      * @param {boolean} authenticated
+     * @param {boolean} admin
+     * @param {boolean} mod
      */
-    constructor(id, name, authenticated) {
+    constructor(id, name, authenticated, admin, mod) {
         this.id = id;
         this.name = name;
         this.authenticated = authenticated;
+        this.admin = admin;
+        this.mod = mod;
     }
 
     /**
@@ -73,29 +91,33 @@ class Identity {
      */
     post() {
         return new Promise((resolve, reject) => {
-            con.query("insert into identity (id, name, authenticated) values (?, ?, ?) on duplicate key update name = ?, authenticated = ?;", [
+            con.query("insert into identity (id, name, authenticated, admin, moderator) values (?, ?, ?, ?, ?) on duplicate key update name = ?, authenticated = ?, admin = ?, moderator = ?;", [
                 this.id,
                 this.name,
                 this.authenticated,
+                this.admin,
+                this.mod,
                 this.name,
                 this.authenticated,
+                this.admin,
+                this.mod,
             ], err => {
                 if (err) {
                     reject(err);
                 } else {
                     if (this.id === null || this.id === undefined) {
-                        con.query("select id, name, authenticated from identity where name = ? order by id desc limit 1;", [this.name], (err, res) => {
+                        con.query("select id, name, authenticated, admin, moderator from identity where name = ? order by id desc limit 1;", [this.name], (err, res) => {
                             if (err) {
                                 reject(err);
                             } else if (res.length < 1) {
                                 reject("Could not retrieve inserted id.");
                             } else {
                                 this.id = res[0].id;
-                                resolve(new Identity(res[0].id, res[0].name, res[0].authenticated));
+                                resolve(new Identity(res[0].id, res[0].name, res[0].authenticated, res[0].admin, res[0].mod));
                             }
                         });
                     } else {
-                        resolve(new Identity(this.id, this.name, this.authenticated));
+                        resolve(new Identity(this.id, this.name, this.authenticated, this.admin, this.mod));
                     }
                 }
             });

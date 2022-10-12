@@ -7,7 +7,7 @@ const listener = {
     listener (message) {
         if (message.author.bot) {
             con.query("delete from archive__messages where id = ?;", [message.id], err => {
-                if (err) console.error(err);
+                if (err) global.api.Logger.warning(err);
             });
         }
     }

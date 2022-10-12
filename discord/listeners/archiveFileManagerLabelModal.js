@@ -17,7 +17,7 @@ const listener = {
 
                         if (file) {
                             file.label = modal.getTextInputValue("label");
-                            file.message.edit(parseFileMessage(file)).then(() => {}, console.error);
+                            file.message.edit(parseFileMessage(file)).then(() => {}, global.api.Logger.warning);
 
                             temporaryMessage(modal, "reply", "File label changed!", 5000, "```New label: " + file.label + "```\n" + "[View new file information here](" + file.message.url + ")")
                         } else {

@@ -4,7 +4,9 @@ const Twitch = require("./Twitch/");
 const Discord = require("./Discord/");
 const SessionService = require("./Session/");
 const Archive = require("./Archive/");
+const Authentication = require("./Authentication/");
 
+const Logger = require("./Logger");
 const FullIdentity = require("./FullIdentity");
 
 const Session = require("./Session");
@@ -35,6 +37,18 @@ class API {
     Archive = new Archive();
 
     /**
+     * Base Authentication API
+     * @type {Authentication}
+     */
+    Authentication = new Authentication();
+
+    /**
+     * Logger API
+     * @type {Logger}
+     */
+    Logger = new Logger();
+
+    /**
      * Returns the FullIdentity for an ID
      * @param {number} id 
      * @returns {Promise<FullIdentity>}
@@ -47,11 +61,15 @@ class API {
                         let i_id = res[0].id;
                         let i_name = res[0].name;
                         let i_auth = res[0].authenticated;
+                        let i_admin = res[0].admin;
+                        let i_mod = res[0].moderator;
 
                         resolve(new FullIdentity(
                             i_id,
                             i_name,
                             i_auth,
+                            i_admin,
+                            i_mod,
                             await this.Twitch.getUsersByIdentity(i_id),
                             await this.Discord.getUsersByIdentity(i_id)
                             ));

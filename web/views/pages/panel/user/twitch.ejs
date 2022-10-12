@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>TMS Panel - Twitch User <%= user.display_name %></title>
+
+    <%- include("../../../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/panel.css">
+    <link rel="stylesheet" href="/assets/css/sidebar.css">
+    <link rel="stylesheet" href="/assets/css/user.css">
+    <link rel="stylesheet" href="/assets/css/punishment.css">
+    <link rel="stylesheet" href="/assets/css/table.css">
+</head>
+<body>
+    <%- include("../../../partials/panel/header") %>
+
+    <div class="sidebar-container">
+        <%- include("../../../partials/panel/sidebar", {page: "moderator/logs", session: session}) %>
+        <main>
+            <div class="container container-md">
+                <section class="<%= (locals.identity && locals.identity.discordAccounts.length > 0 ? "col-8" : "col-12") %>">
+                    <h2><i class="fa-brands fa-twitch"></i>Twitch User: <code><%= user.display_name %></code></h2>
+    
+                    <div class="profile">
+                        <img class="profile-picture" src="<%= user.profile_image_url %>" alt="<%= user.display_name %> profile image">
+                        <div class="profile-info">
+                            <h3><%= user.display_name %><% if (user.affiliation === "partner") { %><img src="/assets/images/badges/twitch/partner.png" alt="partner" title="Twitch Partner" /><% } %><% if (user.identity?.admin) { %><img src="/assets/images/badges/tms/admin.png" alt="tms administrator" title="TMS Administrator" /><% } %><% if (user.identity?.mod) { %><img src="/assets/images/badges/tms/mod.png" alt="tms moderator" title="TMS Moderator" /><% } %> <span class="id"><%= user.id %></span></h3>
+                            <div class="follower-count"><strong>Follower Count:</strong> <%= comma(user.follower_count) %></div>
+                            <div class="view-count"><strong>View Count:</strong> <%= comma(user.view_count) %></div>
+                            <div class="twitch-account"><strong>Twitch Account:</strong> <a target="__blank" href="https://twitch.tv/<%= user.display_name.toLowerCase() %>">https://twitch.tv/<%= user.display_name.toLowerCase() %></a></div>
+                            <div class="chat-logs"><strong>User Chat Logs:</strong> <a href="/panel/chat-history?chatter=<%= user.id %>">Click to view</a></div>
+                        </div>
+                    </div>
+                </section>
+                <% if (locals.identity && locals.identity.discordAccounts.length > 0) { %>
+                <section class="col-4">
+                    <h2><i class="fa-brands fa-discord"></i>Linked Discord Users</h2>
+    
+                    <div class="max-height-375">
+                        <% identity.discordAccounts.forEach(account => { %>
+                            <%- include("../../../partials/panel/user/discord", {account: account}) %>
+                        <% }) %>
+                    </div>
+                </section>
+                <% } %>
+            </div>
+
+            <div class="container container-md">
+                <section class="col-6">
+                    <h2><i class="fa-solid fa-ban"></i>Bans <span class="badge"><%= bans.length %></span></h2>
+                    
+                    <div class="max-height-375">
+                        <% if (bans.length === 0) { %>This user hasn't been banned!<% } %>
+                        <% bans.forEach(ban => { %>
+                            <%- include("../../../partials/panel/punishment/ban", {ban: ban, hideBanned: true}); %>
+                        <% }) %>
+                    </div>
+                </section>
+                <section class="col-6">
+                    <h2><i class="fa-solid fa-timer"></i>Timeouts <span class="badge"><%= timeouts.length %></span></h2>
+                    
+                    <div class="max-height-375">
+                        <% if (timeouts.length === 0) { %>This user hasn't been timed out!<% } %>
+                        <% timeouts.forEach(timeout => { %>
+                            <%- include("../../../partials/panel/punishment/timeout", {timeout: timeout, comma: comma, hideTimedOut: true}); %>
+                        <% }) %>
+                    </div>
+                </section>
+            </div>
+
+            <div class="container container-md">
+                <section class="col-7">
+                    <h2><i class="fa-regular fa-timeline"></i>Active Channels <span class="badge"><%= activeCommunities.length %></span></h2>
+
+                    <div class="max-height-375">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Community</th>
+                                    <th>Chat Message Count</th>
+                                    <th>Last Active</th>
+                                    <th>View Chat History</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (activeCommunities.length === 0) { %><tr><td colspan="4">No active communities!</td></tr><% } %>
+                                <% activeCommunities.forEach(community => { %>
+                                    <%- include("../../../partials/panel/user/community", {community: community, comma: comma, user: user}) %>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+                <section class="col-5">
+                    <h2><i class="fa-solid fa-box-archive"></i>Archive Entries <span class="badge"><%= entries.length %></span></h2>
+
+                    <div class="max-height-375">
+                        <% if (entries.length === 0) { %>No archive entries!<% } %>
+                        <% entries.forEach(entry => { %>
+                            <%- include("../../../partials/panel/entry", {entry: entry}) %>
+                        <% }) %>
+                    </div>
+                </section>
+            </div>
+
+            <%- include("../../../partials/footer") %>
+        </main>
+    </div>
+    
+    <%- include("../../../partials/js") %>
+
+    <script src="/assets/js/panel.js"> </script>
+</body>
+</html>

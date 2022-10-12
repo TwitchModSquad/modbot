@@ -9,7 +9,7 @@ const getExecutor = message => {
             const fetchedLogs = await message.guild.fetchAuditLogs({
                 limit: 6,
                 type: 'MESSAGE_DELETE'
-            }).catch(console.error);
+            }).catch(global.api.Logger.warning);
             
             const auditEntry = fetchedLogs.entries.find(a =>
                 // Small filter function to make use of the little discord provides to narrow down the correct audit entry.
@@ -43,11 +43,11 @@ const listener = {
                         message.content
                     ], err => {
                         if (err) {
-                            console.error(err);
+                            global.api.Logger.warning(err);
                         }
                     });
                 }).catch(err => {
-                    console.error(err);
+                    global.api.Logger.warning(err);
                 });
 
                 if (!message.author.bot) {
@@ -74,12 +74,12 @@ const listener = {
                                         embed.addField("Message Content", "```\n" + message.content.replace(/`/g, "/`") + "```", false);
                                     }
                                     channel.send({content: ' ', embeds: [embed]});
-                                }).catch(console.error);
+                                }).catch(global.api.Logger.warning);
                             }
-                        }).catch(console.error);
-                    }).catch(console.error);
+                        }).catch(global.api.Logger.warning);
+                    }).catch(global.api.Logger.warning);
                 }
-            }).catch(console.error);
+            }).catch(global.api.Logger.warning);
         }
     }
 };

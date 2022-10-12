@@ -1,4 +1,3 @@
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 const Discord = require("discord.js");
 const api = require("../../api/index");
 const {storedCrossBanChannels, storedCrossBanUser} = require("./crossbanManager");
@@ -6,45 +5,13 @@ const {storedCrossBanChannels, storedCrossBanUser} = require("./crossbanManager"
 const config = require("../../config.json");
 const con = require("../../database");
 
-const refreshToken = refresh_token => {
-    return new Promise(async (resolve, reject) => {
-        const oauthResult = await fetch("https://id.twitch.tv/oauth2/token", {
-            method: 'POST',
-            body: new URLSearchParams({
-                client_id: config.twitch.client_id,
-                client_secret: config.twitch.client_secret,
-                refresh_token: refresh_token,
-                grant_type: "refresh_token",
-            }),
-        });
-    
-        oauthResult.json().then(resolve, reject);
-    });
-}
-
-const addBan = (broadcaster_id, moderator_id, access_token, user_id, reason) => {
-    return new Promise(async (resolve, reject) => {
-        const oauthResult = await fetch(`https://api.twitch.tv/helix/moderation/bans?broadcaster_id=${encodeURIComponent(broadcaster_id)}&moderator_id=${encodeURIComponent(moderator_id)}`, {
-            method: 'POST',
-            headers: {
-                Authorization: "Bearer " + access_token,
-                "Client-Id": config.twitch.client_id,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({data:{user_id: user_id, reason: reason}}),
-        });
-    
-        oauthResult.json().then(resolve, reject);
-    });
-}
-
 const listener = {
     name: 'crossbanModalManager',
     eventName: 'modalSubmit',
     eventType: 'on',
     async listener (modal) {
         const handleError = (err, method = "reply") => {
-            console.error(err);
+            global.api.Logger.warning(err);
             modal[method]({content: ' ', embeds: [new Discord.MessageEmbed().setTitle("Uh oh!").setDescription(""+err).setColor(0x9e392f)], ephemeral: true})
         }
 
@@ -85,23 +52,18 @@ const listener = {
 
                 if (storedCrossBanUser[modal.user.id]) {
                     let modUser = storedCrossBanUser[modal.user.id];
-                    let refresh_token = (await con.pquery("select refresh_token from twitch__user where id = ?;", [modUser.id]))?.[0]?.refresh_token;
+                    let refreshToken = (await con.pquery("select refresh_token from twitch__user where id = ?;", [modUser.id]))?.[0]?.refresh_token;
 
-                    const oauthData = await refreshToken(refresh_token);
+                    accessToken = await api.Authentication.Twitch.getAccessToken(refreshToken);
 
-                    if (oauthData?.access_token) {
-                        userClient = true;
-                        modId = modUser.id;
-                        accessToken = oauthData.access_token;
-                    }
+                    userClient = true;
+                    modId = modUser.id;
                 }
             } catch (err) {
-                console.error(err);
+                global.api.Logger.warning(err);
                 handleError(err, "editReply");
                 return;
             }
-
-            console.log(reason);
 
             let successes = "";
             let errors = "";
@@ -112,8 +74,8 @@ const listener = {
                     channel = await api.Twitch.getUserById(channel, false, true);
 
                     if (userClient) {
-                        let result = await addBan(channel.id, modId, accessToken, user.id, reason);
-
+                        let result = await api.Twitch.TwitchAPI.banUser(channel.id, modId, accessToken, user.id, reason);
+                        
                         if (result?.message) {
                             errors += `\n${channel?.display_name ? channel.display_name : channel}: ${result.message}`;
                             continue;

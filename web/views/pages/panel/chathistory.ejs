@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>TMS Panel - Chat History</title>
+
+    <%- include("../../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/panel.css">
+    <link rel="stylesheet" href="/assets/css/sidebar.css">
+    <link rel="stylesheet" href="/assets/css/inputs.css">
+    <link rel="stylesheet" href="/assets/css/chatlog.css">
+</head>
+<body>
+    <%- include("../../partials/panel/header") %>
+
+    <div class="sidebar-container">
+        <%- include("../../partials/panel/sidebar", {page: "chat-history", session: session}) %>
+        <main>
+            <form action="GET" class="container container-sm">
+                <select name="streamer" id="streamer" class="col-6">
+                    <option value="xxx" disabled="disabled"<%- selectedStreamer ? "" : ' selected="selected"' %>>Select a Streamer</option>
+                    <option value="xxx">All streamers</option>
+                    <% streamers.forEach(streamer => { %>
+                        <option value="<%= streamer.streamer_id %>"<%- selectedStreamer == streamer.streamer_id ? ' selected="selected"' : '' %>><%= streamer.display_name %> (<%= streamer.chat_count %>)</option>
+                    <% }) %>
+                </select>
+                <select name="chatter" id="chatter" class="col-6">
+                    <option value="xxx" disabled="disabled"<%- selectedChatter ? "" : ' selected="selected"' %>>Select a Chatter</option>
+                    <option value="xxx">All chatters</option>
+                    <% chatters.forEach(chatter => { %>
+                        <option value="<%= chatter.chatter_id %>"<%- selectedChatter == chatter.chatter_id ? ' selected="selected"' : '' %>><%= chatter.display_name %> (<%= chatter.chat_count %>)</option>
+                    <% }) %>
+                </select>
+            </form>
+            <section>
+                <h2><i class="fa-solid fa-comments"></i>Chat History</h2>
+
+                <%
+                chat.forEach(chatLog => {
+                    const STREAMER_NAME_TARGET = 15;
+                    let streamerName = users[chatLog.streamer_id].display_name.toLowerCase()
+                %>
+                    <div class="chat-log<%= chatLog.deleted ? " deleted" : "" %><%= chatLog.message.startsWith("!") ? " command" : "" %>">
+                        <div class="chat-header">
+                            <% if (!selectedStreamer) { %><span class="streamer"><%- ("&nbsp;").repeat(Math.max(0, STREAMER_NAME_TARGET - streamerName.length)) %>#<%= streamerName %></span><% } %><!--
+                            -->&nbsp;<span class="timestamp"><%- chatLog.timesent %></span>
+                        </div>
+                        <div class="chat-body">
+                            <%- chatLog.badges %>
+                            <a class="user"<%- chatLog.color ? ` style="color: ${chatLog.color};"` : "" %>  href="/panel/user/<%= users[chatLog.chatter_id].id %>"><%= users[chatLog.chatter_id].display_name %></a>:
+                            <span class="message"><%- chatLog.message %></span>
+                        </div>
+                    </div>
+                <% }) %>
+            </section>
+        </main>
+    </div>
+    
+    <%- include("../../partials/js") %>
+
+    <script src="/assets/js/panel.js"> </script>
+    <script src="/assets/js/chathistory.js"> </script>
+</body>
+</html>

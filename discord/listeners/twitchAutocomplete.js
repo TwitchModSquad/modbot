@@ -16,7 +16,7 @@ const listener = {
                         
                         con.query("select display_name from twitch__user where display_name like ? order by id asc limit 25;", [focused.value.replace(/[%\.]/g, "") + "%"], (err, res) => {
                             if (err) {
-                                console.error(err);
+                                global.api.Logger.warning(err);
                                 return;
                             }
 

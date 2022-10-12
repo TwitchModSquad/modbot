@@ -62,7 +62,7 @@ const command = {
                     if (identity?.id) {
                         identity = await global.api.getFullIdentity(identity.id);
                     } else {
-                        identity = new FullIdentity(null, representsTwitch.display_name, false, [representsTwitch], [representsDiscord])
+                        identity = new FullIdentity(null, representsTwitch.display_name, false, false, false, [representsTwitch], [representsDiscord])
                         identity = await identity.post();
                     }
 
@@ -79,15 +79,15 @@ const command = {
                     await guild.getSettings();
 
                     guild.post().then(guild => {
-                        guild.addCommands(interaction.guild).then(() => {}, console.error);
+                        guild.addCommands(interaction.guild).then(() => {}, global.api.Logger.warning);
                         interaction.reply({content: "Registered!", ephemeral: true})
-                        interaction.command?.delete().then(() => {}, console.error);
+                        interaction.command?.delete().then(() => {}, global.api.Logger.warning);
                     }).catch(err => {
-                        console.error(err);
+                        global.api.Logger.warning(err);
                         interaction.reply(errorEmbed("An error occurred: " + err));
                     });
                 } catch(err) {
-                    console.error(err);
+                    global.api.Logger.warning(err);
                     interaction.reply(errorEmbed("An error occurred: " + err));
                 }
             });

@@ -8,7 +8,7 @@ module.exports = () => {
     waiting = true;
     con.query("select id, display_name from twitch__user where follower_count is null or date_add(last_updated, interval 7 day) < now() limit 100;", async (err, res) => {
         if (err) {
-            console.error(err);
+            global.api.Logger.warning(err);
             return;
         }
 
@@ -23,7 +23,7 @@ module.exports = () => {
 
         if (userIds.length < 10) return;
 
-        console.log("Sending request...");
+        global.api.Logger.info("Sending request...");
 
         let startTime = new Date().getTime();
 
@@ -31,11 +31,11 @@ module.exports = () => {
         try {
             helixUsers = await api.Twitch.Direct.helix.users.getUsersByIds(userIds);
         } catch (err) {
-            console.error(err);
+            global.api.Logger.warning(err);
             return;
         }
 
-        console.log(`Received ${helixUsers.length}/${userIds.length} users: ${new Date().getTime() - startTime} ms`);
+        global.api.Logger.info(`Received ${helixUsers.length}/${userIds.length} users: ${new Date().getTime() - startTime} ms`);
         waiting = false;
 
         helixUsers.forEach(async helixUser => {
@@ -55,7 +55,7 @@ module.exports = () => {
                 helixUser.broadcasterType === "" ? null : helixUser.broadcasterType,
                 helixUser.id,
             ], err => {
-                if (err) console.error(err);
+                if (err) global.api.Logger.warning(err);
                 api.Twitch.getUserById(helixUser.id, true);
             });
         });
@@ -69,7 +69,7 @@ module.exports = () => {
 
                 con.query("update twitch__user set follower_count = ? where id = ?;", [followers.total, userId]);
             } catch (err) {
-                console.error(err);
+                global.api.Logger.warning(err);
             }
         });
     });

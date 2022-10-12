@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>TMS Panel - Entry "<%= entry.id %>"</title>
+
+    <%- include("../../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/panel.css">
+    <link rel="stylesheet" href="/assets/css/sidebar.css">
+    <link rel="stylesheet" href="/assets/css/punishment.css">
+</head>
+<body>
+    <%- include("../../partials/panel/header") %>
+
+    <div class="sidebar-container">
+        <%- include("../../partials/panel/sidebar", {page: "entry", session: session, entry: entry}) %>
+        <main>
+            <div class="container container-md">
+                <section class="col-6">
+                    <h2><i class="fa-solid fa-circle-info"></i>Entry Information</h2>
+    
+                    <div class="max-height-375">
+                        <div><strong>Offense:</strong><pre><%= entry.offense %></pre></div>
+                        <div><strong>Description:</strong><pre><%= entry.description %></pre></div>
+                    </div>
+                </section>
+                <section class="col-6">
+                    <h2><i class="fa-solid fa-user"></i> Attached Users</h2>
+
+                    <div class="max-height-375">
+                        <% entry.users.forEach(user => { 
+                            if (user.type === "twitch") { %>
+                                <%- include("../../partials/panel/user/twitch", {account: user.resolvedUser}) %>
+                            <% }
+                        }) %>
+                        <% entry.users.forEach(user => { 
+                            if (user.type === "discord") { %>
+                                <%- include("../../partials/panel/user/discord", {account: user.resolvedUser}) %>
+                            <% }
+                        }) %>
+                        <% entry.users.forEach(user => { 
+                            if (user.type === "identity") { %>
+                                <%- include("../../partials/panel/user/identity", {account: user.resolvedUser}) %>
+                            <% }
+                        }) %>
+                    </div>
+                </section>
+            </div>
+
+            <div class="container container-md">
+                <section class="col-4">
+                    <h2><i class="fa-solid fa-files"></i>Entry Files</span></h2>
+    
+                    <div class="max-height-375">
+                        <% entry.files.forEach(file => { %>
+                            <%- include("../../partials/panel/file", {file: file}) %>
+                        <% }) %>
+                    </div>
+                </section>
+                <section class="col-8 file-information" style="display:none;">
+                    <h2><i class="fa-solid fa-user"></i> File Information</h2>
+
+                    <div class="file-information">
+
+                    </div>
+                </section>
+            </div>
+
+            <%- include("../../partials/footer") %>
+        </main>
+    </div>
+    
+    <%- include("../../partials/js") %>
+
+    <script src="/assets/js/panel.js"> </script>
+    <script src="/assets/js/entry.js"> </script>
+</body>
+</html>

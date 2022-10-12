@@ -24,8 +24,8 @@ module.exports = (async client => {
 			{ body: commands },
 		);
 
-        console.log('[MB] Successfully set commands');
+        global.api.Logger.info('[MB] Successfully set commands');
     } catch (error) {
-        console.error(error);
+        global.api.Logger.warning(error);
     }
 });

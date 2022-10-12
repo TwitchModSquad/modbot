@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>TMS Panel - Homepage</title>
+
+    <%- include("../../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/panel.css">
+    <link rel="stylesheet" href="/assets/css/sidebar.css">
+</head>
+<body>
+    <%- include("../../partials/panel/header") %>
+
+    <div class="sidebar-container">
+        <%- include("../../partials/panel/sidebar", {page: "home", session: session}) %>
+        <main>
+            <% if (locals.noPermission) { %>
+                <div class="alert alert-danger">
+                    <strong>You don't have permission to view this!</strong>
+                    You don't have permission to access this section of the panel. Please contact an administrator if you believe this is an error.
+                </div>
+            <% } %>
+            <div class="container container-md">
+                <section class="col-6">
+                    <h2><i class="fa-solid fa-user"></i>Profile <span class="badge"><%= twitchAccounts.length + discordAccounts.length %></span></h2>
+    
+                    <div class="max-height-375">
+                        <h3>Twitch Accounts</h3>
+                        <% twitchAccounts.forEach(account => { %>
+                            <%- include("../../partials/panel/user/twitch", {account: account}) %>
+                        <% }) %>
+                        
+                        <h3>Discord Accounts</h3>
+                        <% discordAccounts.forEach(account => { %>
+                            <%- include("../../partials/panel/user/discord", {account: account}) %>
+                        <% }) %>
+                    </div>
+                </section>
+                <section class="col-6">
+                    <h2><i class="fa-sharp fa-solid fa-signal-stream"></i>Authorized Streamers <span class="badge"><%= streamers.length %></span></h2>
+
+                    <div class="max-height-375">
+                        <% streamers.forEach(account => { %>
+                            <%- include("../../partials/panel/user/identity", {account: account}) %>
+                        <% }) %>
+                    </div>
+                </section>
+            </div>
+
+            <%- include("../../partials/footer") %>
+        </main>
+    </div>
+    
+    <%- include("../../partials/js") %>
+
+    <script src="/assets/js/panel.js"> </script>
+</body>
+</html>

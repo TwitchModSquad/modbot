@@ -1,0 +1,52 @@
+.chat-log {
+    display: flex;
+    font-family: 'Noto Sans Mono', monospace;
+    font-size: .9rem;
+    margin: .1em 0;
+}
+
+.chat-log .chat-body {
+    margin-left: .6em;
+}
+
+.chat-log.command, .chat-log.deleted {
+    transition: 0.2s opacity;
+}
+
+.chat-log.deleted {
+    text-decoration: line-through;
+    opacity: .8;
+}
+
+.chat-log.command {
+    opacity: .9;
+}
+
+.chat-log.command:hover, .chat-log.deleted:hover {
+    text-decoration: none;
+    opacity: 1;
+}
+
+.chat-log .streamer {
+    color: var(--secondary-text-color);
+}
+
+.chat-log .timestamp {
+    color: var(--tertiary-text-color);
+}
+
+.chat-log .user {
+    color: var(--secondary-text-color);
+    text-shadow: 2px 2px 8px rgba(255,255,255,0.1);
+    text-decoration: none;
+}
+
+.chat-log.command .message {
+    color: var(--secondary-text-color);
+}
+
+.chat-log .message img,
+.chat-log img.chat-badge {
+    display: inline;
+    height: 18px;
+}

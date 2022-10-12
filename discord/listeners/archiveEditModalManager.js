@@ -24,13 +24,13 @@ const listener = {
                         temporaryMessage(modal, "reply", "Offense was updated!", 5000, "**New offense:** ```" + value + "```");
                     }, err => {
                         temporaryMessage(modal, "reply", "Error", 5000, "Error: " + err);
-                        console.error(err);
+                        global.api.Logger.warning(err);
                     });
                 }, err => {
                     temporaryMessage(modal, "reply", "Error", 5000, "Archive entry not found");
                 })
             }, err => {
-                console.error(err);
+                global.api.Logger.warning(err);
                 modal.reply("Error: " + err);
             });
         } else if (modal.customId.startsWith("edit-description-")) {
@@ -48,13 +48,13 @@ const listener = {
                         temporaryMessage(modal, "reply", "Description was updated!", 5000, "**New description:** ```" + value + "```");
                     }, err => {
                         temporaryMessage(modal, "reply", "Error", 5000, "Error: " + err);
-                        console.error(err);
+                        global.api.Logger.warning(err);
                     });
                 }, err => {
                     temporaryMessage(modal, "reply", "Error", 5000, "Archive entry not found");
                 })
             }, err => {
-                console.error(err);
+                global.api.Logger.warning(err);
                 modal.reply("Error: " + err);
             });
         } else if (modal.customId.startsWith("add-twitch-user-")) {
@@ -73,7 +73,7 @@ const listener = {
                         entry.addUser(value, "twitch", user.identity).then(() => {
                             temporaryMessage(modal, "reply", "Twitch user was added!", 5000, "**Unresolved Twitch User:** `" + value + "`");
                         }, err => {
-                            console.error(err);
+                            global.api.Logger.warning(err);
                             temporaryMessage(modal, "reply", "Error", 5000, "Error: " + err);
                         });
                     }
@@ -83,21 +83,21 @@ const listener = {
                             entry.addUser(users[0], "twitch", user.identity).then(() => {
                                 temporaryMessage(modal, "reply", "Twitch user was added!", 5000, "**Twitch User:** `" + users[0].display_name + " (" + users[0].id + ")`");
                             }, err => {
-                                console.error(err);
+                                global.api.Logger.warning(err);
                                 temporaryMessage(modal, "reply", "Error", 5000, "Error: " + err);
                             });
                         } else {
                             submitRaw();
                         }
                     }, err => {
-                        console.error(err);
+                        global.api.Logger.warning(err);
                         submitRaw();
                     });
                 }, err => {
                     temporaryMessage(modal, "reply", "Error", 5000, "Archive entry not found");
                 })
             }, err => {
-                console.error(err);
+                global.api.Logger.warning(err);
                 modal.reply("Error: " + err);
             });
         } else if (modal.customId.startsWith("add-discord-user-")) {
@@ -116,7 +116,7 @@ const listener = {
                         entry.addUser(value, "discord", user.identity).then(() => {
                             temporaryMessage(modal, "reply", "Discord user was added!", 5000, "**Unresolved Discord User:** `" + value + "`");
                         }, err => {
-                            console.error(err);
+                            global.api.Logger.warning(err);
                             temporaryMessage(modal, "reply", "Error", 5000, "Error: " + err);
                         });
                     }
@@ -125,18 +125,18 @@ const listener = {
                         entry.addUser(user, "discord", user.identity).then(() => {
                             temporaryMessage(modal, "reply", "Discord user was added!", 5000, "**Discord User:** `" + user.name + "#" + user.discriminator + " (" + user.id + ")`");
                         }, err => {
-                            console.error(err);
+                            global.api.Logger.warning(err);
                             temporaryMessage(modal, "reply", "Error", 5000, "Error: " + err);
                         });
                     }, err => {
-                        console.error(err);
+                        global.api.Logger.warning(err);
                         submitRaw();
                     });
                 }, err => {
                     temporaryMessage(modal, "reply", "Error", 5000, "Archive entry not found");
                 })
             }, err => {
-                console.error(err);
+                global.api.Logger.warning(err);
                 modal.reply("Error: " + err);
             });
         } else if (modal.customId.startsWith("add-file-")) {
@@ -161,18 +161,18 @@ const listener = {
                         entry.addFile(url, label, user.identity).then(file => {
                             temporaryMessage(modal, "reply", "The file was successfully added!", 5000, "**Label:** `" + file.label + "`\n**Remote Path:** `" + file.remote_path + "`");
                         }, err => {
-                            console.error(err);
+                            global.api.Logger.warning(err);
                             temporaryMessage(modal, "reply", "Error", 5000, "Error: " + err);
                         });
                     } catch (err) {
-                        console.error(err);
+                        global.api.Logger.warning(err);
                         temporaryMessage(message.channel, "send", "Message should either contain an attachment or a URL message content", 5000);
                     }
                 }, err => {
                     temporaryMessage(modal, "reply", "Error", 5000, "Archive entry not found");
                 })
             }, err => {
-                console.error(err);
+                global.api.Logger.warning(err);
                 modal.reply("Error: " + err);
             });
         }

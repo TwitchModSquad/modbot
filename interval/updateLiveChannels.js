@@ -18,7 +18,7 @@ const getLiveChannel = () => {
 module.exports = () => {
     con.query("select distinct tu.id from identity__moderator as im join twitch__user as tu on tu.identity_id = im.modfor_id where im.active = true;", async (err, res) => {
         if (err) {
-            console.error(err); return;
+            global.api.Logger.warning(err); return;
         }
 
         let channel = await getLiveChannel();
@@ -54,7 +54,7 @@ module.exports = () => {
 
         con.query("select identity_id from live where end_time is null;", async (errl, resl) => {
             if (errl) {
-                console.error(errl);
+                global.api.Logger.warning(errl);
                 return;
             }
 
@@ -76,7 +76,7 @@ module.exports = () => {
     
                     if (!activeStreams.includes(identity.id)) {
                         con.query("insert into live (identity_id) values (?);", [identity.id], async err => {
-                            if (err) console.error(err);
+                            if (err) global.api.Logger.warning(err);
 
                             const embed = new MessageEmbed()
                                 .setAuthor({name: `🔴 ${user.display_name} is now live!`})
@@ -101,14 +101,14 @@ module.exports = () => {
 
                                                     try {
                                                         mentionEveryone = await guild.getSetting("lv-everyone", "boolean");
-                                                    }catch (err) {console.error(err)}
+                                                    }catch (err) {global.api.Logger.warning(err)}
 
                                                     channel.send({content: mentionEveryone ? '@everyone' : ' ', embeds: [embed]});
                                                 }
-                                            }).catch(console.error);
-                                        }).catch(console.error);
+                                            }).catch(global.api.Logger.warning);
+                                        }).catch(global.api.Logger.warning);
                                     });
-                                } else console.error(err);
+                                } else global.api.Logger.warning(err);
                             });
                         });
                     } else {
@@ -122,7 +122,7 @@ module.exports = () => {
 
                 con.query("update live set end_time = now() where identity_id = ?;", [identity.id], err => {
                     if (err) {
-                        console.error();
+                        global.api.Logger.warning();
                         return;
                     }
 

@@ -1,0 +1,116 @@
+body {
+    background-image: 
+        linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.15)),
+        url("/assets/images/banners/banner-large.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+header {
+    margin: 2em;
+    text-align: center;
+}
+
+.logo {
+    width: 1em;
+    height: 1em;
+    border-radius: .5em;
+    margin-right: .2em;
+}
+
+h1 {
+    font-weight: 400;
+    font-size: 1.3rem;
+    margin: 0 0 1em 0;
+    text-align: center;
+}
+
+h1 span {
+    font-weight: 300;
+    color: var(--secondary-text-color);
+}
+
+main {
+    background-color: var(--secondary-background-color);
+    width: calc(100% - 2.5em);
+    max-width: 25em;
+    margin: 4em auto;
+    padding: 1em;
+    box-shadow: var(--shadow);
+    border-radius: .3em;
+}
+
+main p {
+    text-align: center;
+}
+
+.login > a {
+    position: relative;
+    display: block;
+    color: var(--primary-text-color);
+    text-decoration: none;
+    text-align: center;
+    margin: .6em 0;
+    padding: .8em;
+    border-radius: .3em;
+    box-shadow: var(--heavy-shadow);
+    text-shadow: var(--shadow);
+    transition: 0.4s;
+}
+
+.login > a::after {
+    font-family: "Font Awesome 6 Pro";
+    font-weight: 400;
+    content: '\f061';
+    font-size: .8rem;
+    position: absolute;
+    right: 1.2em;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: 0.4s;
+}
+
+.login > a:link:hover::after {
+    right: .8em;
+}
+
+.login > a i, .login > a img {
+    font-size: 1.4rem;
+    position: absolute;
+    left: .8em;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.login > a img {
+    width: 25px;
+    height: 25px;
+}
+
+.login > a.twitch {
+    background-color: #9147ff;
+}
+
+.login > a.twitch:hover {
+    background-color: #8239ef;
+}
+
+.login > a.discord {
+    color: var(--primary-text-color);
+    background-color: #5865f2;
+}
+
+.login > a.complete {
+    background-color: var(--primary-tms-color);
+    font-weight: bold;
+}
+
+.login > a.complete::after {
+    font-weight: bold;
+}
+
+.login > a.complete:hover {
+    background-color: var(--secondary-tms-color);
+}

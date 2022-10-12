@@ -38,11 +38,14 @@ class FullIdentity extends Identity {
      * Main constructor for a full identity
      * @param {number} id 
      * @param {string} name 
+     * @param {boolean} authenticated
+     * @param {boolean} admin
+     * @param {boolean} mod
      * @param {TwitchUser[]} twitchAccounts 
      * @param {DiscordUser[]} discordAccounts 
      */
-    constructor(id, name, authenticated, twitchAccounts, discordAccounts) {
-        super(id, name, authenticated);
+    constructor(id, name, authenticated, admin, mod, twitchAccounts, discordAccounts) {
+        super(id, name, authenticated, admin, mod);
 
         this.twitchAccounts = twitchAccounts;
         this.discordAccounts = discordAccounts;
@@ -78,7 +81,7 @@ class FullIdentity extends Identity {
                                 link,
                             ];
                         } catch (e) {
-                            console.error(e);
+                            global.api.Logger.warning(e);
                         }
                     }
                     resolve(result);

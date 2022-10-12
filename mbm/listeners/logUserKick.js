@@ -8,7 +8,7 @@ const getKickInfo = member => {
             const fetchedLogs = await member.guild.fetchAuditLogs({
                 limit: 6,
                 type: 'MEMBER_KICK'
-            }).catch(console.error);
+            }).catch(global.api.Logger.warning);
             
             const auditEntry = fetchedLogs.entries.find(a =>
                 // Small filter function to make use of the little discord provides to narrow down the correct audit entry.
@@ -36,13 +36,13 @@ const listener = {
                 try {
                     kickedBy = await Discord.getUserById(kickInfo.executor.id, false, true);
                 } catch(err) {
-                    console.error(err);
+                    global.api.Logger.warning(err);
                 }
 
                 Discord.getUserById(member.id, false, true).then(user => {
-                    guild.addUserKick(user, kickInfo?.reason ? kickInfo.reason : null, kickedBy).then(() => {}, console.error);
-                    guild.removeUser(user).then(() => {}, console.error);
-                }).catch(console.error);
+                    guild.addUserKick(user, kickInfo?.reason ? kickInfo.reason : null, kickedBy).then(() => {}, global.api.Logger.warning);
+                    guild.removeUser(user).then(() => {}, global.api.Logger.warning);
+                }).catch(global.api.Logger.warning);
             }
 
             guild.getSetting("lde-enabled", "boolean").then(enabled => {
@@ -69,12 +69,12 @@ const listener = {
                                 }
         
                                 channel.send({content: ' ', embeds: [embed]});
-                            }).catch(console.error);
-                        }).catch(console.error);
-                    }).catch(console.error);
+                            }).catch(global.api.Logger.warning);
+                        }).catch(global.api.Logger.warning);
+                    }).catch(global.api.Logger.warning);
                 }
-            }).catch(console.error);
-        }).catch(console.error);
+            }).catch(global.api.Logger.warning);
+        }).catch(global.api.Logger.warning);
     }
 };
 

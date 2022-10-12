@@ -54,27 +54,27 @@ const listener = {
         await client.guilds.fetch();
         client.guilds.cache.forEach(async guild => {
             const members = await guild.members.fetch();
-            console.log(`Fetched members for ${guild.name}: ${members.size} members`)
+            global.api.Logger.info(`Fetched members for ${guild.name}: ${members.size} members`)
 
             guild.channels.fetch().then(channels => {
                 channels.forEach(channel => {
                     if (channel.type === "GUILD_TEXT") {
-                        channel.messages.fetch().then(() => {}, console.error); // By default will just fetch 50 messages.
+                        channel.messages.fetch().then(() => {}, global.api.Logger.warning); // By default will just fetch 50 messages.
                     }
                 });
-            }, console.error);
+            }, global.api.Logger.warning);
 
             await guild.commands.fetch();
 
             Discord.getGuild(guild.id).then(dGuild => {
                 guild.members.cache.forEach(member => {
                     Discord.getUserById(member.id, false, true).then(dUser => {
-                        dGuild.addUser(dUser).then(() => {}, console.error);
-                    }, console.error);
+                        dGuild.addUser(dUser).then(() => {}, global.api.Logger.warning);
+                    }, global.api.Logger.warning);
                 });
                 dGuild.addCommands(guild);
             }).catch(async err => {
-                addCommand(guild, registerCommand.data).then(() => {}, console.error);
+                addCommand(guild, registerCommand.data).then(() => {}, global.api.Logger.warning);
             });
         });
     }
