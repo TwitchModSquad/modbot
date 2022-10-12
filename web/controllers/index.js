@@ -8,6 +8,10 @@ const panel = require("./panel/");
 authRouter.use("/signon", signon);
 authRouter.use("/panel", panel)
 
+noAuthRouter.get("/", (req, res) => {
+    res.render("pages/index")
+});
+
 module.exports = {
     noAuth: noAuthRouter,
     auth: authRouter,
