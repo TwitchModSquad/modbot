@@ -45,14 +45,27 @@ router.get("/", async (req, res) => {
 
     try {
         if (data.selectedChatter) {
-            data.streamers = await con.pquery("select twitch__chat_chatters.*, twitch__user.display_name from twitch__chat_chatters join twitch__user on twitch__user.id = twitch__chat_chatters.streamer_id where chatter_id = ? order by chat_count desc limit 200;", [data.selectedChatter]);
+            data.streamers = await con.pquery("select twitch__chat_chatters.*, twitch__user.display_name from twitch__chat_chatters join twitch__user on twitch__user.id = twitch__chat_chatters.streamer_id where chatter_id = ? order by chat_count desc;", [data.selectedChatter]);
         } else
-            data.streamers = await con.pquery("select twitch__chat_streamers.*, twitch__user.display_name from twitch__chat_streamers join twitch__user on twitch__user.id = twitch__chat_streamers.streamer_id order by chat_count desc limit 200;");
+            data.streamers = await con.pquery("select twitch__chat_streamers.*, twitch__user.display_name from twitch__chat_streamers join twitch__user on twitch__user.id = twitch__chat_streamers.streamer_id order by chat_count desc;");
         
         if (data.selectedStreamer) {
             data.chatters = await con.pquery("select chatter_id, chat_count, twitch__user.display_name from twitch__chat_chatters join twitch__user on twitch__user.id = twitch__chat_chatters.chatter_id where streamer_id = ? order by chat_count desc limit 100;", [data.selectedStreamer]);
         } else
             data.chatters = await con.pquery("select chatter_id, sum(chat_count) as chat_count, twitch__user.display_name from twitch__chat_chatters join twitch__user on twitch__user.id = twitch__chat_chatters.chatter_id group by chatter_id order by chat_count desc limit 100;");
+
+        if (data.selectedChatter && !data.chatters.find(x => x.chatter_id == data.selectedChatter)) {
+            let extended;
+            if (data.selectedStreamer) {
+                extended = await con.pquery("select chatter_id, chat_count, twitch__user.display_name from twitch__chat_chatters join twitch__user on twitch__user.id = twitch__chat_chatters.chatter_id where streamer_id = ? and chatter_id = ? order by chat_count desc limit 1;", [data.selectedStreamer, data.selectedChatter]);
+            } else
+                extended = await con.pquery("select chatter_id, sum(chat_count) as chat_count, twitch__user.display_name from twitch__chat_chatters join twitch__user on twitch__user.id = twitch__chat_chatters.chatter_id group by chatter_id where chatter_id = ? order by chat_count desc limit 100;", [data.selectedChatter]);
+
+            data.chatters = [
+                ...data.chatters,
+                ...extended
+            ]
+        }
     } catch (err) {
         global.api.Logger.warning(err);
     }

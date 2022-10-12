@@ -5,6 +5,7 @@ module.exports = () => {
         if (err) global.api.Logger.warning(err);
         
         for (let i = 0; i < res.length; i++) {
+            let row = res[i];
             try {
                 await con.pquery("insert into twitch__chat_streamers (streamer_id, chat_count) values (?, ?) on duplicate key update chat_count = ?;", [row.streamer_id, row.chat_count, row.chat_count]);
             } catch(err) {
@@ -19,6 +20,7 @@ module.exports = () => {
         if (err) global.api.Logger.warning(err);
         
         for (let i = 0; i < res.length; i++) {
+            let row = res[i];
             try {
                 await con.pquery("insert into twitch__chat_chatters (chatter_id, streamer_id, chat_count, last_active) values (?, ?, ?, ?) on duplicate key update chat_count = ?, last_active = ?;", [row.streamer_id, row.chat_count, row.chat_count]);
             } catch(err) {
