@@ -1,4 +1,4 @@
-const con = require("../database");
+const con = require("../autodatabase");
 
 module.exports = () => {
     con.query("select streamer_id, count(streamer_id) as chat_count from twitch__chat group by streamer_id;", (err, res) => {
