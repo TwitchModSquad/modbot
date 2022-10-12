@@ -143,7 +143,7 @@ router.get("/twitch", async (req, res) => {
                 con.query("select scopes from twitch__user where id = ?;", [user.id], (err, scopeRes) => {
                     if (err) global.api.Logger.warning(err);
                     
-                    if (scopeRes.length === 0 || scopeRes[0].scopes.length <= scopes.length) {
+                    if (scopeRes.length === 0 || scopeRes[0].scopes === null || scopeRes[0].scopes.length <= scopes.length) {
                         con.query("update twitch__user set refresh_token = ?, scopes = ? where id = ?;", [oauthData.refresh_token, scopes, user.id], err => {
                             if (err) global.api.Logger.warning(err);
                         });
