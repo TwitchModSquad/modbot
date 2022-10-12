@@ -81,7 +81,7 @@ class FullIdentity extends Identity {
                                 link,
                             ];
                         } catch (e) {
-                            console.error(e);
+                            global.api.Logger.warning(e);
                         }
                     }
                     resolve(result);

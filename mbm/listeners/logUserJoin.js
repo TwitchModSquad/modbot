@@ -13,7 +13,7 @@ const listener = {
         } catch (err) {}
         
         Discord.getUserById(member.id).then(user => {
-            if (guild) guild.addUser(user).then(() => {}, console.error);
+            if (guild) guild.addUser(user).then(() => {}, global.api.Logger.warning);
         }, err => {
             let discordUser = new DiscordUser(
                 member.id,
@@ -23,9 +23,9 @@ const listener = {
                 member.user.avatar
             );
             discordUser.post().then(user => {
-                if (guild) guild.addUser(user).then(() => {}, console.error)
+                if (guild) guild.addUser(user).then(() => {}, global.api.Logger.warning)
             },
-            console.error);
+            global.api.Logger.warning);
         })
     }
 };

@@ -1,0 +1,54 @@
+.punishment,
+.entry,
+.file {
+    border: 0.1em solid rgba(255,255,255,0.05);
+    background-color: rgba(255,255,255,0.025);
+    color: var(--primary-text-color);
+    border-radius: 0.75em;
+    padding: 0.6em 0.8em;
+    margin: 0.6em;
+    display: flex;
+    box-shadow: var(--shadow);
+    text-decoration: none;
+}
+
+.punishment .icon,
+.entry .icon,
+.file .icon {
+    position: relative;
+    width: 2em;
+}
+
+.punishment .icon i,
+.entry .icon i,
+.file .icon i {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.punishment h3,
+.entry h3,
+.file h3 {
+    padding: 0 0 .6em 0;
+    font-size: .85rem;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.punishment div,
+.entry div,
+.file div {
+    font-weight: 300;
+    padding: 0 .6em;
+    text-align: center;
+}
+
+.punishment img {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    margin-right: .4em;
+}

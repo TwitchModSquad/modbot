@@ -39,5 +39,5 @@ app.use('/', routes.auth);
 app.use('/', controllers.auth);
 
 app.listen(config.backend.port, () => {
-    console.log("Express server started on port " + config.backend.port);
+    global.api.Logger.info("Express server started on port " + config.backend.port);
 });

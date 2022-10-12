@@ -1,4 +1,4 @@
-const API_URI = "http://localhost:8080/";
+const API_URI = "http://localhost:8080/api/";
 
 function createCookie(name, value, days) {
     if (days) {
@@ -47,10 +47,10 @@ const api = {
 const parse = {
     account: {
         discord(object) {
-            return `<div class="discord-user"><img src="${object.avatar_url}" /><div class="user-info"><div class="user-name">${object.name}<span class="discriminator">#${object.discriminator}</span></div><div class="user-stats">${object.id}</div></div></div>`;
+            return `<a class="discord-user" href="/panel/user/${object.id}"><img src="${object.avatar_url}" /><div class="user-info"><div class="user-name">${object.name}<span class="discriminator">#${object.discriminator}</span></div><div class="user-stats">${object.id}</div></div></a>`;
         },
         twitch(object) {
-            return `<div class="twitch-user"><img src="${object.profile_image_url}" /><div class="user-info"><div class="user-name">${object.display_name}</div><div class="user-stats">${object.id} <span class="bullet">&bullet;</span> ${object.follower_count}&nbsp;follower${object.follower_count == 1 ? "" : "s"} <span class="bullet">&bullet;</span> ${object.view_count}&nbsp;view${object.view_count == 1 ? "" : "s"}</div></div></div>`;
+            return `<a class="twitch-user" href="/panel/user/${object.id}"><img src="${object.profile_image_url}" /><div class="user-info"><div class="user-name">${object.display_name}</div><div class="user-stats">${object.id} <span class="bullet">&bullet;</span> ${object.follower_count}&nbsp;follower${object.follower_count == 1 ? "" : "s"} <span class="bullet">&bullet;</span> ${object.view_count}&nbsp;view${object.view_count == 1 ? "" : "s"}</div></div></a>`;
         },
     },
 };

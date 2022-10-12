@@ -1,0 +1,5 @@
+<tr>
+    <td><%- include("./user/identity", {account: guild.represents}) %></td>
+    <td><%= guild.name %></td>
+    <td><a href="/panel/user/<%= guild.owner.id %>">@<%= guild.owner.name %>#<%= guild.owner.discriminator %></a></td>
+</tr>

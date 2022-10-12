@@ -14,7 +14,7 @@
     <%- include("../../partials/panel/header") %>
 
     <div class="sidebar-container">
-        <%- include("../../partials/panel/sidebar", {page: "chat-history"}) %>
+        <%- include("../../partials/panel/sidebar", {page: "chat-history", session: session}) %>
         <main>
             <form action="GET" class="container container-sm">
                 <select name="streamer" id="streamer" class="col-6">
@@ -46,7 +46,8 @@
                             -->&nbsp;<span class="timestamp"><%- chatLog.timesent %></span>
                         </div>
                         <div class="chat-body">
-                            <span class="user"<%- chatLog.color ? ` style="color: ${chatLog.color};"` : "" %>><%= users[chatLog.chatter_id].display_name %></span>:
+                            <%- chatLog.badges %>
+                            <a class="user"<%- chatLog.color ? ` style="color: ${chatLog.color};"` : "" %>  href="/panel/user/<%= users[chatLog.chatter_id].id %>"><%= users[chatLog.chatter_id].display_name %></a>:
                             <span class="message"><%- chatLog.message %></span>
                         </div>
                     </div>

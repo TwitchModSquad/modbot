@@ -31,7 +31,7 @@ router.get('/:file', (req, res) => {
     if (req.params.file.match(NAME_REGEX)) {
         con.query("select * from archive__files where local_path is not null and name = ?;", [req.params.file], (err, result) => {
             if (err || result.length === 0) {
-                console.log(err);
+                global.api.Logger.info(err);
                 res.status(404);
                 res.json({success: false, error: "File not found", stage: 3});
                 return;
@@ -86,7 +86,7 @@ router.get('/:file', (req, res) => {
                         res.sendFile(OUTPUT_FILE);
                     });
                 }, err => {
-                    console.log(err);
+                    global.api.Logger.info(err);
                     res.status(404);
                     res.json({success: false, error: "File not found", stage: 2});
                 });

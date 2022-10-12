@@ -197,7 +197,7 @@ class Entry {
                         }
                     }
                 } catch (err) {
-                    console.error(err);
+                    global.api.Logger.warning(err);
                 }
             }
 
@@ -226,24 +226,24 @@ class Entry {
                             user.createDM().then(channel => {
                                 channel.messages.fetch(messageObj.id).then(async message => {
                                     let content = ((message.content && message.content.length > 0) ? message.content : " ");
-                                    message.edit({content: content, embeds: [newEmbed]}).then(() => {}, console.error);
-                                }, console.error);
-                            }, console.error);
+                                    message.edit({content: content, embeds: [newEmbed]}).then(() => {}, global.api.Logger.warning);
+                                }, global.api.Logger.warning);
+                            }, global.api.Logger.warning);
                         });
                     } else if (messageObj.reason === "edit") {
                         global.client.discord.users.fetch(messageObj.channel_id).then(user => {
                             user.createDM().then(channel => {
                                 channel.messages.fetch(messageObj.id).then(async message => {
-                                    message.edit(editMessage).then(() => {}, console.error);
-                                }, console.error);
-                            }, console.error);
+                                    message.edit(editMessage).then(() => {}, global.api.Logger.warning);
+                                }, global.api.Logger.warning);
+                            }, global.api.Logger.warning);
                         });
                     } else {
                         global.client.discord.channels.fetch(messageObj.channel_id).then(channel => {
                             channel.messages.fetch(messageObj.id).then(async message => {
                                 let content = ((message.content && message.content.length > 0) ? message.content : " ");
-                                message.edit({content: content, embeds: [newEmbed], components: [await this.createCrossbanRow()]}).then(() => {}, console.error);
-                            }, console.error);
+                                message.edit({content: content, embeds: [newEmbed], components: [await this.createCrossbanRow()]}).then(() => {}, global.api.Logger.warning);
+                            }, global.api.Logger.warning);
                         });
                     }
                 });
@@ -452,7 +452,7 @@ class Entry {
                 }
                 con.query("select id from archive__users where archive_id = ? and type = ? and user = ? and value = ?;", [this.id, type, user, value], (err, res) => {
                     if (err) {
-                        console.error(err);
+                        global.api.Logger.warning(err);
                         reject(err);
                         return;
                     }
@@ -503,14 +503,14 @@ class Entry {
 
                 con.query("insert into archive__files (archive_id, local_path, remote_path, name, label, content_type) values (?, ?, ?, ?, ?, ?);", [this.id, local_path, remote_path, name, label, content_type], err => {
                     if (err) {
-                        console.error(err);
+                        global.api.Logger.warning(err);
                         reject(err);
                         return;
                     }
 
                     con.query("select id from archive__files where archive_id = ? and local_path = ? and remote_path = ? and name = ? and label = ? and content_type = ?;", [this.id, local_path, remote_path, name, label, content_type], (err, res) => {
                         if (err) {
-                            console.error(err);
+                            global.api.Logger.warning(err);
                             reject(err);
                             return;
                         }
@@ -654,7 +654,7 @@ class Entry {
         });
 
         con.query("select id, channel_id, reason from archive__messages where archive_id = ?;", [this.id], (err, res) => {
-            if (err) {console.error(err);return;}
+            if (err) {global.api.Logger.warning(err);return;}
 
             res.forEach(messageObj => {
                 if (messageObj.reason === "receipt" || messageObj.reason === "update") {
@@ -662,18 +662,18 @@ class Entry {
                         user.createDM().then(channel => {
                             channel.messages.fetch(messageObj.id).then(async message => {
                                 if (messageObj.reason === "receipt") {
-                                    message.edit({content: '***This archive entry has been deleted.***', embeds: [await this.discordEmbed()]}).then(() => {}, console.error);
+                                    message.edit({content: '***This archive entry has been deleted.***', embeds: [await this.discordEmbed()]}).then(() => {}, global.api.Logger.warning);
                                 } else {
-                                    message.delete().then(() => {}, console.error);
+                                    message.delete().then(() => {}, global.api.Logger.warning);
                                 }
-                            }, console.error);
-                        }, console.error);
+                            }, global.api.Logger.warning);
+                        }, global.api.Logger.warning);
                     });
                 } else {
                     global.client.discord.channels.fetch(messageObj.channel_id).then(channel => {
                         channel.messages.fetch(messageObj.id).then(async message => {
-                            message.delete().then(() => {}, console.error);
-                        }, console.error);
+                            message.delete().then(() => {}, global.api.Logger.warning);
+                        }, global.api.Logger.warning);
                     });
                 }
             });
@@ -695,7 +695,7 @@ class Entry {
         // Attempt to remove any public records that currently exist.
 
         con.query("select * from archive__messages where archive_id = ? and (reason = 'public-record' or reason = 'sort');", [this.id], async (err, res) => {
-            if (err) {console.error(err);return;}
+            if (err) {global.api.Logger.warning(err);return;}
 
             let oldChannel = null;
 
@@ -706,14 +706,14 @@ class Entry {
                     oldChannel = channel;
                     channel.messages.fetch(messageObj.id).then(message => {
                         message.delete();
-                    }, console.error);
+                    }, global.api.Logger.warning);
                 } catch (e) {
-                    console.error(e);
+                    global.api.Logger.warning(e);
                 }
             }
 
             con.query("delete from archive__messages where archive_id = ? and (reason = 'public-record' or reason = 'sort');", [this.id], async err => {
-                if (err) {console.error(err);return;}
+                if (err) {global.api.Logger.warning(err);return;}
 
                 channel.send({content: ' ', embeds: [await this.discordEmbed()], components: [await this.createCrossbanRow()]}).then(message => {
 
@@ -723,11 +723,11 @@ class Entry {
                         oldChannel?.id,
                         channel.id,
                     ], err => {
-                        if (err) console.error(err);
+                        if (err) global.api.Logger.warning(err);
                     });
 
                     con.query("insert into archive__messages (id, guild_id, channel_id, archive_id, reason) values (?, ?, ?, ?, 'public-record');", [message.id, message.guild.id, message.channel.id, this.id], async err => {
-                        if (err) console.error(err);
+                        if (err) global.api.Logger.warning(err);
 
                         if (this.owner?.discordAccounts.length > 0) {
                             let receiptMessage = null;
@@ -764,12 +764,12 @@ class Entry {
 
                                         const addMessage = updateMessage => {
                                             con.query("insert into archive__messages (id, guild_id, channel_id, archive_id, reason) values (?, ?, ?, ?, 'update');", [updateMessage.id, message.guild.id, discordUser.id, this.id], err => {
-                                                if (err) console.error(err);
+                                                if (err) global.api.Logger.warning(err);
                                             });
                                         }
 
                                         const fallbackFunc = () => {
-                                            dmChannel.send({content: ' ', embeds: [embed]}).then(addMessage, console.error);
+                                            dmChannel.send({content: ' ', embeds: [embed]}).then(addMessage, global.api.Logger.warning);
                                         }
 
                                         if (receiptMessage) {
@@ -782,12 +782,12 @@ class Entry {
                                         } else {
                                             fallbackFunc();
                                         }
-                                    }, console.error);
-                                }, console.error);
+                                    }, global.api.Logger.warning);
+                                }, global.api.Logger.warning);
                             });
                         }
                     });
-                }, console.error);
+                }, global.api.Logger.warning);
             });
         });
     }

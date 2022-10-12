@@ -19,11 +19,11 @@ const listener = {
                         newMessage.content
                     ], err => {
                         if (err) {
-                            console.error(err);
+                            global.api.Logger.warning(err);
                         }
                     });
                 }).catch(err => {
-                    console.error(err);
+                    global.api.Logger.warning(err);
                 });
 
                 guild.getSetting("lde-enabled", "boolean").then(enabled => {
@@ -38,12 +38,12 @@ const listener = {
                                         .addField("New Message", "```\n" + newMessage.content.replace(/\\`/g, "`").replace(/`/g, "\\`") + "```", false)
                                         .setColor(0x4c80d4)
                                         .setAuthor({name: oldMessage.author.username, iconURL: oldMessage.author.avatarURL()})]});
-                            }).catch(console.error);
+                            }).catch(global.api.Logger.warning);
                         }
-                    }).catch(console.error);
-                }).catch(console.error);
+                    }).catch(global.api.Logger.warning);
+                }).catch(global.api.Logger.warning);
             }).catch(err => {
-                console.error(err);
+                global.api.Logger.warning(err);
             });
         }
     }

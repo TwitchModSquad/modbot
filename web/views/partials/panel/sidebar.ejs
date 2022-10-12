@@ -1,7 +1,25 @@
-<div class="sidebar">
+<% 
+    function isStreamer() {
+        let streamer = false;
+        if (locals.session?.identity?.twitchAccounts) {
+            locals.session.identity.twitchAccounts.forEach(account => {
+                if (account.follower_count >= 5000 || account.affiliation === "partner") {
+                    streamer = true;
+                }
+            });
+        }
+        return streamer;
+    }
+%><div class="sidebar">
     <nav>
-        <a href="/panel/" <%- page === "home" ? ' class="active"' : '' %>><i class="fa-solid fa-house"></i>&nbsp;Home</a><!--
+       <% if (locals.session?.identity?.mod || locals.session?.identity?.admin) { %><div class="separator">TMS Moderation Panel</div><!--
+    --><a href="/panel/moderator/logs" <%- page === "moderator/logs" ? ' class="active"' : '' %>><i class="fa-regular fa-cabinet-filing"></i>&nbsp;ModBot Logs</a><!--
+    --><% } %><div class="separator">Records</div><!--
+    --><a href="/panel/" <%- page === "home" ? ' class="active"' : '' %>><i class="fa-solid fa-house"></i>&nbsp;Home</a><!--
     --><a href="/panel/chat-history" <%- page === "chat-history" ? ' class="active"' : '' %>><i class="fa-solid fa-comments"></i>&nbsp;Chat History</a><!--
-    --><a href="/panel/search" <%- page === "search" ? ' class="active"' : '' %>><i class="fa-solid fa-magnifying-glass"></i>&nbsp;User Search</a>
+    --><a href="/panel/search" <%- page === "search" ? ' class="active"' : '' %>><i class="fa-solid fa-magnifying-glass"></i>&nbsp;User Search</a><!--
+    --><% if (locals.user) { %><a href="/panel/user/<%= user.id %>" class="margin-left active"><i class="fa-regular fa-user"></i>&nbsp;User: <%= (user.display_name ? user.display_name : user.name + "#" + user.discriminator) %></a><% } %><!--
+    --><% if (locals.entry) { %><a href="/panel/entry/<%= entry.id %>" class="margin-left active"><i class="fa-solid fa-file"></i>&nbsp;Entry: <%= entry.id %></a><%
+    } if (isStreamer()) { %><div class="separator">Streamer Functions</div><a href="/panel/streamer-functions"<%- page === "streamer-functions" ? ' class="active"' : '' %>><i class="fa-solid fa-signal-stream"></i>&nbsp;Streamer Functions</a><% } %>
     </nav>
 </div>

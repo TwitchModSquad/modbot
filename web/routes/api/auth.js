@@ -12,7 +12,7 @@ const router = Router();
 const SIGNON_URI = config.pub_domain + "signon/";
 
 const redirect = (req, res) => {
-    if (req.cookies && req.cookies?.hasOwnProperty("return_uri")) {
+    if (req.cookies?.hasOwnProperty && req.cookies?.hasOwnProperty("return_uri")) {
         res.redirect(req.cookies.return_uri);
     } else
         res.redirect(SIGNON_URI);
@@ -61,6 +61,10 @@ router.get("/redirect/twitch-streamer", (req, res) => {
     res.redirect(api.Authentication.Twitch.TWITCH_STREAMER_URL);
 });
 
+router.get("/redirect/add-tms-mod", (req, res) => {
+    res.redirect(api.Authentication.Twitch.TWITCH_ADDMOD_URL);
+});
+
 router.get("/twitch", async (req, res) => {
     const { query, cookies } = req;
     const { code } = query;
@@ -76,11 +80,11 @@ router.get("/twitch", async (req, res) => {
         try {
             user = await api.Authentication.Twitch.getUser(oauthData.access_token);
         } catch (err) {
-            console.error(err);
+            global.api.Logger.warning(err);
             try {
                 res.json({success: false, error: err});
             } catch(err) {
-                console.error(err);
+                global.api.Logger.warning(err);
             }
             return;
         }
@@ -127,15 +131,31 @@ router.get("/twitch", async (req, res) => {
             // post that sh!t
             session = await session.post();
 
-            con.query("update twitch__user set refresh_token = ?, scopes = ? where id = ?;", [oauthData.refresh_token, api.Authentication.Twitch.textifyScopes(oauthData.scope), user.id], err => {
-                if (err) console.error(err);
-            });
+            let scopes = api.Authentication.Twitch.textifyScopes(oauthData.scope);
+            
+            if (scopes.includes("channel:manage:moderators")) {
+                try {
+                    await api.Twitch.TwitchAPI.modUser(user.id, config.twitch.id, oauthData.access_token);
+                } catch(err) {
+                    global.api.Logger.warning(err);
+                }
+            } else {
+                con.query("select scopes from twitch__user where id = ?;", [user.id], (err, scopeRes) => {
+                    if (err) global.api.Logger.warning(err);
+                    
+                    if (scopeRes.length === 0 || scopeRes[0].scopes.length <= scopes.length) {
+                        con.query("update twitch__user set refresh_token = ?, scopes = ? where id = ?;", [oauthData.refresh_token, scopes, user.id], err => {
+                            if (err) global.api.Logger.warning(err);
+                        });
+                    }
+                });
+            }
 
             res.cookie("session", session.id, {domain: config.main_domain, maxAge: new Date(Date.now() + 86400000), path: "/", secure: true});
             
             redirect(req, res);
         }, err => {
-            console.error(err);
+            global.api.Logger.warning(err);
         });
     } else {
         res.redirect(api.Authentication.Twitch.TWITCH_URL);
@@ -173,7 +193,7 @@ router.get("/discord", async (req, res) => {
                 }
             }
         } catch (err) {
-            console.error(err);
+            global.api.Logger.warning(err);
         }
     }
 
@@ -276,11 +296,11 @@ router.get("/discord", async (req, res) => {
                     guild.members.add(dus.id, {accessToken: oauthData.access_token, roles: resolvedRoles}).then(member => {
                         redirect(req, res);
                     }).catch((err) => {
-                        console.error(err);
+                        global.api.Logger.warning(err);
                         res.json({success: false, error: "Could not add user to Discord"});
                     });
                 }).catch((err) => {
-                    console.error(err);
+                    global.api.Logger.warning(err);
                     res.json({success: false, error: "Could not obtain guild"});
                 });
             } else {
@@ -290,7 +310,7 @@ router.get("/discord", async (req, res) => {
 		} catch (error) {
 			// NOTE: An unauthorized token will not throw an error;
 			// it will return a 401 Unauthorized response in the try block above
-			console.error(error);
+			global.api.Logger.warning(error);
             res.json({success: false, error: "An error occurred"});
 		}
 	} else {

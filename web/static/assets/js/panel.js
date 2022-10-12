@@ -7,4 +7,8 @@ $(function() {
     if ($("body").width() < 800) {
         $("html").addClass("sidebar-collapse");
     }
+
+    $("img").on("error", function() {
+        $(this).attr("src", "/assets/images/blank-profile.webp");
+    });
 });

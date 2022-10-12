@@ -38,13 +38,15 @@
 .chat-log .user {
     color: var(--secondary-text-color);
     text-shadow: 2px 2px 8px rgba(255,255,255,0.1);
+    text-decoration: none;
 }
 
 .chat-log.command .message {
     color: var(--secondary-text-color);
 }
 
-.chat-log .message img {
+.chat-log .message img,
+.chat-log img.chat-badge {
     display: inline;
     height: 18px;
 }

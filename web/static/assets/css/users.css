@@ -1,11 +1,19 @@
 .discord-user, .twitch-user, .identity {
     border: .1em solid rgba(255,255,255,0.05);
     background-color: rgba(255,255,255,0.025);
+    color: var(--primary-text-color);
     border-radius: .75em;
     padding: .6em .8em;
     margin: .6em;
     display: flex;
     box-shadow: var(--shadow);
+    text-decoration: none;
+    text-align: left;
+    cursor: default;
+}
+
+a.discord-user, a.twitch-user, a.identity {
+    cursor: pointer;
 }
 
 .discord-user img, .twitch-user img, .identity img {

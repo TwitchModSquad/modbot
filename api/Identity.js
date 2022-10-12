@@ -91,7 +91,7 @@ class Identity {
      */
     post() {
         return new Promise((resolve, reject) => {
-            con.query("insert into identity (id, name, authenticated, admin, `mod`) values (?, ?, ?, ?, ?) on duplicate key update name = ?, authenticated = ?, admin = ?, `mod` = ?;", [
+            con.query("insert into identity (id, name, authenticated, admin, moderator) values (?, ?, ?, ?, ?) on duplicate key update name = ?, authenticated = ?, admin = ?, moderator = ?;", [
                 this.id,
                 this.name,
                 this.authenticated,
@@ -106,7 +106,7 @@ class Identity {
                     reject(err);
                 } else {
                     if (this.id === null || this.id === undefined) {
-                        con.query("select id, name, authenticated, admin, mod from identity where name = ? order by id desc limit 1;", [this.name], (err, res) => {
+                        con.query("select id, name, authenticated, admin, moderator from identity where name = ? order by id desc limit 1;", [this.name], (err, res) => {
                             if (err) {
                                 reject(err);
                             } else if (res.length < 1) {

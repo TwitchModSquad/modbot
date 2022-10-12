@@ -27,10 +27,10 @@ fs.readdir(TEMP_DIRECTORY, (err, files) => {
     if (!err) {
         for (const file of files) {
             fs.unlink(path.join(TEMP_DIRECTORY, file), err => {
-                if (err) console.error(err);
+                if (err) global.api.Logger.warning(err);
             });
         }
-    } else console.error(err);
+    } else global.api.Logger.warning(err);
 });
 } catch (e) {}
 
@@ -133,7 +133,7 @@ const listener = {
                                 });
                             }
                         } catch (err) {
-                            console.error(err);
+                            global.api.Logger.warning(err);
                             temporaryMessage(message.channel, "send", "Message should either contain an attachment or a URL message content", 5000);
                         }
                     }

@@ -9,6 +9,8 @@ const Cache = require("../Cache/Cache");
 const Assumption = require("../Assumption");
 const AssumedTwitchUser = require("./AssumedTwitchUser");
 
+const TwitchAPI = require("./TwitchAPI");
+
 const config = require("../../config.json");
 
 const {ApiClient} = require("twitch");
@@ -28,6 +30,13 @@ class Twitch {
      * @type {ApiClient}
      */
     Direct = api;
+
+    /**
+     * Custom class for Helix calls
+     * 
+     * @type {TwitchAPI}
+     */
+    TwitchAPI = new TwitchAPI();
 
     /**
      * Access to Chat methods
@@ -77,7 +86,7 @@ class Twitch {
      */
     getUserById(id, bypassCache = false, requestIfUnavailable = false) {
         return this.userCache.get(id, (resolve, reject) => {
-            con.query("select twitch__user.*, identity.name as identity_name, identity.authenticated, identity.admin, identity.mod from twitch__user left join identity on twitch__user.identity_id = identity.id where twitch__user.id = ?;", [id], (err, res) => {
+            con.query("select twitch__user.*, identity.name as identity_name, identity.authenticated, identity.admin, identity.moderator from twitch__user left join identity on twitch__user.identity_id = identity.id where twitch__user.id = ?;", [id], (err, res) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -154,7 +163,7 @@ class Twitch {
                                     new AssumedTwitchUser(user, [new Assumption("display_name", display_name, user.display_name)]),
                                 ];
                             } catch (e) {
-                                console.error(e);
+                                global.api.Logger.warning(e);
                             }
                         }
                         resolve(result);
@@ -189,7 +198,7 @@ class Twitch {
                                 user,
                             ];
                         } catch (e) {
-                            console.error(e);
+                            global.api.Logger.warning(e);
                         }
                     }
                     resolve(result);

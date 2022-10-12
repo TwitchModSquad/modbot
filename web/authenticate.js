@@ -26,13 +26,12 @@ router.use('/', (req, res, next) => {
             if (result.length > 0) {
                 let row = result[0];
                 api.getFullIdentity(row["iid"]).then(identity => {
-                    if (!identity.authenticated) {
-                        req.session = {id: row.sid, created: row.screated, identity: identity};
-                        req.authCode = 2;
-                    } else {
-                        req.session = {id: row.sid, created: row.screated, identity: identity};
+                    if (identity.authenticated) {
                         req.authCode = 3;
+                    } else {
+                        req.authCode = 2;
                     }
+                    req.session = {id: row.sid, created: row.screated, identity: identity};
                     next();
                 }).catch(err => {
                     res.json({success: false, error: err});

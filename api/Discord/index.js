@@ -52,7 +52,7 @@ class Discord {
      */
     getUserById(id, overrideCache = false, requestIfUnavailable = false) {
         return this.userCache.get(id, (resolve, reject) => {
-            con.query("select discord__user.*, identity.name as identity_name, identity.authenticated, identity.admin, identity.mod from discord__user left join identity on discord__user.identity_id = identity.id where discord__user.id = ?;", [id], (err, res) => {
+            con.query("select discord__user.*, identity.name as identity_name, identity.authenticated, identity.admin, identity.moderator from discord__user left join identity on discord__user.identity_id = identity.id where discord__user.id = ?;", [id], (err, res) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -100,7 +100,7 @@ class Discord {
                                 new AssumedDiscordUser(user, [new Assumption("name", name, user.name)]),
                             ];
                         } catch (e) {
-                            console.error(e);
+                            global.api.Logger.warning(e);
                         }
                     }
                     resolve(result);
@@ -137,7 +137,7 @@ class Discord {
                                 new AssumedDiscordUser(user, [new Assumption("name", name, user.name), new Assumption("discriminator", discriminator, user.discriminator)]),
                             ];
                         } catch (e) {
-                            console.error(e);
+                            global.api.Logger.warning(e);
                         }
                     }
                     resolve(result);
@@ -166,7 +166,7 @@ class Discord {
                                 user,
                             ];
                         } catch (e) {
-                            console.error(e);
+                            global.api.Logger.warning(e);
                         }
                     }
                     resolve(result);

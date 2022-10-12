@@ -9,7 +9,7 @@ const getExecutor = member => {
             const fetchedLogs = await member.guild.fetchAuditLogs({
                 limit: 6,
                 type: 'MEMBER_UPDATE'
-            }).catch(console.error);
+            }).catch(global.api.Logger.warning);
             
             const auditEntry = fetchedLogs.entries.find(a =>
                 // Small filter function to make use of the little discord provides to narrow down the correct audit entry.
@@ -48,12 +48,12 @@ const listener = {
                                 embed.addField("Old Nickname", "```\n" + (oldMember.nickname ? oldMember.nickname.replace(/\\`/g, "`").replace(/`/g, "\\`") : "[unset]") + "```", false)
                                 embed.addField("New Nickname", "```\n" + (newMember.nickname ? newMember.nickname.replace(/\\`/g, "`").replace(/`/g, "\\`") : "[unset]") + "```", false)
                                 channel.send({content: ' ', embeds: [embed]});
-                            }).catch(console.error);
+                            }).catch(global.api.Logger.warning);
                         }
-                    }).catch(console.error);
-                }).catch(console.error);
+                    }).catch(global.api.Logger.warning);
+                }).catch(global.api.Logger.warning);
             }
-        }).catch(console.error);
+        }).catch(global.api.Logger.warning);
     }
 };
 

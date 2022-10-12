@@ -79,15 +79,15 @@ const command = {
                     await guild.getSettings();
 
                     guild.post().then(guild => {
-                        guild.addCommands(interaction.guild).then(() => {}, console.error);
+                        guild.addCommands(interaction.guild).then(() => {}, global.api.Logger.warning);
                         interaction.reply({content: "Registered!", ephemeral: true})
-                        interaction.command?.delete().then(() => {}, console.error);
+                        interaction.command?.delete().then(() => {}, global.api.Logger.warning);
                     }).catch(err => {
-                        console.error(err);
+                        global.api.Logger.warning(err);
                         interaction.reply(errorEmbed("An error occurred: " + err));
                     });
                 } catch(err) {
-                    console.error(err);
+                    global.api.Logger.warning(err);
                     interaction.reply(errorEmbed("An error occurred: " + err));
                 }
             });

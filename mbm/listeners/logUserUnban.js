@@ -9,9 +9,9 @@ const getUnbanInfo = ban => {
             const fetchedLogs = await ban.guild.fetchAuditLogs({
                 limit: 6,
                 type: 'GUILD_BAN_REMOVE'
-            }).catch(console.error);
+            }).catch(global.api.Logger.warning);
 
-            fetchedLogs.entries.forEach(e => console.log(e.extra));
+            fetchedLogs.entries.forEach(e => global.api.Logger.info(e.extra));
             const auditEntry = fetchedLogs.entries.find(a =>
                 // Small filter function to make use of the little discord provides to narrow down the correct audit entry.
                 a.target.id === ban.user.id &&
@@ -34,8 +34,8 @@ const listener = {
             const unbanInfo = await getUnbanInfo(ban);
 
             Discord.getUserById(ban.user.id, false, true).then(user => {
-                guild.removeUserBan(user).then(() => {}, console.error);
-            }).catch(console.error);
+                guild.removeUserBan(user).then(() => {}, global.api.Logger.warning);
+            }).catch(global.api.Logger.warning);
 
             guild.getSetting("lde-enabled", "boolean").then(enabled => {
                 guild.getSetting("lde-user-unban", "boolean").then(unbanEnabled => {
@@ -47,10 +47,10 @@ const listener = {
                                     .setDescription(`User ${ban.user} was unbanned from the guild`)
                                     .setColor(0x595959)
                                     .setAuthor({name: author.username, iconURL: author.avatarURL()})]});
-                        }).catch(console.error);
+                        }).catch(global.api.Logger.warning);
                     }
-                }).catch(console.error);
-            }).catch(console.error);
+                }).catch(global.api.Logger.warning);
+            }).catch(global.api.Logger.warning);
 
             global.client.discord.channels.fetch(config.liveban_channel).then(banChannel => {
                 const embed = new MessageEmbed()
@@ -66,7 +66,7 @@ const listener = {
 
                 banChannel.send({content: ' ', embeds: [embed]});
             });
-        }).catch(console.error);
+        }).catch(global.api.Logger.warning);
     }
 };
 

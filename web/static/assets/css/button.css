@@ -1,0 +1,10 @@
+button {
+    background: var(--primary-tms-color);
+    color: var(--primary-text-color);
+    font-size: 1rem;
+    padding: .6em .8em;
+    border-radius: .3em;
+    border: none;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+}

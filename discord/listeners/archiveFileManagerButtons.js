@@ -34,15 +34,14 @@ const listener = {
 
                     if (file && file.hasOwnProperty("local_path")) {
                         fs.unlink(file.local_path, err => {
-                            if (err) console.error(err);
+                            if (err) global.api.Logger.warning(err);
                         });
                     }
 
                     cache[user.identity.id].files = cache[user.identity.id].files.filter(x => x.message.id !== interaction.message.id);
                     interaction.message.delete();
-                    console.log(cache[user.identity.id]);
                 }, err => {
-                    console.error(err);
+                    global.api.Logger.warning(err);
                     interaction.reply("You're not properly linked to TMS");
                 });
             }

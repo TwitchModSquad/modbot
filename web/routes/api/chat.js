@@ -37,7 +37,7 @@ router.get("/select-menu", (req, res) => {
     if (req.query.user) {
         con.query("select streamer_id, chat_count from twitch__chat_chatters where chatter_id = ? order by chat_count desc;", [req.query.user], async (err, response) => {
             if (err) {
-                console.error(err);
+                global.api.Logger.warning(err);
                 res.json({success: false, error: err});
                 return;
             }
@@ -59,7 +59,7 @@ router.get("/select-menu", (req, res) => {
     } else if (req.query["all-streamers"]) {
         con.query("select streamer_id, chat_count from twitch__chat_streamers order by chat_count desc;", async (err, response) => {
             if (err) {
-                console.error(err);
+                global.api.Logger.warning(err);
                 res.json({success: false, error: err});
                 return;
             }
@@ -81,7 +81,7 @@ router.get("/select-menu", (req, res) => {
     } else if (req.query.channel) {
         con.query("select chatter_id, chat_count from twitch__chat_chatters where streamer_id = ? order by chat_count desc;", [req.query.channel], async (err, response) => {
             if (err) {
-                console.error(err);
+                global.api.Logger.warning(err);
                 res.json({success: false, error: err});
                 return;
             }

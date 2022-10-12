@@ -43,7 +43,7 @@ const view = async (guild, interaction, settingChanged = null) => {
 
     embed.setDescription(description);
 
-    interaction.reply({content: ' ', embeds: [embed], ephemeral: true}).then(console.log, console.error);
+    interaction.reply({content: ' ', embeds: [embed], ephemeral: true}).then(global.api.Logger.info, global.api.Logger.warning);
 }
 
 const command = {
@@ -147,7 +147,7 @@ const command = {
                 } else {
                     interaction.reply(errorEmbed(`Setting ${interaction.options.getString("setting")} does not exist!`));
                 }
-            }).catch(err => {console.error(err);interaction.reply(errorEmbed("" + err));});
+            }).catch(err => {global.api.Logger.warning(err);interaction.reply(errorEmbed("" + err));});
         } else {
             interaction.reply(errorEmbed("Command must be sent in a guild"));
         }

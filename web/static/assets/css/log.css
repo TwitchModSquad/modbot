@@ -1,0 +1,32 @@
+:root {
+    --info-color: #d2dbe5;
+    --warning-color: #e3de80;
+    --severe-color: #dc4e4e;
+}
+
+.log {
+    display: flex;
+    font-family: 'Noto Sans Mono', monospace;
+    font-size: .9rem;
+    margin: .1em 0;
+}
+
+.log .log-body {
+    margin-left: .6em;
+}
+
+.log .timestamp {
+    color: var(--tertiary-text-color);
+}
+
+.log-info {
+    color: var(--info-color);
+}
+
+.log-warning {
+    color: var(--warning-color);
+}
+
+.log-severe {
+    color: var(--severe-color);
+}

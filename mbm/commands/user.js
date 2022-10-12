@@ -94,10 +94,10 @@ const command = {
 
                     interaction.reply({content: ' ', embeds: embeds, ephemeral: true});
                 } catch (err) {
-                    console.error(err);
+                    global.api.Logger.warning(err);
                     interaction.reply(errorEmbed(err.toString()));
                 }
-            }).catch(err => {console.error(err);interaction.reply(errorEmbed("" + err));});
+            }).catch(err => {global.api.Logger.warning(err);interaction.reply(errorEmbed("" + err));});
         } else {
             interaction.reply(errorEmbed("Command must be sent in a guild"));
         }

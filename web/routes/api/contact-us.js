@@ -66,11 +66,11 @@ router.post("/", (req, res) => {
             channel.send({message: ' ', embeds: [embed]}).then(() => {
                 res.json({success: true})
             }).catch(err => {
-                console.error(err);
+                global.api.Logger.warning(err);
                 res.json({success: false, error: "Unknown error. Please contact Twijn#8888 on Discord or twijn@twijn.net for support."});
             });
         }).catch(err => {
-            console.error(err);
+            global.api.Logger.warning(err);
             res.json({success: false, error: "Unknown error. Please contact Twijn#8888 on Discord or twijn@twijn.net for support."});
         });
 
@@ -85,15 +85,15 @@ router.post("/", (req, res) => {
                 channel.send({message: '<@267380687345025025>', embeds: [embed]}).then(() => {
                     res.json({success: true})
                 }).catch(err => {
-                    console.error(err);
+                    global.api.Logger.warning(err);
                     res.json({success: false, error: "Unknown error. Please contact Twijn#8888 on Discord or twijn@twijn.net for support."});
                 });
             }).catch(err => {
-                console.error(err);
+                global.api.Logger.warning(err);
                 res.json({success: false, error: "Unknown error. Please contact Twijn#8888 on Discord or twijn@twijn.net for support."});
             });
         }).catch(err => {
-            console.error(err);
+            global.api.Logger.warning(err);
             res.json({success: false, error: "Unknown error. Please contact Twijn#8888 on Discord or twijn@twijn.net for support."});
         });
     });

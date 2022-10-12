@@ -16,9 +16,9 @@ const listener = {
             if (customId === "cancel-edit") {
                 interaction.message.delete().then(() => {
                     con.query("delete from archive__messages where id = ?;", [interaction.message.id], err => {
-                        if (err) console.error(err);
+                        if (err) global.api.Logger.warning(err);
                     });
-                }, console.error);
+                }, global.api.Logger.warning);
             } else
                 if (customId === "edit-offense"
                     || customId === "edit-description"
@@ -26,7 +26,7 @@ const listener = {
                     || customId === "add-discord-user"
                     || customId === "add-file") {
                 con.query("select archive_id from archive__messages where id = ?;", [interaction.message.id], (err, res) => {
-                    if (err) console.error(err);
+                    if (err) global.api.Logger.warning(err);
 
                     if (res.length > 0) {
                         api.Archive.getEntryById(res[0].archive_id).then(entry => {
@@ -131,7 +131,7 @@ const listener = {
                                 });
                             }
                         }, err => {
-                            console.error(err);
+                            global.api.Logger.warning(err);
                             interaction.reply("We couldn't resolve this message ID to an archive entry.");
                         });
                     } else {
@@ -143,7 +143,7 @@ const listener = {
             if (interaction.component.customId === "remove-users"
                 || interaction.component.customId === "remove-files") {
                 con.query("select archive_id from archive__messages where id = ?;", [interaction.message.id], (err, res) => {
-                    if (err) console.error(err);
+                    if (err) global.api.Logger.warning(err);
 
                     if (res.length > 0) {
                         api.Discord.getUserById(interaction.user.id).then(user => {
@@ -166,7 +166,7 @@ const listener = {
                                     .setTitle("Edited successfully!");
                                 interaction.reply({content: ' ', embeds: [embed], ephemeral: true});
                             }, err => {
-                                console.error(err);
+                                global.api.Logger.warning(err);
                                 interaction.reply("We couldn't resolve this message ID to an archive entry.");
                             });
                         }, err => {

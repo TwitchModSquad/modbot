@@ -3,11 +3,13 @@ const config = require("../../config.json");
 
 const NORMAL_SCOPES = "user:read:email moderator:manage:banned_users";
 const STREAMER_SCOPES = "user:read:email moderator:manage:banned_users moderation:read";
+const ADD_MODERATOR_SCOPES = "user:read:email channel:manage:moderators";
 
 class TwitchAuthentication {
 
     TWITCH_URL = `https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=${config.twitch.client_id}&redirect_uri=${encodeURIComponent(config.api_domain + "auth/twitch")}&scope=${encodeURIComponent(NORMAL_SCOPES)}`;
     TWITCH_STREAMER_URL = `https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=${config.twitch.client_id}&redirect_uri=${encodeURIComponent(config.api_domain + "auth/twitch")}&scope=${encodeURIComponent(STREAMER_SCOPES)}`;
+    TWITCH_ADDMOD_URL = `https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=${config.twitch.client_id}&redirect_uri=${encodeURIComponent(config.api_domain + "auth/twitch")}&scope=${encodeURIComponent(ADD_MODERATOR_SCOPES)}`;
     TWITCH_REDIRECT = config.api_domain + "auth/twitch";
     
     /**
@@ -70,6 +72,7 @@ class TwitchAuthentication {
             }
             result += scope;
         })
+        return result;
     }
 
     /**
@@ -79,6 +82,34 @@ class TwitchAuthentication {
      */
     objectifyScopes(scopes) {
         return scopes.split("\n");
+    }
+
+    /**
+     * Utilizes a refresh token to obtain an access token for a user.
+     * @param {string} refresh_token 
+     * @returns 
+     */
+    getAccessToken(refresh_token) {
+        return new Promise(async (resolve, reject) => {
+            const oauthResult = await fetch("https://id.twitch.tv/oauth2/token", {
+                method: 'POST',
+                body: new URLSearchParams({
+                    client_id: config.twitch.client_id,
+                    client_secret: config.twitch.client_secret,
+                    refresh_token: refresh_token,
+                    grant_type: "refresh_token",
+                }),
+            });
+        
+            oauthResult.json().then(oauthData => {
+                if (oauthData?.access_token) {
+                    resolve(oauthData.access_token);
+                } else {
+                    global.api.Logger.severe(oauthData);
+                    reject("Unable to request access token, reason: " + oauthData?.message);
+                }
+            }, reject);
+        });
     }
 
 }

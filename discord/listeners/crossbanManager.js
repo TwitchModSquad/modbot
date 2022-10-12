@@ -13,8 +13,8 @@ api.Twitch.getUserById(config.twitch.id, false, true).then(tmsUser => {
                 streamer.id
             ];
         });
-    }).catch(console.error);
-}).catch(console.error);
+    }).catch(global.api.Logger.warning);
+}).catch(global.api.Logger.warning);
 
 const listener = {
     name: 'crossbanManager',
@@ -28,7 +28,7 @@ const listener = {
         }
 
         const handleError = (err, method = "reply") => {
-            console.error(err);
+            global.api.Logger.warning(err);
             interaction[method]({content: ' ', embeds: [new Discord.MessageEmbed().setTitle("Uh oh!").setDescription(err).setColor(0x9e392f)], ephemeral: true})
         }
 
@@ -48,7 +48,7 @@ const listener = {
                                 refreshToken = (await con.pquery("select refresh_token from twitch__user where id = ?;", [identity.twitchAccounts[i].id]))?.[0]?.refresh_token;
                                 listener.storedCrossBanUser[interaction.member.id] = identity.twitchAccounts[i];
                             } catch(err) {
-                                console.error(err);
+                                global.api.Logger.warning(err);
                             }
 
                             let streamers = await identity.twitchAccounts[i].getStreamers();
