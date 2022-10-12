@@ -32,7 +32,7 @@ updateTwitchUsernames();
 updateDiscordUsernames();
 setTimeout(updateEntryUsernames, 5000);
 
-setInterval(updateChatIndexes, 15 * MINUTES_TO_MILLISECONDS); // 15 minutes
+setInterval(updateChatIndexes, 1 * HOURS_TO_MILLISECONDS); // 15 minutes
 setInterval(updateUsers, 10 * SECONDS_TO_MILLISECONDS); // 10 seconds
 setInterval(updateTwitchUsernames, 1 * MINUTES_TO_MILLISECONDS);
 setInterval(updateDiscordUsernames, 1 * MINUTES_TO_MILLISECONDS);
