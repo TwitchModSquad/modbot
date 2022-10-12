@@ -90,7 +90,7 @@ router.get("/", async (req, res) => {
             ]
         }
 
-        const chat = await con.pquery(`select * from twitch__chat${query} order by timesent desc limit 500;`, vars);
+        const chat = await con.pquery(`select * from twitch__chat${query} order by timesent desc limit 100;`, vars);
         
         async function addUser(id) {
             if (!data.users.hasOwnProperty(id)) {
