@@ -26,7 +26,7 @@ const SECONDS_TO_MILLISECONDS = 1000;
 const MINUTES_TO_MILLISECONDS = 60 * SECONDS_TO_MILLISECONDS;
 const   HOURS_TO_MILLISECONDS = 60 * MINUTES_TO_MILLISECONDS;
 
-// updateChatIndexes();
+updateChatIndexes();
 updateUsers();
 updateTwitchUsernames();
 updateDiscordUsernames();

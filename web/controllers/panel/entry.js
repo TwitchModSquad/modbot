@@ -11,6 +11,7 @@ router.get("/:id", async (req, res) => {
         }
         res.render("pages/panel/entry", {session: req.session, entry: entry});
     } catch (err) {
+        api.Logger.severe(err);
         res.status(404);
         res.send("no");
     }
