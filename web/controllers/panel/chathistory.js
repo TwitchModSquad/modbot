@@ -59,7 +59,7 @@ router.get("/", async (req, res) => {
             if (data.selectedStreamer) {
                 extended = await con.pquery("select chatter_id, chat_count, twitch__user.display_name from twitch__chat_chatters join twitch__user on twitch__user.id = twitch__chat_chatters.chatter_id where streamer_id = ? and chatter_id = ? order by chat_count desc limit 1;", [data.selectedStreamer, data.selectedChatter]);
             } else
-                extended = await con.pquery("select chatter_id, sum(chat_count) as chat_count, twitch__user.display_name from twitch__chat_chatters join twitch__user on twitch__user.id = twitch__chat_chatters.chatter_id group by chatter_id where chatter_id = ? order by chat_count desc limit 100;", [data.selectedChatter]);
+                extended = await con.pquery("select chatter_id, sum(chat_count) as chat_count, twitch__user.display_name from twitch__chat_chatters join twitch__user on twitch__user.id = twitch__chat_chatters.chatter_id where chatter_id = ? limit 1;", [data.selectedChatter]);
 
             data.chatters = [
                 ...data.chatters,
