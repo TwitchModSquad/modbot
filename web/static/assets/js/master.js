@@ -1,4 +1,4 @@
-const API_URI = "https://tms.to/api/";
+const API_URI = "http://localhost:8080/api/";
 
 function createCookie(name, value, days) {
     if (days) {

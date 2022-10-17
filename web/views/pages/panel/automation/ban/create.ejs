@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>TMS Panel - Ban Automation</title>
+
+    <%- include("../../../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/panel.css">
+    <link rel="stylesheet" href="/assets/css/sidebar.css">
+    <link rel="stylesheet" href="/assets/css/log.css">
+</head>
+<body>
+    <%- include("../../../partials/panel/header") %>
+
+    <div class="sidebar-container">
+        <%- include("../../../partials/panel/sidebar", {page: "automation/ban", session: session}) %>
+        <main>
+            <section>
+                <h2><i class="fa-solid fa-ban"></i>Ban Automation</h2>
+
+            </section>
+
+            <%- include("../../../partials/footer") %>
+        </main>
+    </div>
+    
+    <%- include("../../../partials/js") %>
+
+    <script src="/assets/js/panel.js"> </script>
+</body>
+</html>

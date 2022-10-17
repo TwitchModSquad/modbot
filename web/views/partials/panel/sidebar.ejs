@@ -20,6 +20,8 @@
     --><a href="/panel/search" <%- page === "search" ? ' class="active"' : '' %>><i class="fa-solid fa-magnifying-glass"></i>&nbsp;User Search</a><!--
     --><% if (locals.user) { %><a href="/panel/user/<%= user.id %>" class="margin-left active"><i class="fa-regular fa-user"></i>&nbsp;User: <%= (user.display_name ? user.display_name : user.name + "#" + user.discriminator) %></a><% } %><!--
     --><% if (locals.entry) { %><a href="/panel/entry/<%= entry.id %>" class="margin-left active"><i class="fa-solid fa-file"></i>&nbsp;Entry: <%= entry.id %></a><%
-    } if (isStreamer()) { %><div class="separator">Streamer Functions</div><a href="/panel/streamer-functions"<%- page === "streamer-functions" ? ' class="active"' : '' %>><i class="fa-solid fa-signal-stream"></i>&nbsp;Streamer Functions</a><% } %>
+    } if (isStreamer()) { %><div class="separator">Streamer Functions</div><a href="/panel/streamer-functions"<%- page === "streamer-functions" ? ' class="active"' : '' %>><i class="fa-solid fa-signal-stream"></i>&nbsp;Streamer Functions</a><% } %><!--
+    --><div class="separator">Automation</div><!--
+    --><a href="/panel/automation/ban/list" <%- page === "automation/ban" ? ' class="active"' : '' %>><i class="fa-solid fa-ban"></i>&nbsp;Ban Automation</a>
     </nav>
 </div>
