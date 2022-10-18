@@ -1,0 +1,18 @@
+body {
+    background-image: url('/assets/images/banners/welcome.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.small {
+    font-size: .8rem;
+}
+
+.center {
+    display: block;
+    text-align: center;
+}
+
+h2 {
+    font-size: 1rem;
+}

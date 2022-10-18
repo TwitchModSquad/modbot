@@ -12,10 +12,10 @@ const command = {
 
         api.Discord.getUserById(interaction.user.id, false, true).then(discordAccount => {
             if (discordAccount.identity?.id) {
-                con.query("insert into invite (invite, initiated_by, expiry) values (?, ?, date_add(now(), interval 30 minute));", [code, discordAccount.identity.id], () => {
+                con.query("insert into invite (invite, initiated_by, expiry) values (?, ?, date_add(now(), interval 1 hour));", [code, discordAccount.identity.id], () => {
                     const embed = new MessageEmbed()
                         .setTitle("Invite Link")
-                        .setDescription(`Send this link to invite your friends to TMSQD!\n\nhttps://join.tms.to/${code}\n\n**Do not allow others to use this link to invite others. This link will expire in 30 minutes.**`)
+                        .setDescription(`Send this link to invite your friends to TMSQD!\n\nhttps://join.tms.to/${code}\n\n**Do not allow others to use this link to invite others. This link will expire in 1 hour.**`)
                         .setColor(0x772ce8);
 
                     interaction.reply({content: ' ', embeds: [embed], ephemeral: true});

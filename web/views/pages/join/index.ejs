@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Twitch Mod Squad - Invite</title>
+
+    <%- include("../../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/signon.css">
+    <link rel="stylesheet" href="/assets/css/join.css">
+</head>
+<body>
+    <main>
+        <h1><img class="logo" src="/assets/images/logos/logo.webp" alt="Twitch Mod Squad Logo"> Twitch Mod Squad <span>invite</span></h1>
+        <p>We're glad you're here! We'll redirect you shortly.</p>
+        <h2 class="center">Invited By</h2>
+        <%- include("../../partials/panel/user/identity", {account: invitedBy}) %>
+        <p class="small">You will be prompted to authenticate with both Twitch and Discord services respectively. This is utilized to authenticate your user, automatically add you to the Twitch Mod Squad discord, as well as verify the channels that you mod for.</p>
+        <a href="<%= url %>" class="small center">Not redirecting? Click here.</a>
+    </main>
+
+    <%- include("../../partials/footer") %>
+    
+    <%- include("../../partials/js") %>
+    <script>setTimeout(function() {window.location = "<%= url %>";}, 3000);</script>
+</body>
+</html>
