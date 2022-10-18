@@ -14,7 +14,7 @@ router.get("/:invite", (req, res) => {
     con.query("select initiated_by from invite where invite = ? and expiry >= now();", [invite], async (err, result) => {
         if (!err) {
             if (result.length > 0) {
-                res.cookie("invite", invite, {domain: config.main_domain, maxAge: new Date(Date.now() + 86400000), path: "/", secure: true});
+                res.cookie("invite", invite, {domain: config.main_domain, maxAge: 360000, path: "/", secure: true});
                 res.render("pages/join/index", {url: api.Authentication.Twitch.TWITCH_URL, invitedBy: await api.getFullIdentity(result[0].initiated_by)});
             } else {
                 res.render("pages/join/expired");
