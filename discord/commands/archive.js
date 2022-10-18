@@ -156,6 +156,19 @@ const command = {
             },
             {
                 type: 1,
+                name: "refresh",
+                description: "Refresh an Archive submission",
+                options: [
+                    {
+                        type: 3,
+                        name: "id",
+                        description: "ID of the archive entry. 8 character string",
+                        required: true,
+                    }
+                ],
+            },
+            {
+                type: 1,
                 name: "edit",
                 description: "Edit an Archive submission",
                 options: [
@@ -278,6 +291,21 @@ const command = {
                 } else {
                     interaction.error("Your account isn't properly linked to TMS. Contact <@267380687345025025>");
                 }
+            }, error => {
+                interaction.error(error);
+            });
+        } else if (subcommand === "refresh") {
+            api.Discord.getUserById(interaction.member.id).then(user => {
+                api.Archive.getEntryById(interaction.options.getString("id", true)).then(entry => {
+                    if (interaction.level === 2 || entry.owner.id === user.identity?.id) {
+                        entry.refreshMessages();
+                        interaction.success("Successfully updated all entry messages!");
+                    } else {
+                        interaction.error("**You don't have permission!**\nYou must be an administrator to use this command.");
+                    }
+                }, error => {
+                    interaction.error(error);
+                });
             }, error => {
                 interaction.error(error);
             });
