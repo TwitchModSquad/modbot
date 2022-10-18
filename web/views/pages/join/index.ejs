@@ -7,6 +7,8 @@
 
     <link rel="stylesheet" href="/assets/css/signon.css">
     <link rel="stylesheet" href="/assets/css/join.css">
+
+    <meta content="Here's your invite to Twitch Mod Squad, courtesy of <%= invitedBy.name %>. We're glad to have you! This link will redirect you through authorization methods to Twitch and Discord. This information is used to verify your identity. We don't ever get hands on your password, and these permissions may be revoked at any time in the respective platform's settings." property="og:description" />
 </head>
 <body>
     <main>
@@ -21,6 +23,6 @@
     <%- include("../../partials/footer") %>
     
     <%- include("../../partials/js") %>
-    <script>setTimeout(function() {window.location = "<%= url %>";}, 3000);</script>
+    <script>//setTimeout(function() {window.location = "<%= url %>";}, 3000);</script>
 </body>
 </html>
