@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const con = require("../../database");
+const config = require("../../config.json");
 const api = require("../../api/");
 
 router.get("/", (req, res) => {
