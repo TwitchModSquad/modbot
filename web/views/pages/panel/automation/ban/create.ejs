@@ -3,29 +3,80 @@
 <head>
     <title>TMS Panel - Ban Automation</title>
 
-    <%- include("../../../partials/head") %>
+    <%- include("../../../../partials/head") %>
 
     <link rel="stylesheet" href="/assets/css/panel.css">
     <link rel="stylesheet" href="/assets/css/sidebar.css">
     <link rel="stylesheet" href="/assets/css/log.css">
+    <link rel="stylesheet" href="/assets/css/inputs.css">
 </head>
 <body>
-    <%- include("../../../partials/panel/header") %>
+    <%- include("../../../../partials/panel/header") %>
 
     <div class="sidebar-container">
-        <%- include("../../../partials/panel/sidebar", {page: "automation/ban", session: session}) %>
+        <%- include("../../../../partials/panel/sidebar", {page: "automation/ban", session: session}) %>
         <main>
-            <section>
-                <h2><i class="fa-solid fa-ban"></i>Ban Automation</h2>
+            <form method="POST" action="create" class="form">
+                <section>
+                    <h2><i class="fa-solid fa-ban"></i>Create a new Ban Automation</h2>
 
-            </section>
+                        <div class="input-group">
+                            <label for="automation-name">Automation Name</label>
+                            <input type="text" name="automation-name" id="automation-name" placeholder="Automation Name" />
+                        </div>
+                </section>
 
-            <%- include("../../../partials/footer") %>
+                <div class="container container-md">
+                    <section class="col-6">
+                        <h2><i class="fa-solid fa-bullseye"></i> Automation Targets</h2>
+    
+                        <div class="user-search input-group">
+                            <label for="add-target">Add Target Channels</label>
+                            <input type="search" name="add-target" id="add-target" class="twitch-search" placeholder="Search for a Twitch user..." />
+                            <div class="search-results"></div>
+                        </div>
+                    </section>
+                    <section class="col-6">
+                        <h2><i class="fa-regular fa-scale-balanced"></i> Automation Rules</h2>
+    
+                        <div class="container container-md">
+                            <div class="input-group col-4">
+                                <label for="add-rule-type">Rule Type</label>
+                                <select name="add-rule-type" id="add-rule-type">
+                                    <option value="x" selected="selected">Select a Type</option>
+                                    <option value="streamer">Streamer</option>
+                                    <option value="moderator">Moderator</option>
+                                    <option value="Reason">Reason</option>
+                                    <option value="chatlog">Chat Log</option>
+                                </select>
+                            </div>
+                            <div class="input-group col-8" id="add-rule-value" style="display: none;">
+                                <label for="add-rule-value">Rule Value</label>
+                                <input type="text" name="add-rule-value" id="add-rule-value" />
+                            </div>
+                            <div class="user-search input-group" style="display: none;">
+                                <label for="add-target">Add Target Channels</label>
+                                <input type="search" name="add-target" id="add-target" class="twitch-search" placeholder="Search for a Twitch user..." />
+                                <div class="search-results"></div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <section>
+                    <h2><i class="fa-solid fa-paper-plane"></i> Submit</h2>
+
+                    <input type="submit" value="Add Ban Automation">
+                </section>
+            </form>
+
+            <%- include("../../../../partials/footer") %>
         </main>
     </div>
     
-    <%- include("../../../partials/js") %>
+    <%- include("../../../../partials/js") %>
 
     <script src="/assets/js/panel.js"> </script>
+    <script src="/assets/js/search.js"> </script>
 </body>
 </html>

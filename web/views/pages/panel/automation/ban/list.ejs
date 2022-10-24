@@ -7,7 +7,7 @@
 
     <link rel="stylesheet" href="/assets/css/panel.css">
     <link rel="stylesheet" href="/assets/css/sidebar.css">
-    <link rel="stylesheet" href="/assets/css/log.css">
+    <link rel="stylesheet" href="/assets/css/automation.css">
 </head>
 <body>
     <%- include("../../../../partials/panel/header") %>
@@ -18,7 +18,10 @@
             <section>
                 <h2><i class="fa-solid fa-ban"></i>Ban Automation</h2>
 
-                
+                <a class="automation ban create-automation" href="create"><div class="icon"><i class="fa-solid fa-plus"></i></div><div class="content"><h3>Create Automation</h3>Create a new automation to get started.</div></a>
+                <% automations.forEach(automation => { %>
+                    <%- include("../../../../partials/automation/ban", {automation: automation}) %>
+                <% }) %>
             </section>
 
             <%- include("../../../../partials/footer") %>
