@@ -3,9 +3,10 @@ const con = require("../../database");
 const Identity = require("../Identity");
 
 const BanAutomation = require("./BanAutomation/");
+const Rule = require("./BanAutomation/Rule");
 
 class Automation {
-    
+
     /**
      * Creates a new Ban Automation
      * @param {Identity} identity 
@@ -18,12 +19,12 @@ class Automation {
                 if (err) {
                     reject(err);
                 } else {
-                    con.query("select id, name from twitch__ban__automation where creator_id = ? and name = ? order by id desc limit 1;", [identity.id, name], (err, res) => {
+                    con.query("select id, name from twitch__ban__automation where creator_id = ? and name = ? order by id desc limit 1;", [identity.id, name], async (err, res) => {
                         if (err) {
                             reject(err);
                         } else {
                             if (res.length > 0) {
-                                return new BanAutomation(res[0].id, res[0].name, [], []);
+                                resolve(new BanAutomation(res[0].id, res[0].name, await global.api.getFullIdentity(identity.id), [], []));
                             } else {
                                 reject("Unable to retrieve created automation. This is embarrassing");
                             }
@@ -41,7 +42,71 @@ class Automation {
      */
     getBanAutomation(id) {
         return new Promise((resolve, reject) => {
+            con.query("select id, name from twitch__ban__automation where id = ?;", [id], (err, res) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    if (res.length > 0) {
+                        con.query("select * from twitch__ban__automation_rules where automation_id = ?;", async (err, rulres) => {
+                            if (err) {
+                                reject(err);
+                            } else {
+                                let targets = [];
+                                let rules = [];
 
+                                for (let i = 0; i < rulres.length; i++) {
+                                    let rul = rulres[i];
+                                    if (rul.type === "target") {
+                                        targets = [
+                                            ...targets,
+                                            await global.api.Twitch.getUserById(rul.value),
+                                        ]
+                                    } else {
+                                        rules = [
+                                            ...rules,
+                                            new Rule(rul.type, rul.value),
+                                        ]
+                                    }
+                                }
+
+                                resolve(new BanAutomation(res[0].id, res[0].name, await global.api.getFullIdentity(res[0].creator_id), targets, rules));
+                            }
+                        });
+                    } else {
+                        reject("Ban automation not found");
+                    }
+                }
+            });
+        });
+    }
+
+    /**
+     * Retrieves existing ban automations by identity ID
+     * @param {number} identityId
+     * @return {Promise<BanAutomation[]>}
+     */
+    getBanAutomationsByCreator(identityId) {
+        return new Promise((resolve, reject) => {
+            con.query("select id from twitch__ban__automation where creator_id = ?;", [identityId], async (err, res) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    let automations = [];
+
+                    try {
+                        for (let i = 0; i < res.length; i++) {
+                            automations = [
+                                ...automations,
+                                await this.getBanAutomation(res[i].id),
+                            ]
+                        }
+
+                        resolve(automations);
+                    } catch (err) {
+                        reject(err);
+                    }
+                }
+            });
         });
     }
 
