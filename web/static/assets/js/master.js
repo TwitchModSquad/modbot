@@ -26,6 +26,11 @@ function eraseCookie(name) {
     createCookie(name, "", -1);
 }
 
+function comma(x) {
+    if (!x) return "";
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
 const api = {
     get: function(uri) {
         return new Promise((resolve, reject) => {
@@ -46,11 +51,11 @@ const api = {
 
 const parse = {
     account: {
-        discord(object) {
-            return `<a class="discord-user" href="/panel/user/${object.id}"><img src="${object.avatar_url}" /><div class="user-info"><div class="user-name">${object.name}<span class="discriminator">#${object.discriminator}</span></div><div class="user-stats">${object.id}</div></div></a>`;
+        discord(object, appendAttributes = "") {
+            return `<a class="discord-user" href="/panel/user/${object.id}"${appendAttributes}><img src="${object.avatar_url}" /><div class="user-info"><div class="user-name">${object.name}<span class="discriminator">#${object.discriminator}</span></div><div class="user-stats">${object.id}</div></div></a>`;
         },
-        twitch(object) {
-            return `<a class="twitch-user" href="/panel/user/${object.id}"><img src="${object.profile_image_url}" /><div class="user-info"><div class="user-name">${object.display_name}</div><div class="user-stats">${object.id} <span class="bullet">&bullet;</span> ${object.follower_count}&nbsp;follower${object.follower_count == 1 ? "" : "s"} <span class="bullet">&bullet;</span> ${object.view_count}&nbsp;view${object.view_count == 1 ? "" : "s"}</div></div></a>`;
+        twitch(object, appendAttributes = "") {
+            return `<a class="twitch-user" href="/panel/user/${object.id}"${appendAttributes}><img src="${object.profile_image_url}" /><div class="user-info"><div class="user-name">${object.display_name}</div><div class="user-stats">${object.id} <span class="bullet">&bullet;</span> ${typeof(object.follower_count) === "number" ? comma(object.follower_count) : object.follower_count}&nbsp;follower${object.follower_count == 1 ? "" : "s"} <span class="bullet">&bullet;</span> ${typeof(object.view_count) === "number" ? comma(object.view_count) : object.view_count}&nbsp;view${object.view_count == 1 ? "" : "s"}</div></div></a>`;
         },
     },
 };

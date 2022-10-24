@@ -5,27 +5,36 @@ let searchBoxResults;
 
 const MORE_CHARS_REQUIRED = `<div class="none">Type at least 2 characters to get search results</div>`;
 
-function search(query) {
+function search(query, results = searchBoxResults, showTwitch = true, showDiscord = true) {
     api.get("search/" + encodeURIComponent(query)).then(result => {
         let twitchAccounts = "";
         let discordAccounts = "";
 
-        result.twitchAccountResults.forEach(twitchAccount => {
-            twitchAccounts += parse.account.twitch(twitchAccount);
-        });
+        if (showTwitch) {
+            result.twitchAccountResults.forEach(twitchAccount => {
+                twitchAccounts += parse.account.twitch(twitchAccount);
+            });
+        }
 
-        result.discordAccountResults.forEach(discordAccount => {
-            discordAccounts += parse.account.discord(discordAccount);
-        });
+        if (showDiscord) {
+            result.discordAccountResults.forEach(discordAccount => {
+                discordAccounts += parse.account.discord(discordAccount);
+            });
+        }
 
-        if (twitchAccounts === "") {
+        if (showTwitch && twitchAccounts === "") {
             twitchAccounts = `<div class="no-results">No twitch accounts found</div>`;
         }
-        if (discordAccounts === "") {
+        if (showDiscord && discordAccounts === "") {
             discordAccounts = `<div class="no-results">No discord accounts found</div>`;
         }
 
-        searchBoxResults.html(`<h3>Twitch Accounts</h3>${twitchAccounts}<h3>Discord Accounts</h3>${discordAccounts}`);
+        if (showTwitch && showDiscord) {
+            results.html(`<h3>Twitch Accounts</h3>${twitchAccounts}<h3>Discord Accounts</h3>${discordAccounts}`);
+        } else {
+            results.html(`${twitchAccounts}${discordAccounts}`)
+            // one of them is false, so one is completely blank => concatenate both and set
+        }
     }, alert);
 }
 
@@ -63,6 +72,44 @@ $(function() {
             search(query);
         } else {
             searchBoxResults.html(MORE_CHARS_REQUIRED);
+        }
+        return false;
+    });
+
+    $(".twitch-search").on("keyup", function() {
+        if (updateTimeout !== null) {
+            clearTimeout(updateTimeout);
+        }
+        let query = $(this).val();
+        let results = $(this).closest("form").find(".search-results");
+
+        if (query && query.length > 0) {
+            $(this).parent().addClass("force-open");
+        } else {
+            $(this).parent().removeClass("force-open");
+        }
+
+        if (query.length > 2) {
+            updateTimeout = setTimeout(function() {
+                search(query, results, true, false);
+            }, UPDATE_TIMEOUT_DELAY);
+        } else {
+            results.html(MORE_CHARS_REQUIRED);
+        }
+    });
+
+    $(".twitch-search").closest("form").submit(function() {
+        let query = $(this).find(".twitch-search").val();
+        let results = $(this).find(".search-results");
+
+        if (updateTimeout !== null) {
+            clearTimeout(updateTimeout);
+        }
+
+        if (query.length > 2) {
+            search(query, results, true, false);
+        } else {
+            results.html(MORE_CHARS_REQUIRED);
         }
         return false;
     });
