@@ -22,7 +22,7 @@
 
                         <div class="input-group">
                             <label for="automation-name">Automation Name</label>
-                            <input type="text" name="automation-name" id="automation-name" placeholder="Automation Name" />
+                            <input type="text" name="automation-name" id="automation-name" placeholder="Automation Name" required="required" />
                         </div>
                 </section>
 
@@ -30,11 +30,15 @@
                     <section class="col-6">
                         <h2><i class="fa-solid fa-bullseye"></i> Automation Targets</h2>
     
-                        <div class="user-search input-group">
-                            <label for="add-target">Add Target Channels</label>
-                            <input type="search" name="add-target" id="add-target" class="twitch-search" placeholder="Search for a Twitch user..." />
-                            <div class="search-results"></div>
+                        <div class="input-group">
+                            <label for="targets"></label>
+                            <select name="targets" id="targets" multiple="multiple">
+                                <% targets.forEach(target => { %>
+                                    <option value="<%= target.id %>"><%= target.display_name %></option>
+                                <% }) %>
+                            </select>
                         </div>
+                        <small>Use <code>ctrl + click</code> to select multiple targets.</small>
                     </section>
                     <section class="col-6">
                         <h2><i class="fa-regular fa-scale-balanced"></i> Automation Rules</h2>
@@ -43,10 +47,10 @@
                             <div class="input-group col-4">
                                 <label for="add-rule-type">Rule Type</label>
                                 <select name="add-rule-type" id="add-rule-type">
-                                    <option value="x" selected="selected">Select a Type</option>
+                                    <option value="x" selected="selected" disabled="disabled">Select a Type</option>
                                     <option value="streamer">Streamer</option>
                                     <option value="moderator">Moderator</option>
-                                    <option value="Reason">Reason</option>
+                                    <option value="reason">Reason</option>
                                     <option value="chatlog">Chat Log</option>
                                 </select>
                             </div>
@@ -54,12 +58,14 @@
                                 <label for="add-rule-value">Rule Value</label>
                                 <input type="text" name="add-rule-value" id="add-rule-value" />
                             </div>
-                            <div class="user-search input-group" style="display: none;">
+                            <div class="user-search input-group col-8" style="display: none;" id="add-rule-twitchuser" data-search-name="rule-streamer">
                                 <label for="add-target">Add Target Channels</label>
                                 <input type="search" name="add-target" id="add-target" class="twitch-search" placeholder="Search for a Twitch user..." />
                                 <div class="search-results"></div>
+                                <div class="selections"></div>
                             </div>
                         </div>
+                        <small><code>Moderator</code> and <code>reason</code> rules only work if the streamer has authenticated with elevated permissions. <a href="/panel/streamer-functions">Click here for more information.</a></small>
                     </section>
                 </div>
 
@@ -78,5 +84,6 @@
 
     <script src="/assets/js/panel.js"> </script>
     <script src="/assets/js/search.js"> </script>
+    <script src="/assets/js/banautomation.js"> </script>
 </body>
 </html>
