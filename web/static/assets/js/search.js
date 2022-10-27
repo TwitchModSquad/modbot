@@ -5,20 +5,20 @@ let searchBoxResults;
 
 const MORE_CHARS_REQUIRED = `<div class="none">Type at least 2 characters to get search results</div>`;
 
-function search(query, results = searchBoxResults, showTwitch = true, showDiscord = true) {
+function search(query, results = searchBoxResults, showTwitch = true, showDiscord = true, handleFunc = null) {
     api.get("search/" + encodeURIComponent(query)).then(result => {
         let twitchAccounts = "";
         let discordAccounts = "";
 
         if (showTwitch) {
             result.twitchAccountResults.forEach(twitchAccount => {
-                twitchAccounts += parse.account.twitch(twitchAccount);
+                twitchAccounts += parse.account.twitch(twitchAccount, handleFunc !== null ? ` onclick="${handleFunc}($(this), '${twitchAccount.id}', 'twitch');return false;"` : "");
             });
         }
 
         if (showDiscord) {
             result.discordAccountResults.forEach(discordAccount => {
-                discordAccounts += parse.account.discord(discordAccount);
+                discordAccounts += parse.account.discord(discordAccount, handleFunc !== null ? ` onclick="${handleFunc}($(this), '${discordAccount.id}', 'discord');return false;"` : "");
             });
         }
 
@@ -36,6 +36,22 @@ function search(query, results = searchBoxResults, showTwitch = true, showDiscor
             // one of them is false, so one is completely blank => concatenate both and set
         }
     }, alert);
+}
+
+function addUser(ele, id, type) {
+    if ($(`#${type}-${id}`).length === 0) {
+        let userSearch = ele.closest(".user-search");
+        let name = userSearch.attr("data-search-name");
+        let selections = userSearch.find(".selections");
+        let container = $(`<div id="${type}-${id}" target="Click to remove"><a href="#" onclick="$(this).parent().remove();return false;" class="${type}-user">${ele.html()}</a><input type="hidden" name="${name}[]" value="${id}" ></div>`);
+        selections.append(container);
+
+        userSearch.find("input").val("");
+        userSearch.find(".search-results").html("");
+        userSearch.removeClass("force-open");
+    } else {
+        console.log(`duplicate user #${type}-${id}`)
+    }
 }
 
 $(function() {
@@ -91,7 +107,7 @@ $(function() {
 
         if (query.length > 2) {
             updateTimeout = setTimeout(function() {
-                search(query, results, true, false);
+                search(query, results, true, false, "addUser");
             }, UPDATE_TIMEOUT_DELAY);
         } else {
             results.html(MORE_CHARS_REQUIRED);
@@ -107,7 +123,7 @@ $(function() {
         }
 
         if (query.length > 2) {
-            search(query, results, true, false);
+            search(query, results, true, false, "addUser");
         } else {
             results.html(MORE_CHARS_REQUIRED);
         }
