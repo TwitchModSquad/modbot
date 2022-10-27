@@ -19,7 +19,18 @@ router.get("/list", async (req, res) => {
 router.get("/create", async (req, res) => {
     let data = {
         session: req.session,
+        targets: [],
     };
+
+    streamers = await req.session.identity.getActiveModeratorChannels();
+    console.log(streamers);
+
+    for (let i = 0; i < streamers.length; i++) {
+        data.targets = [
+            ...data.targets,
+            ...streamers[i].modForIdentity.twitchAccounts,
+        ]
+    }
 
     res.render("pages/panel/automation/ban/create", data);
 });
