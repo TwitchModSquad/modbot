@@ -42,12 +42,12 @@ class Automation {
      */
     getBanAutomation(id) {
         return new Promise((resolve, reject) => {
-            con.query("select id, name from twitch__ban__automation where id = ?;", [id], (err, res) => {
+            con.query("select id, name, creator_id from twitch__ban__automation where id = ?;", [id], (err, res) => {
                 if (err) {
                     reject(err);
                 } else {
                     if (res.length > 0) {
-                        con.query("select * from twitch__ban__automation_rules where automation_id = ?;", async (err, rulres) => {
+                        con.query("select * from twitch__ban__automation_rules where automation_id = ?;", [id], async (err, rulres) => {
                             if (err) {
                                 reject(err);
                             } else {
