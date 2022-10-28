@@ -26,7 +26,7 @@ class Rule {
      */
     getUser() {
         return new Promise((resolve, reject) => {
-            if (type === "streamer" || type === "moderator") {
+            if (this.type === "streamer" || this.type === "moderator") {
                 global.api.Twitch.getUserById(this.value).then(user => {
                     this.user = user;
                     resolve(user);
