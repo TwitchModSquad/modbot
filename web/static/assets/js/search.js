@@ -98,6 +98,7 @@ $(function() {
         }
         let query = $(this).val();
         let results = $(this).closest("form").find(".search-results");
+        let userSearch = $(this).closest(".user-search");
 
         if (query && query.length > 0) {
             $(this).parent().addClass("force-open");
@@ -107,7 +108,11 @@ $(function() {
 
         if (query.length > 2) {
             updateTimeout = setTimeout(function() {
-                search(query, results, true, false, "addUser");
+                let func = "addUser";
+                if (userSearch.attr("data-search-func"))
+                    func = userSearch.attr("data-search-func");
+                    
+                search(query, results, true, false, func);
             }, UPDATE_TIMEOUT_DELAY);
         } else {
             results.html(MORE_CHARS_REQUIRED);
@@ -115,18 +120,8 @@ $(function() {
     });
 
     $(".twitch-search").closest("form").submit(function() {
-        let query = $(this).find(".twitch-search").val();
-        let results = $(this).find(".search-results");
-
-        if (updateTimeout !== null) {
-            clearTimeout(updateTimeout);
+        if ($(document.activeElement).hasClass("twitch-search")) {
+            return false;
         }
-
-        if (query.length > 2) {
-            search(query, results, true, false, "addUser");
-        } else {
-            results.html(MORE_CHARS_REQUIRED);
-        }
-        return false;
     });
 });
