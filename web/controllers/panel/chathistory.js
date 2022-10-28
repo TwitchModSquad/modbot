@@ -11,7 +11,7 @@ const TWITCH_BADGES_URL = BADGES_URL + "twitch/";
 const TMS_BADGES_URL = BADGES_URL + "tms/";
 
 function parseDate(date) {
-    let mon = date.getMonth() + "";
+    let mon = (date.getMonth()+1) + "";
     let day = date.getDate() + "";
     let yer = (date.getFullYear() - (Math.floor(date.getFullYear()/100)*100)) + "";
 
