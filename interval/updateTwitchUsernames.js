@@ -8,7 +8,9 @@ module.exports = () => {
             con.query("update twitch__username set last_seen = now() where id = ? and last_seen is null;", [user.id], err => {
                 if (err) global.api.Logger.warning(err);
 
-                con.query("insert into twitch__username (id, display_name, first_seen) values (?, ?, now());", [user.id, user.display_name]);
+                con.query("insert into twitch__username (id, display_name, first_seen) values (?, ?, now()) on duplicate key update display_name = ?;", [user.id, user.display_name, user.display_name], err => {
+                    if (err) global.api.Logger.warning(err);
+                });
             });
         })
     });
