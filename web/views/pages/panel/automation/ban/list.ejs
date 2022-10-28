@@ -20,7 +20,7 @@
 
                 <a class="automation ban create-automation" href="create"><div class="icon"><i class="fa-solid fa-plus"></i></div><div class="content"><h3>Create Automation</h3>Create a new automation to get started.</div></a>
                 <% automations.forEach(automation => { %>
-                    <%- include("../../../../partials/automation/ban", {automation: automation}) %>
+                    <%- include("../../../../partials/panel/automation/ban", {automation: automation}) %>
                 <% }) %>
             </section>
 
