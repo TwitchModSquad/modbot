@@ -22,6 +22,7 @@
     --><% if (locals.entry) { %><a href="/panel/entry/<%= entry.id %>" class="margin-left active"><i class="fa-solid fa-file"></i>&nbsp;Entry: <%= entry.id %></a><%
     } if (isStreamer()) { %><div class="separator">Streamer Functions</div><a href="/panel/streamer-functions"<%- page === "streamer-functions" ? ' class="active"' : '' %>><i class="fa-solid fa-signal-stream"></i>&nbsp;Streamer Functions</a><% } %><!--
     --><div class="separator">Automation</div><!--
-    --><a href="/panel/automation/ban/list" <%- page === "automation/ban" ? ' class="active"' : '' %>><i class="fa-solid fa-ban"></i>&nbsp;Ban Automation</a>
+    --><a href="/panel/automation/ban/list" <%- page === "automation/ban" ? ' class="active"' : '' %>><i class="fa-solid fa-ban"></i>&nbsp;Ban Automation</a><!--
+    --><% if (locals.banAutomation) { %><a href="/panel/automation/ban/edit/<%= banAutomation.id %>" class="margin-left active"><i class="fa-solid fa-wand-magic-sparkles"></i>&nbsp;Ban Automation: #<%= banAutomation.id %></a><% } %>
     </nav>
 </div>
