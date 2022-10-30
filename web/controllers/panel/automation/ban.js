@@ -55,7 +55,7 @@ router.get("/edit/:id", async (req, res) => {
         session: req.session,
         targets: [],
         automation: automation,
-        selectedTargets: automation.targets.map(x => x.id),
+        selectedTargets: automation.targets.map(x => x.id+""),
         rules: {
             streamers: automation.rules.filter(x => x.type === "streamer"),
             moderators: automation.rules.filter(x => x.type === "moderator"),
@@ -98,7 +98,7 @@ router.get("/edit/:id", async (req, res) => {
         }
     }
     data.rules.moderators = moderatorRules;
-console.log(data);
+    
     res.render("pages/panel/automation/ban/edit", data);
 });
 
@@ -245,8 +245,6 @@ router.post("/create", async (req, res) => {
                     addError(err);
                 }
             }
-
-            console.log(errors);
 
             res.redirect("/panel/automation/ban/edit/" + automation.id);
         }, err => {
