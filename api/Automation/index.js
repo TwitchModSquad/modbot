@@ -1,4 +1,7 @@
+const api = require("..");
 const con = require("../../database");
+
+const Cache = require("../Cache/Cache");
 
 const Identity = require("../Identity");
 
@@ -6,6 +9,25 @@ const BanAutomation = require("./BanAutomation/");
 const Rule = require("./BanAutomation/Rule");
 
 class Automation {
+
+    /**
+     * Ban automation cache
+     * @type {Cache}
+     */
+    banAutomationCache = new Cache(600000);
+
+    /**
+     * Constructor for Automation API endpoints. Will automatically load all ban automations into cache.
+     */
+    constructor() {
+        con.query("select id from twitch__ban__automation;", (err, res) => {
+            if (err) api.Logger.warning(err);
+
+            res.forEach(row => {
+                this.getBanAutomation(row.id); // nasty way of loading automations, but it is what it is
+            });
+        });
+    }
 
     /**
      * Creates a new Ban Automation
@@ -24,7 +46,9 @@ class Automation {
                             reject(err);
                         } else {
                             if (res.length > 0) {
-                                resolve(new BanAutomation(res[0].id, res[0].name, await global.api.getFullIdentity(identity.id), [], []));
+                                let automation = new BanAutomation(res[0].id, res[0].name, await global.api.getFullIdentity(identity.id), [], []);
+                                this.banAutomationCache.put(res[0].id, automation);
+                                resolve(automation);
                             } else {
                                 reject("Unable to retrieve created automation. This is embarrassing");
                             }
@@ -41,7 +65,7 @@ class Automation {
      * @return {Promise<BanAutomation>}
      */
     getBanAutomation(id) {
-        return new Promise((resolve, reject) => {
+        return this.banAutomationCache.get(id, (resolve, reject) => {
             con.query("select id, name, creator_id from twitch__ban__automation where id = ?;", [id], (err, res) => {
                 if (err) {
                     reject(err);
@@ -108,6 +132,14 @@ class Automation {
                 }
             });
         });
+    }
+
+    /**
+     * Retrieves all ban automations from the cache
+     * @returns {BanAutomation[]}
+     */
+    getBanAutomations() {
+        return Array.from(this.banAutomationCache.objectStore.entries());
     }
 
 }
