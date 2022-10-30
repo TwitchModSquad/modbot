@@ -106,7 +106,7 @@ class FullIdentity extends Identity {
             const identityEmbed = new MessageEmbed()
                     .setAuthor({name: this.name, iconURL: this.avatar_url, url: this.getShortlink()})
                     .setDescription(this.name)
-                    .setFooter({text: "TMS Identity #" + this.id, iconURL: "https://twitchmodsquad.com/assets/images/logo.webp"})
+                    .setFooter({text: "TMS Identity #" + this.id, iconURL: "https://tms.to/assets/images/logos/logo.webp"})
                     .setThumbnail(this.avatar_url)
                     .setColor(0x772ce8);
 
