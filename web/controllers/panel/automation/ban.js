@@ -44,7 +44,6 @@ router.get("/edit/:id", async (req, res) => {
         api.Logger.severe(err);
         res.send("error!");
     }
-    console.log(automation);
 
     if (automation.creator.id !== req.session.identity.id) {
         res.redirect("/panel/no-permission");
