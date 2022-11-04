@@ -15,9 +15,7 @@ const con = require("../database");
 
 const discordClient = require("../discord/discord");
 const Discord = require("discord.js");
-
-let nextClient = Date.now();
-let clients = [];
+const ListenClient = require("./ListenClient");
 
 let modSquadGuild = null;
 
@@ -29,6 +27,8 @@ let timeoutList = [];
 let bannedPerMinute = {};
 
 let refreshTokens = {};
+
+let listenClient = new ListenClient();
 
 // Refresh the bans per minute stat for each watched channel every second
 setInterval(() => {
@@ -93,65 +93,6 @@ con.query("select * from twitch__timeout where active = true;", (err, res) => {
 
     global.api.Logger.info("Loaded " + timeoutList.length + " t/o's");
 });
-
-/**
- * @param {Number} day - 0-6 as a representation of the day of the week (0 = Sunday)
- * @returns {String} The corresponding day of the week as a 3 character String
-*/
-function parseDay(day) {
-    let result = "";
-
-    switch (day) {
-        case 0:
-            result = "Sun";
-            break;
-        case 1:
-            result = "Mon";
-            break;
-        case 2:
-            result = "Tue";
-            break;
-        case 3:
-            result = "Wed";
-            break;
-        case 4:
-            result = "Thu";
-            break;
-        case 5:
-            result = "Fri";
-            break;
-        case 6:
-            result = "Sat";
-    }
-
-    return result;
-}
-
-/**
- * 
- * @param { Number | String | Date | undefined } timestamp - The timestamp to parse, if provided, otherwise the current time is parsed
- * @returns {String} The parsed Date in the format MM:DD:YY HH:MM:SS
- */
-function parseDate(timestamp) {
-    let dte = new Date(timestamp);
-
-    let hr = "" + dte.getHours();
-    let mn = "" + dte.getMinutes();
-    let sc = "" + dte.getSeconds();
-
-    if (hr.length === 1) hr = "0" + hr;
-    if (mn.length === 1) mn = "0" + mn;
-    if (sc.length === 1) sc = "0" + sc;
-
-    let mo = "" + (dte.getMonth() + 1);
-    let dy = "" + dte.getDate();
-    let yr = dte.getFullYear();
-
-    if (mo.length === 1) mo = "0" + mo;
-    if (dy.length === 1) dy = "0" + dy;
-
-    return `${parseDay(dte.getDay())} ${mo}.${dy}.${yr} ${hr}:${mn}:${sc}`;
-}
 
 // I think reason may be deprecated here, so it may always be null. I'll have to check on that.
 /**
@@ -470,18 +411,7 @@ const handle = {
             let streamer = (await api.Twitch.getUserByName(channel.replace("#", ""), true))[0];
             let user = (await api.Twitch.getUserByName(tags.username, true))[0];
     
-            con.query("insert into twitch__chat (id, streamer_id, user_id, message, emotes, badges, color, timesent) values (?, ?, ?, ?, ?, ?, ?, ?);", [
-                tags.id,
-                streamer.id,
-                user.id,
-                message,
-                tags["emotes-raw"],
-                tags["badges-raw"],
-                tags["color"],
-                tags["tmi-sent-ts"],
-            ], err => {
-                if (err) global.api.Logger.warning(err);
-            });
+            
     
             if (await isBanned(channel, tags["user-id"])) {
                 global.api.Logger.info("Changing ban active state of " + tags["display-name"]);
@@ -674,81 +604,38 @@ const initializeClient = () => {
 }
 
 /**
- * Finds a client object that has space to listen to new channels, if none are found, creates a new client object
- * @returns {ClientObject} A client object which is ready to be used
- */
-const getFreeClient = () => {
-    for (let client of clients) {
-        if (client.channels.length < CLIENT_MAXIMUM_CHANNELS) {
-            return client;
-        }
-    }
-
-    return initializeClient();
-}
-
-/**
- * 
- * @returns {Number} The total number of channels currently being listened to by the bot
- */
-const getChannelCount = () => {
-    let total = 0;
-    clients.forEach(client => {
-        total += client.channels.length;
-    })
-    return total;
-}
-
-/**
  * Update the Discord bot's presence to reflect the current number of channels being listened to
  * @returns {void} 
 */
 const updateActivity = () => {
-    let channelCount = getChannelCount();
-    let nodeCount = clients.length;
+    let channelCount = listenClient.channels.length;
     if (global?.client?.discord?.user)
-        global.client.discord.user.setActivity(`${channelCount} channel${channelCount === 1 ? "" : "s"} with ${nodeCount} node${nodeCount === 1 ? "" : "s"}`, {type: "WATCHING"})
+        global.client.discord.user.setActivity(`${channelCount} channel${channelCount === 1 ? "" : "s"}`, {type: "WATCHING"})
 }
 
 setInterval(updateActivity, 30000);
 setTimeout(updateActivity, 3000);
 
 /**
- * 
+ * Listens to the specified channel
  * @param {String} channel - The twitch channel to add to the bot's listening list
  */
 const listenOnChannel = channel => {
-    getFreeClient().addChannel(channel);
+    listenClient.join(channel);
 }
 
 /**
- * 
+ * Parts from the specified channel
  * @param {String} channel - The twitch channel to remove from the bot's listening list
  */
 const partFromChannel = channel => {
-    channel = channel.replace('#', "");
-    for (let client of channels) {
-        if (client.channels.includes(channel)) {
-            global.api.Logger.info("Parting channel " + channel);
-            client.client.part(channel);
-            client.channels.splice(client.channels.indexOf(channel), 1);
-        }
-    }
+    listenClient.part(channel);
+    global.api.Logger.info("Parting from channel " + channel);
 }
 
 // Fetch the current mod squad Discord Guild object
 discordClient.guilds.fetch(config.modsquad_discord).then(guild => {
     modSquadGuild = guild;
-});
-
-con.query("select distinct lower(twitch__user.display_name) as name from identity__moderator join identity on modfor_id = identity.id join twitch__user on twitch__user.identity_id = identity.id where identity__moderator.active = true;", (err, res) => {
-    if (err) {global.api.Logger.warning(err);return;}
-
-    res.forEach(streamer => {
-        listenOnChannel(streamer.name);
-    });
-
-    global.api.Logger.info("Startup completed!");
 });
 
 // Create a singular client object to execute bans
@@ -763,6 +650,18 @@ const banClient = new tmi.Client({
 
 banClient.connect();
 
+con.query("select distinct lower(twitch__user.display_name) as name from identity__moderator join identity on modfor_id = identity.id join twitch__user on twitch__user.identity_id = identity.id where identity__moderator.active = true limit 5000;", (err, res) => {
+    if (err) {global.api.Logger.severe(err);return;}
+    
+    for (let i = 0; i < res.length; i++) {
+        listenOnChannel(res[i].name);
+    }
+
+    global.api.Logger.info("Startup completed!");
+    
+    listenClient.connect();
+});
+
 // Bind listenOnChannel to the global scope
 global.listenOnChannel = listenOnChannel;
 
@@ -771,5 +670,5 @@ global.client.ban = banClient;
 module.exports = {
     listenOnChannel: listenOnChannel,
     banClient: banClient,
-    getClients: function() {return clients;},
+    listenClient: listenClient,
 };
