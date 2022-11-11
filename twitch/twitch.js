@@ -439,9 +439,7 @@ const handle = {
         }
     },
     messageDeleted: (channel, username, deletedMessage, userstate) => {
-        let id = userstate["target-msg-id"];
-    
-        con.query("update twitch__chat set deleted = true where id = ?;", [id]);
+        
     },
     ban: (channel, username, reason, userstate) => {
         addBan(channel, userstate["target-user-id"], username, reason, userstate["tmi-sent-ts"]);
