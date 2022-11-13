@@ -28,17 +28,21 @@ module.exports = () => {
         let streams = [];
 
         const getStreams = async () => {
-            const retrievedStreams = await api.Twitch.Direct.helix.streams.getStreams({
-                limit: 100,
-                userId: userList,
-            });
+            try {
+                const retrievedStreams = await api.Twitch.Direct.helix.streams.getStreams({
+                    limit: 100,
+                    userId: userList,
+                });
 
-            streams = [
-                ...streams,
-                ...retrievedStreams.data,
-            ];
+                streams = [
+                    ...streams,
+                    ...retrievedStreams.data,
+                ];
 
-            userList = [];
+                userList = [];
+            } catch (err) {
+                api.Logger.severe(err);
+            }
         }
 
         for (let i = 0; i < res.length; i++) {
