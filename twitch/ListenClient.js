@@ -109,7 +109,7 @@ class ListenClient {
             channel,
         ]
         if (this.client)
-            this.client.join(channel);
+            this.client.join(channel).catch(api.Logger.warning);
     }
     
     /**
@@ -120,7 +120,7 @@ class ListenClient {
         channel = channel.replace("#", "").toLowerCase();
         this.channels = this.channels.filter(x => x !== channel);
         if (this.client)
-            this.client.part(channel);
+            this.client.part(channel).catch(api.Logger.warning);
     }
 
     /**
