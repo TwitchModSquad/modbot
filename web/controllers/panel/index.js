@@ -8,6 +8,7 @@ const entry = require("./entry");
 const streamerFunctions = require("./streamerfunctions");
 
 const moderator = require("./moderator/");
+const automation = require("./automation/");
 
 router.use(require("../requireAuthenticated"));
 
@@ -44,6 +45,7 @@ router.get("/no-permission", (req, res) => {
 router.use("/chat-history", chatHistory);
 router.use("/search", search);
 router.use("/moderator", moderator);
+router.use("/automation", automation);
 router.use("/user", user);
 router.use("/entry", entry);
 router.use("/streamer-functions", streamerFunctions);

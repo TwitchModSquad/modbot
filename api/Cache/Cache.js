@@ -27,9 +27,9 @@ class Cache {
     /**
      * Constructor for a Cache object
      * 
-     * @param {number} expirationTime Default: 60,000 milliseconds (60 seconds)
+     * @param {number} expirationTime Default: 120,000 milliseconds (120 seconds)
      */
-    constructor(expirationTime = 60000) {
+    constructor(expirationTime = 120000) {
         this.expirationTime = expirationTime;
         this.objectStore = {};
 

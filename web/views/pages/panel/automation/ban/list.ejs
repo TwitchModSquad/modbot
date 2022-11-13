@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>TMS Panel - Ban Automation List</title>
+
+    <%- include("../../../../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/panel.css">
+    <link rel="stylesheet" href="/assets/css/sidebar.css">
+    <link rel="stylesheet" href="/assets/css/automation.css">
+</head>
+<body>
+    <%- include("../../../../partials/panel/header") %>
+
+    <div class="sidebar-container">
+        <%- include("../../../../partials/panel/sidebar", {page: "automation/ban", session: session}) %>
+        <main>
+            <section>
+                <h2><i class="fa-solid fa-ban"></i>Ban Automation</h2>
+
+                <a class="automation ban create-automation" href="create"><div class="icon"><i class="fa-solid fa-plus"></i></div><div class="content"><h3>Create Automation</h3>Create a new automation to get started.</div></a>
+                <% automations.forEach(automation => { %>
+                    <%- include("../../../../partials/panel/automation/ban", {automation: automation}) %>
+                <% }) %>
+            </section>
+
+            <%- include("../../../../partials/footer") %>
+        </main>
+    </div>
+    
+    <%- include("../../../../partials/js") %>
+
+    <script src="/assets/js/panel.js"> </script>
+</body>
+</html>

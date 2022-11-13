@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>TMS Panel - Ban Automation</title>
+
+    <%- include("../../../../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/panel.css">
+    <link rel="stylesheet" href="/assets/css/sidebar.css">
+    <link rel="stylesheet" href="/assets/css/log.css">
+    <link rel="stylesheet" href="/assets/css/inputs.css">
+    <link rel="stylesheet" href="/assets/css/automation.css">
+</head>
+<body>
+    <%- include("../../../../partials/panel/header") %>
+
+    <div class="sidebar-container">
+        <%- include("../../../../partials/panel/sidebar", {page: "automation/ban", session: session}) %>
+        <main>
+            <form method="POST" action="create" class="form">
+                <div class="alert alert-danger">
+                    <strong>An error has occurred!</strong>
+                    <%= error %>
+                </div>
+
+                <section>
+                    <h2><i class="fa-solid fa-ban"></i>Create a new Ban Automation</h2>
+
+                        <div class="input-group">
+                            <label for="automation-name">Automation Name</label>
+                            <input type="text" name="automation-name" id="automation-name" placeholder="Automation Name" value="<%= automationName %>" />
+                        </div>
+                </section>
+
+                <div class="container container-md">
+                    <div class="col-6">
+                        <section>
+                            <h2><i class="fa-solid fa-bullseye"></i> Automation Targets</h2>
+        
+                            <div class="input-group">
+                                <label for="targets"></label>
+                                <select name="targets" id="targets" multiple="multiple">
+                                    <% targets.forEach(target => { %>
+                                        <option value="<%= target.id %>"<%- selectedTargets.includes(target.id+"") ? ` selected="selected"` : "" %>><%= target.display_name %></option>
+                                    <% }) %>
+                                </select>
+                            </div>
+                            <small>Use <code>ctrl + click</code> to select multiple targets.</small>
+                        </section>
+
+                        <section style="font-size: .8rem;">
+                            <h2><i class="fa-solid fa-circle-info"></i> Rule Explaination</h2>
+        
+                            <p>
+                                One of the defined streamers <i>and</i> moderators <strong>must</strong> match for this automation to be considered.
+                            </p>
+                            <p>
+                                <i>Either</i> the ban reason or chat log filters must match, including the streamer &amp; moderator, in order for the automation to be considered.
+                            </p>
+                            <p>
+                                Therefore, the relationship effectively works like this:
+                            </p>
+                            <pre>[any streamer] and [any moderator] and ([any reason] or [any chat log])</pre>
+                            <p>
+                                Chat log checks the 10 most recent chat entries of that user.
+                            </p>
+                        </section>
+                    </div>
+                    <section class="col-6">
+                        <h2><i class="fa-regular fa-scale-balanced"></i> Automation Rules</h2>
+    
+                        <div class="container container-md">
+                            <div class="input-group col-4">
+                                <label for="add-rule-type">Rule Type</label>
+                                <select name="add-rule-type" id="add-rule-type">
+                                    <option value="x" selected="selected" disabled="disabled">Select a Type</option>
+                                    <option value="streamer">Streamer</option>
+                                    <option value="moderator">Moderator</option>
+                                    <option value="reason">Reason</option>
+                                    <option value="chatlog">Chat Log</option>
+                                </select>
+                            </div>
+                            <div class="input-group col-8" id="add-rule-value" style="display: none;" data-rule-name="rule-reason">
+                                <label for="rule-value">Rule Value (contains, case insensitive)</label>
+                                <input type="text" name="rule-value" id="rule-value" />
+                            </div>
+                            <div class="user-search input-group col-8" style="display: none;" id="add-rule-twitchuser" data-search-name="rule-streamer" data-search-func="addRuleUser">
+                                <label for="rule-twitchuser">Select a User</label>
+                                <input type="search" name="rule-twitchuser" id="rule-twitchuser" class="twitch-search" placeholder="Search for a Twitch user..." />
+                                <div class="search-results"></div>
+                            </div>
+                        </div>
+                        <div id="rule-streamer" class="rule-list">
+                            <h3>Streamers</h3>
+                            <small<%- rules.streamers.length > 0 ? ` style="display:none;"` : "" %>>No streamer filters have been selected.</small>
+                            <div>
+                                <% rules.streamers.forEach(streamer => { %>
+                                    <div id="twitch-<%= streamer.id %>" target="Click to remove" onclick="$(this).remove();return false;"><%- include("../../../../partials/panel/user/twitch", {account: streamer}) %><input type="hidden" name="rule-streamer[]" value="<%= streamer.id %>" ></div>
+                                <% }) %>
+                            </div>
+                        </div>
+                        <div id="rule-moderator" class="rule-list">
+                            <h3>Moderators</h3>
+                            <small<%- rules.moderators.length > 0 ? ` style="display:none;"` : "" %>>No moderator filters have been selected.</small>
+                            <div>
+                                <% rules.moderators.forEach(moderator => { %>
+                                    <div id="twitch-<%= moderator.id %>" target="Click to remove" onclick="$(this).remove();return false;"><%- include("../../../../partials/panel/user/twitch", {account: moderator}) %><input type="hidden" name="rule-moderator[]" value="<%= moderator.id %>" ></div>
+                                <% }) %>
+                            </div>
+                        </div>
+                        <div id="rule-reason" class="rule-list">
+                            <h3>Reason</h3>
+                            <small<%- rules.reason.length > 0 ? ` style="display:none;"` : "" %>>No reason filters have been selected.</small>
+                            <div>
+                                <% rules.reason.forEach((reason, i) => { %>
+                                    <div id="rule-<%= i+500 %>" class="container" style="margin: .3em 0;"><input type="text" name="rule-reason[]" value="<%= reason %>" class="col-11" style="margin-right: 1em;"><div class="col-1" style="position: relative;"><button type="button" onclick="$(this).parent().parent().remove();return false;" aria-label="Remove rule" style="position: absolute;right: 0;"><i class="fa-solid fa-xmark"></i></button></div></div>
+                                <% }) %>
+                            </div>
+                        </div>
+                        <div id="rule-chatlog" class="rule-list">
+                            <h3>Chat Log</h3>
+                            <small<%- rules.chatlog.length > 0 ? ` style="display:none;"` : "" %>>No chat log filters have been selected.</small>
+                            <div>
+                                <% rules.chatlog.forEach((chatlog, i) => { %>
+                                    <div id="rule-<%= i+1000 %>" class="container" style="margin: .3em 0;"><input type="text" name="rule-chatlog[]" value="<%= chatlog %>" class="col-11" style="margin-right: 1em;"><div class="col-1" style="position: relative;"><button type="button" onclick="$(this).parent().parent().remove();return false;" aria-label="Remove rule" style="position: absolute;right: 0;"><i class="fa-solid fa-xmark"></i></button></div></div>
+                                <% }) %>
+                            </div>
+                        </div>
+                        <small class="mt-sm"><code>Moderator</code> and <code>reason</code> rules only work if the streamer has authenticated with elevated permissions. <a href="/panel/streamer-functions">Click here for more information.</a> Note: This link will only work if you are a Twitch partner or affiliate with 5,000+ followers.</small>
+                    </section>
+                </div>
+
+                <section>
+                    <h2><i class="fa-solid fa-paper-plane"></i> Submit</h2>
+
+                    <input type="submit" value="Add Ban Automation">
+                </section>
+            </form>
+
+            <%- include("../../../../partials/footer") %>
+        </main>
+    </div>
+    
+    <%- include("../../../../partials/js") %>
+
+    <script src="/assets/js/panel.js"> </script>
+    <script src="/assets/js/search.js"> </script>
+    <script src="/assets/js/banautomation.js"> </script>
+</body>
+</html>

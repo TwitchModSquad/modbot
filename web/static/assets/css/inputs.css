@@ -60,3 +60,60 @@ input[type=search] {
 .search-box.force-open input[type=search] {
     border-radius: .6em .6em 0 0;
 }
+
+.form input[type=text],
+.form input[type=search],
+.form select {
+    display: block;
+    width: calc(100% - 1.6em);
+    margin: 0;
+    border-color: var(--primary-background-color);
+    background-color: var(--tertiary-background-color);
+}
+
+.form .input-group input,
+.form .input-group select {
+    margin-top: .4em;
+}
+
+.user-search {
+    position: relative;
+}
+
+.user-search input[type=search] {
+    width: 100%;
+    z-index: 5;
+}
+
+.user-search:focus-within input[type=search],
+.user-search.force-open input[type=search] {
+    border-radius: .6em .6em 0 0;
+}
+
+.search-results {
+    display: none;
+    position: absolute;
+    width: calc(100% - 1.2em - 2px);
+    padding: .4em .6em;
+    background-color: var(--tertiary-background-color);
+    border: 1px solid var(--primary-background-color);
+    border-radius: 0 0 .6em .6em;
+    border-top: none;
+}
+
+.user-search:focus-within .search-results,
+.user-search.force-open .search-results {
+    display: block;
+}
+
+button, input[type=submit] {
+    background: var(--primary-tms-color);
+    color: var(--primary-text-color);
+    font-size: .9rem;
+    font-weight: 500;
+    padding: .6em .8em;
+    border-radius: .3em;
+    border: none;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+}

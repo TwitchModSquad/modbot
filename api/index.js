@@ -5,6 +5,7 @@ const Discord = require("./Discord/");
 const SessionService = require("./Session/");
 const Archive = require("./Archive/");
 const Authentication = require("./Authentication/");
+const Automation = require("./Automation/");
 
 const Logger = require("./Logger");
 const FullIdentity = require("./FullIdentity");
@@ -41,6 +42,12 @@ class API {
      * @type {Authentication}
      */
     Authentication = new Authentication();
+
+    /**
+     * Base Automation API
+     * @type {Automation}
+     */
+    Automation = new Automation();
 
     /**
      * Logger API

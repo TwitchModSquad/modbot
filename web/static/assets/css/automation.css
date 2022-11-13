@@ -1,0 +1,41 @@
+.automation {
+    border: 0.1em solid rgba(255,255,255,0.05);
+    background-color: rgba(255,255,255,0.025);
+    color: var(--primary-text-color);
+    border-radius: 0.75em;
+    padding: 0.6em 0.8em;
+    margin: 0.6em;
+    display: flex;
+    box-shadow: var(--shadow);
+    text-decoration: none;
+}
+
+.automation .icon {
+    position: relative;
+    width: 2em;
+}
+
+.automation .icon i {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.automation h3 {
+    font-size: 1.2rem;
+    font-weight: 300;
+}
+
+.automation .content {
+    font-size: .9rem;
+}
+
+.rule-list {
+    margin: .5em 0;
+}
+
+.rule-list h3 {
+    font-size: 1rem;
+    font-weight: 300;
+}
