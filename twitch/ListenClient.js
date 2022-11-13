@@ -160,7 +160,7 @@ class ListenClient {
     connect() {
         this.client = new tmi.Client({
             options: {
-                debug: true,
+                debug: false,
                 // joinInterval: 5000,
                 skipMembership: true,
             },
