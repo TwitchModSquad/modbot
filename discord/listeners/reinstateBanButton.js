@@ -74,7 +74,7 @@ const listener = {
                     // Hide ban
                     interaction.message.delete().then(() => {
                         banChannel.send({content: ' ', embeds: [banEmbed], components: [row]}).then(message => {
-                            con.query("update twitch__ban set discord_message = ? where discord_message = ?;", [message.id, oldMessageId], err => {
+                            con.query("update twitch__ban set discord_message = ?, hide_reason = null where discord_message = ?;", [message.id, oldMessageId], err => {
                                 if (err) {
                                     handleError(err);
                                 } else {
