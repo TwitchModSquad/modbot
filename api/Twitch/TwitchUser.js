@@ -472,7 +472,7 @@ class TwitchUser extends User {
                     .setColor(0x772ce8)
                     .setThumbnail(this.profile_image_url)
                     .setDescription(`\`\`\`${this.id}\`\`\`**Name: **${this.display_name}\n**Followers: **${comma(this.follower_count)}\n**Views: **${comma(this.view_count)}\n[Profile](https://twitch.tv/${this.display_name.toLowerCase()})`)
-                    .setFooter({text: "TMS Twitch User #" + this.id, iconURL: "https://twitchmodsquad.com/assets/images/logo.webp"});
+                    .setFooter({text: "TMS Twitch User #" + this.id, iconURL: "https://tms.to/assets/images/logos/logo.webp"});
 
             if (this.description && this.description !== "")
                 embed.addField("Description", "```\n" + this.description + "```", false);

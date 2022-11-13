@@ -159,7 +159,7 @@ class Entry {
                 .addField("Description", "```" + this.description + "```")
                 .setDescription("**Submitted by " + (this.owner?.name ? this.owner.name : "Unresolvable") + "**" + (discordAccount ? " (<@" + discordAccount.id + ">)" : ""))
                 .setTimestamp(this.time_submitted)
-                .setFooter({text: "ID: " + this.id, iconURL: "https://twitchmodsquad.com/assets/images/logo.webp"});
+                .setFooter({text: "ID: " + this.id, iconURL: "https://tms.to/assets/images/logos/logo.webp"});
         
             if (users !== "") {
                 embed.addField("User Accounts", users);
@@ -760,7 +760,7 @@ class Entry {
                                             .setDescription(executorString + " moved archive entry `" + this.id + "`" + from + " to [#" + message.channel.name + "](" + message.url + ")")
                                             .setColor(0x772ce8)
                                             .setTimestamp(Date.now())
-                                            .setFooter({text: "Archive Entry Update", iconURL: "https://twitchmodsquad.com/assets/images/logo.webp"});
+                                            .setFooter({text: "Archive Entry Update", iconURL: "https://tms.to/assets/images/logos/logo.webp"});
 
                                         const addMessage = updateMessage => {
                                             con.query("insert into archive__messages (id, guild_id, channel_id, archive_id, reason) values (?, ?, ?, ?, 'update');", [updateMessage.id, message.guild.id, discordUser.id, this.id], err => {

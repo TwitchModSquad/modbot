@@ -67,7 +67,7 @@ class Identity {
             const identityEmbed = new MessageEmbed()
                     .setAuthor({name: this.name, url: this.getShortlink()})
                     .setDescription(this.name)
-                    .setFooter({text: "TMS Identity #" + this.id, iconURL: "https://twitchmodsquad.com/assets/images/logo.webp"})
+                    .setFooter({text: "TMS Identity #" + this.id, iconURL: "https://tms.to/assets/images/logos/logo.webp"})
                     .setColor(0x772ce8);
 
             embeds = [identityEmbed];

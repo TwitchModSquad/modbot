@@ -125,7 +125,7 @@ class DiscordUser extends User {
                     .setThumbnail(this.avatar_url)
                     .setColor(0x772ce8)
                     .setDescription(`\`\`\`${this.id}\`\`\`<@${this.id}>`)
-                    .setFooter({text: "TMS Discord User #" + this.id, iconURL: "https://twitchmodsquad.com/assets/images/logo.webp"});
+                    .setFooter({text: "TMS Discord User #" + this.id, iconURL: "https://tms.to/assets/images/logos/logo.webp"});
 
             const mutualGuilds = await this.getGuilds();
             
