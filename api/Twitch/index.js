@@ -60,18 +60,22 @@ class Twitch {
      */
     getUserByIdByForce(id) {
         return new Promise(async (resolve, reject) => {
-            let helixUser = await api.helix.users.getUserById(id);
+            try {
+                let helixUser = await api.helix.users.getUserById(id);
 
-            if (helixUser) {
-                let user = new TwitchUser(helixUser.id, null, helixUser.displayName, null, helixUser.profilePictureUrl, helixUser.offlinePlaceholderUrl, helixUser.description, helixUser.views, null, (helixUser.broadcasterType === "" ? null : helixUser.broadcasterType));
-                await user.refreshFollowers();
-                user.post();
-
-                await con.pquery("insert into twitch__username (id, display_name) values (?, ?) on duplicate key update last_seen = null;", [user.id, user.display_name]);
-                
-                resolve(user);
-            } else {
-                reject("User not found!");
+                if (helixUser) {
+                    let user = new TwitchUser(helixUser.id, null, helixUser.displayName, null, helixUser.profilePictureUrl, helixUser.offlinePlaceholderUrl, helixUser.description, helixUser.views, null, (helixUser.broadcasterType === "" ? null : helixUser.broadcasterType));
+                    await user.refreshFollowers();
+                    user.post();
+    
+                    await con.pquery("insert into twitch__username (id, display_name) values (?, ?) on duplicate key update last_seen = null;", [user.id, user.display_name]);
+                    
+                    resolve(user);
+                } else {
+                    reject("User not found!");
+                }
+            } catch (err) {
+                reject(err);
             }
         });
     }
