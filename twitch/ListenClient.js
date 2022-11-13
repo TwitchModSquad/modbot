@@ -27,7 +27,14 @@ class ListenClient {
      */
     listeners = {
         message: [],
+        timeout: [],
+        ban: [],
     };
+
+    /**
+     * Stores a key-object pair of the number of bans in a minute in each channel
+     */
+    bannedPerMinute = {};
 
     /**
      * Wraps listener parameters to be more TMS friendly than TMI functions
@@ -43,6 +50,44 @@ class ListenClient {
                 this.listeners.message.forEach(func => {
                     try {
                         func(streamer, chatter, tags, message, self);
+                    } catch (e) {
+                        global.api.Logger.warning(e);
+                    }
+                });
+            } catch (e) {
+                global.api.Logger.warning(e);
+            }
+        },
+        timeout: async (channel, username, reason, duration, userstate) => {
+            try {
+                let streamer = (await api.Twitch.getUserByName(channel.replace("#", ""), true))[0];
+                let chatter = await api.Twitch.getUserById(userstate["target-user-id"], false, true);
+        
+                this.listeners.timeout.forEach(func => {
+                    try {
+                        func(streamer, chatter, duration, userstate["tmi-sent-ts"], userstate);
+                    } catch (e) {
+                        global.api.Logger.warning(e);
+                    }
+                });
+            } catch (e) {
+                global.api.Logger.warning(e);
+            }
+        },
+        ban: async (channel, username, reason, userstate) => {
+            try {
+                let streamer = (await api.Twitch.getUserByName(channel.replace("#", ""), true))[0];
+                let chatter = await api.Twitch.getUserById(userstate["target-user-id"], false, true);
+
+                if (!this.bannedPerMinute.hasOwnProperty(streamer.id)) this.bannedPerMinute[streamer.id] = [];
+                this.bannedPerMinute[streamer.id] = [
+                    ...this.bannedPerMinute[streamer.id],
+                    Date.now(),
+                ]
+        
+                this.listeners.ban.forEach(func => {
+                    try {
+                        func(streamer, chatter, userstate["tmi-sent-ts"], userstate, this.bannedPerMinute[streamer.id].length);
                     } catch (e) {
                         global.api.Logger.warning(e);
                     }
@@ -97,7 +142,16 @@ class ListenClient {
             }
         }
 
+        setInterval(() => {
+            for (const [streamer, timestampList] of Object.entries(this.bannedPerMinute)) {
+                let now = Date.now();
+                this.bannedPerMinute[streamer] = timestampList.filter(ts => now - ts < 60000);
+            }
+        }, 1000);
+
         this.client.on("message", this.listenerWrappers.message);
+        this.client.on("timeout", this.listenerWrappers.timeout);
+        this.client.on("ban", this.listenerWrappers.ban);
     }
 
     /**
@@ -105,13 +159,17 @@ class ListenClient {
      */
     connect() {
         this.client = new tmi.Client({
-            options: { debug: true },
+            options: {
+                debug: true,
+                // joinInterval: 5000,
+                skipMembership: true,
+            },
             connection: { reconnect: true },
             channels: this.channels,
             identity: {
                 username: config.twitch.username,
                 password: config.twitch.oauth,
-            }
+            },
         });
 
         this.initialize();
