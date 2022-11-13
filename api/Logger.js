@@ -14,17 +14,23 @@ class Logger {
 
     severe(msg) {
         console.log(SEVERE_CODE, msg);
-        this.logToDatabase("SEVERE", msg);
+        try {
+            this.logToDatabase("SEVERE", msg);
+        } catch (err) {}
     }
 
     warning(msg) {
         console.log(WARNING_CODE, msg);
-        this.logToDatabase("WARNING", msg);
+        try {
+            this.logToDatabase("WARNING", msg);
+        } catch (err) {}
     }
 
     info(msg) {
         console.log(INFO_CODE, msg);
-        this.logToDatabase("INFO", msg);
+        try {
+            this.logToDatabase("INFO", msg);
+        } catch (err) {}
     }
 }
 
