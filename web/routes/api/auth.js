@@ -40,7 +40,9 @@ router.get("/invite/:invite", (req, res) => {
     if (req.params.invite) {
         res.cookie("invite", req.params.invite, {
             secure: true,
-            maxAge: 360000
+            maxAge: 10 * 60 * 60, // 10 hours
+            domain: config.main_domain,
+            path: '/',
         });
 
         res.redirect(api.Authentication.Twitch.TWITCH_URL);
@@ -151,8 +153,13 @@ router.get("/twitch", async (req, res) => {
                 });
             }
 
-            res.cookie("session", session.id, {domain: config.main_domain, maxAge: new Date(Date.now() + 86400000), path: "/", secure: true});
-            
+            res.cookie("session", session.id, {
+                domain: config.main_domain,
+                maxAge: 14 * 24 * 60 * 60, // 14 days
+                path: "/",
+                secure: true
+            });
+
             redirect(req, res);
         }, err => {
             global.api.Logger.warning(err);
