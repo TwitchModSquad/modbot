@@ -11,70 +11,9 @@ const discordClient = require("../discord/discord");
 const Discord = require("discord.js");
 const ListenClient = require("./ListenClient");
 
-let modSquadGuild = null;
-
 let disallowed_channels = ["ludwig", "tarzaned", "flexingseal", "miki", "dirtybird", "alttprandomizer"];
 
-let bannedPerMinute = {};
-
 let listenClient = new ListenClient();
-
-// I think reason may be deprecated here, so it may always be null. I'll have to check on that.
-/**
- * Add a ban event to the database
- * @param {String} channel - The twitch channel where the user was banned
- * @param {String} userid - The twitch user id to add to the ban list
- * @param {String} username - The twitch username of the offending user
- * @param {String} reason - The reason for the ban
- * @param {Number} timebanned - The timestamp of the ban event as a unix timestamp
- * @returns {void}
- */
-const addBan = async (channel, userid, username, reason, timebanned) => {
-    let channelStripped = channel.replace("#", "");
-
-    let streamer = (await api.Twitch.getUserByName(channelStripped, true))[0];
-    let streamer_id = streamer.id;
-
-    let speaker = (await api.Twitch.getUserByName(username, true))[0];
-
-    /* 
-     If the BPM rate of the channel of interest is healthy (under the BPM cap) and the liveban text channel is 
-     found, the bot will send a message detailing the twitch ban information to the liveban text channel.
-    */
-    if (bannedPerMinute[channel].length <= 5) {
-        if (config.hasOwnProperty("liveban_channel")) {
-            let dchnl = modSquadGuild.channels.cache.find(dchnl => dchnl.id == config.liveban_channel);
-
-            if (dchnl.isText()) {
-                
-            }
-        }
-    } else {
-        global.api.Logger.info(`Not notifying of ban in ${channel} due to exceeding BPM threshold (${bannedPerMinute[channel]}>5)`);
-    }
-}
-
-/**
- * A parent function used to easily call event functions when twitch events are triggered
- * @method message - The twitch message event handler
- * @method messageDeleted - The twitch messageDeleted event handler
- * @method ban - The twitch ban event handler
- * @method timeout - The twitch timeout event handler
- */
-const handle = {
-    message: async (channel, tags, message, self) => {
-        
-    },
-    messageDeleted: (channel, username, deletedMessage, userstate) => {
-        
-    },
-    ban: (channel, username, reason, userstate) => {
-        addBan(channel, userstate["target-user-id"], username, reason, userstate["tmi-sent-ts"]);
-    },
-    timeout: (channel, username, reason, duration, userstate) => {
-        
-    },
-};
 
 /**
  * Update the Discord bot's presence to reflect the current number of channels being listened to
