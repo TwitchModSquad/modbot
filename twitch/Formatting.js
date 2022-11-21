@@ -208,7 +208,7 @@ class Formatting {
                 if (activeChannels !== "")
                     embed.addField(`Active in Channels:`, `\`\`\`\nChannel${' '.repeat(longestChannelName + ACTIVE_CHANNEL_PADDING - 7)}Last Active${activeChannels}\`\`\``);
                 
-                resolve(embed);    
+                resolve(embed);
             });
         });
     }
