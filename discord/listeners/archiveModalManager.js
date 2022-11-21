@@ -96,7 +96,7 @@ const listener = {
                                     const continueEmbed = new MessageEmbed()
                                         .setTitle("Add files, images, and URLs!")
                                         .setDescription("We've created a new thread to add documents!\n\nVisit it [here](" + message.url + ").")
-                                        .setFooter({text: "Information message. This embed will expire in 20 seconds.", iconURL: "https://twitchmodsquad.com/assets/images/logo.webp"});
+                                        .setFooter({text: "Information message. This embed will expire in 20 seconds.", iconURL: "https://tms.to/assets/images/logos/logo.webp"});
                                     modal.reply({content: ' ', embeds: [continueEmbed]}).then(() => {
                                         setTimeout(() => {
                                             try {

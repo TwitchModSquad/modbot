@@ -15,7 +15,6 @@ require("./twitch/twitch");
 require("./web/express");
 
 // Load global intervals
-const updateChatIndexes = require("./interval/updateChatIndexs");
 const updateUsers = require("./interval/updateUsers");
 const updateTwitchUsernames = require("./interval/updateTwitchUsernames");
 const updateDiscordUsernames = require("./interval/updateDiscordUsernames");
@@ -30,9 +29,7 @@ updateUsers();
 updateTwitchUsernames();
 updateDiscordUsernames();
 setTimeout(updateEntryUsernames, 5 * SECONDS_TO_MILLISECONDS);
-// setTimeout(updateChatIndexes, 15 * MINUTES_TO_MILLISECONDS);
 
-// setInterval(updateChatIndexes, 1 * HOURS_TO_MILLISECONDS);
 setInterval(updateUsers, 10 * SECONDS_TO_MILLISECONDS);
 setInterval(updateTwitchUsernames, 1 * MINUTES_TO_MILLISECONDS);
 setInterval(updateDiscordUsernames, 1 * MINUTES_TO_MILLISECONDS);

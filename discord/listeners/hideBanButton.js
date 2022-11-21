@@ -81,9 +81,11 @@ const listener = {
                 }
 
                 // Send embed
-                let title = "Hide Ban";
+                let title = "Hide ban";
 
                 if (streamer && chatter) title = `Hide ban: '${chatter.display_name}' in '${streamer.display_name}'`;
+
+                if (title.length > 45) title = "Hide ban: " + chatter.display_name;
 
                 const modal = new Modal()
                     .setCustomId("hide-ban")

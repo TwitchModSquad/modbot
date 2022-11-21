@@ -19,7 +19,7 @@ const command = {
     temporaryMessage (obj, method, message, timeout = 5000, description = null) {
         const embed = new MessageEmbed()
             .setTitle(message)
-            .setFooter({text: `Information message. This message will expire in ${(timeout/1000)} second${timeout === 1000 ? "" : "s"}.`, iconURL: "https://twitchmodsquad.com/assets/images/logo.webp"});
+            .setFooter({text: `Information message. This message will expire in ${(timeout/1000)} second${timeout === 1000 ? "" : "s"}.`, iconURL: "https://tms.to/assets/images/logos/logo.webp"});
 
         if (description !== null) embed.setDescription(description);
 
