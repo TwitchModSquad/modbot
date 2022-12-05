@@ -1,0 +1,91 @@
+const express = require("express");
+const bodyParser = require("body-parser");
+const router = express.Router();
+
+const api = require("../../../api/");
+const con = require("../../../database");
+
+router.get("/:id", (req, res) => {
+    api.getGroupById(req.params.id).then(group => {
+        res.render("pages/group/view", {group: group});
+    }).catch(err => {
+        api.Logger.warning(err);
+        res.send("Nope!");
+    });
+});
+
+router.get("/:token/settime", (req, res) => {
+    let token = req.params.token;
+
+    con.query("select id from `group` where token = ?;", [token], (err, result) => {
+        if (err) {
+            api.Logger.warning(err);
+            res.send("Nope!");
+        } else {
+            if (result.length > 0) {
+                api.getGroupById(result[0].id).then(group => {
+                    res.render("pages/group/settime", {group: group});
+                }, err => {
+                    api.Logger.warning(err);
+                    res.send("Nope!");
+                })
+            } else {
+                res.send("Nope!");
+            }
+        }
+    });
+});
+
+router.use(bodyParser.urlencoded({extended: true}));
+
+router.post("/:token/settime", (req, res) => {
+    let token = req.params.token;
+    let date = Number(req.body?.datetime);
+
+    if (!date || isNaN(date)) {
+        res.render("pages/group/settime", {group: group, error: "Unable to process datetime value: " + req.body?.datetime});
+        return;
+    }
+
+    con.query("select id, token_identity from `group` where token = ?;", [token], (err, result) => {
+        if (err) {
+            api.Logger.warning(err);
+            res.send("Nope!");
+        } else {
+            if (result.length > 0) {
+                api.getGroupById(result[0].id).then(async group => {
+                    let identity = null;
+
+                    if (result[0].token_identity) {
+                        try {
+                            identity = await api.getFullIdentity(result[0].token_identity);
+                        } catch(err) {
+                            api.Logger.warning(err);
+                        }
+                    }
+
+                    const now = new Date();
+                    date = new Date(date * 1000);
+                    let diff = date.getTime() - now.getTime();
+                    if (diff >= 0) {
+                        group.setStartTime(date, identity).then(() => {
+                            res.render("pages/group/settime-success", {group: group, time: date.toLocaleString()});
+                        }, err => {
+                            res.render("pages/group/settime", {group: group, error: "Unknown error occurred!"});
+                            api.Logger.severe(err);
+                        });
+                    } else {
+                        res.render("pages/group/settime", {group: group, error: "Unable to set start time in the past!"});
+                    }
+                }, err => {
+                    api.Logger.warning(err);
+                    res.send("Nope!");
+                })
+            } else {
+                res.send("Nope!");
+            }
+        }
+    });
+});
+
+module.exports = router;

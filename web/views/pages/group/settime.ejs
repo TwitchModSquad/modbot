@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>TMS Set Group Time</title>
+
+    <%- include("../../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/group.css">
+    <link rel="stylesheet" href="/assets/css/button.css">
+</head>
+<body>
+    <main>
+        <h1><img class="logo" src="/assets/images/logos/logo.webp" alt="Twitch Mod Squad Logo"> Twitch Mod Squad <span>group time</span></h1>
+        
+        <% if (locals.error) { %>
+        <div class="alert alert-danger">
+            <strong>An error occurred while processing this request!</strong>
+            <%= locals.error %>
+        </div>
+        <% } %>
+
+        <p>Set time for <code><%= group.game %></code> group hosted by <code><%= group.host.display_name %></code></p>
+        <form class="settime" method="POST">
+
+            <div class="input-group">
+                <label for="date">Date</label>
+                <input type="date" id="date" name="date" />
+            </div>
+
+            <div class="input-group">
+                <label for="time">Time</label>
+                <input type="time" id="time" name="time" />
+            </div>
+            
+            <input type="hidden" name="datetime" id="datetime">
+
+            <pre id="time-output" style="display: none;margin: .8em 0;"></pre>
+
+            <input type="submit" value="Set Time" class="button" style="margin-top:.5em;">
+        </form>
+        <small style="display:block;text-align:center;margin-top:.5em;">Time on this page is equivalent to your local time.</small>
+    </main>
+
+    <%- include("../../partials/footer") %>
+    
+    <%- include("../../partials/js") %>
+<script>
+    // thank you to https://r.3v.fi/discord-timestamps/ for a lot of the date/time code.
+
+    const date = $("#date");
+    const time = $("#time");
+    
+    const datetime = $("#datetime");
+
+    const output = $("#time-output");
+
+    function automaticRelativeDifference(d) {
+        const diff = -((new Date().getTime() - d.getTime())/1000)|0;
+        const absDiff = Math.abs(diff);
+        
+        if (absDiff > 86400*30*10) {
+            return { duration: Math.round(diff/(86400*365)), unit: 'years' };
+        }
+        if (absDiff > 86400*25) {
+            return { duration: Math.round(diff/(86400*30)), unit: 'months' };
+        }
+        if (absDiff > 3600*21) {
+            return { duration: Math.round(diff/86400), unit: 'days' };
+        }
+        if (absDiff > 60*44) {
+            return { duration: Math.round(diff/3600), unit: 'hours' };
+        }
+        if (absDiff > 30) {
+            return { duration: Math.round(diff/60), unit: 'minutes' };
+        }
+        return { duration: diff, unit: 'seconds' };
+    }
+
+    function updateTimes() {
+        const selectedDate = new Date(document.getElementById("date").valueAsNumber + document.getElementById("time").valueAsNumber + new Date().getTimezoneOffset() * 60000);
+        const ts = selectedDate.getTime().toString();
+        datetime.val(ts.substr(0, ts.length - 3));
+        const diff = automaticRelativeDifference(selectedDate);
+        const formatter = new Intl.DateTimeFormat(navigator.language || 'en', {dateStyle: "short", timeStyle: "short"});
+
+        if (diff.duration === 0) {
+            output.html(`Relative: right now\n${formatter.format(selectedDate)}`);
+        } else
+            output.html(`Relative: ${Math.abs(diff.duration)} ${diff.unit} ${diff.duration > 0 ? "from now" : "ago"}\n${formatter.format(selectedDate)}`);
+        output.show();
+    }
+
+    $(function() {
+        const now = new Date(Date.now() + 3600000);
+        date.val(`${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, "0")}-${now.getDate().toString().padStart(2, '0')}`)
+        time.val(`${now.getHours().toString().padStart(2, '0')}:00`);
+
+        date.on("change", updateTimes);
+        time.on("change", updateTimes);
+
+        updateTimes();
+    })
+</script>
+</body>
+</html>
