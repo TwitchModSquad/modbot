@@ -58,8 +58,12 @@ const listener = {
 
             guild.channels.fetch().then(channels => {
                 channels.forEach(channel => {
-                    if (channel.type === "GUILD_TEXT") {
-                        channel.messages.fetch().then(() => {}, () => {}); // By default will just fetch 50 messages.
+                    try {
+                        if (channel.type === "GUILD_TEXT") {
+                            channel.messages.fetch().then(() => {}, () => {}); // By default will just fetch 50 messages.
+                        }
+                    } catch(err) {
+                        global.api.Logger.warning(err);
                     }
                 });
             }, global.api.Logger.warning);
