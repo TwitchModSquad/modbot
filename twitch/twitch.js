@@ -8,7 +8,6 @@ const tmi = require('tmi.js');
 const con = require("../database");
 
 const discordClient = require("../discord/discord");
-const Discord = require("discord.js");
 const ListenClient = require("./ListenClient");
 
 let disallowed_channels = ["ludwig", "tarzaned", "flexingseal", "miki", "dirtybird", "alttprandomizer"];
@@ -70,7 +69,7 @@ con.query("select distinct lower(twitch__user.display_name) as name from identit
         listenOnChannel(res[i].name);
     }
 
-    global.api.Logger.info("Startup completed!");
+    api.Logger.info("Startup completed!");
     
     listenClient.connect();
 });
