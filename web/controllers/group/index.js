@@ -14,6 +14,40 @@ router.get("/:id", (req, res) => {
     });
 });
 
+router.get("/u/:name", (req, res) => {
+    api.Twitch.getUserByName(req.params.name, false).then(users => {
+        let user = users[0];
+
+        con.query("select id from group__user join `group` on `group`.id = group__user.group_id where group__user.user_id = ? and `group`.active order by `group`.starttime asc;", [user.id], async (err, result) => {
+            if (!err) {
+                if (result.length === 0) {
+                    result.send("Nope!");
+                } else if (result.length === 1) {
+                    api.getGroupById(result[0].id).then(group => {
+                        res.render("pages/group/view", {group: group});
+                    }, err => {
+                        api.Logger.warning(err);
+                        res.send("Nope!");
+                    });
+                } else {
+                    let groups = [];
+                    for (let i = 0; i < result.length; i++) {
+                        groups = [
+                            ...groups,
+                            await api.getGroupById(result[i].id),
+                        ];
+                    }
+                    res.render("pages/group/multiple", {user: user, groups: groups});
+                }
+            } else {
+                res.send(err);
+            }
+        });
+    }, err => {
+        res.send(err);
+    })
+});
+
 router.get("/:token/settime", (req, res) => {
     let token = req.params.token;
 
