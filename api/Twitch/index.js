@@ -4,6 +4,7 @@ const TwitchChat = require("./TwitchChat");
 
 const Identity = require("../Identity");
 const TwitchUser = require("./TwitchUser");
+const TwitchCommand = require("./TwitchCommand");
 
 const Cache = require("../Cache/Cache");
 const Assumption = require("../Assumption");
@@ -18,6 +19,17 @@ const {ClientCredentialsAuthProvider} = require("twitch-auth");
 
 const authProvider = new ClientCredentialsAuthProvider(config.twitch.client_id, config.twitch.client_secret);
 const api = new ApiClient({ authProvider });
+
+let commands = [];
+
+setTimeout(() => {
+    for (const name in global.twitchCommands) {
+        commands = [
+            ...commands,
+            name
+        ]
+    }
+}, 500);
 
 /**
  * Utility class for Twitch services
@@ -51,6 +63,13 @@ class Twitch {
      * @type {Cache}
      */
     userCache = new Cache();
+
+    /**
+     * Streamer command cache
+     * 
+     * @type {Cache}
+     */
+    streamerCommands = new Cache(600000);
 
     /**
      * Requests a user directly from the Twitch Helix API
@@ -213,6 +232,100 @@ class Twitch {
                 } else {
                     reject(err);
                 }
+            });
+        });
+    }
+
+    /**
+     * Gets the commands under a specified streamer
+     * @param {TwitchUser} streamer 
+     * @return {Promise<TwitchCommand[]>}
+     */
+    getStreamerCommands(streamer) {
+        return this.streamerCommands.get(streamer.id, (resolve, reject) => {
+            con.query("select id, name, referenced_command from twitch__command where streamer_id = ? order by referenced_command asc, name asc;", [streamer.id], (err, res) => {
+                if (!err) {
+                    let commands = res.map(x => new TwitchCommand(
+                            x.id,
+                            streamer,
+                            x.name.toLowerCase(),
+                            x.referenced_command.toLowerCase()
+                        ));
+                    
+                    resolve(commands);
+                } else {
+                    reject(err);
+                }
+            });
+        });
+    }
+
+    /**
+     * Adds a command to a streamer
+     * @param {TwitchUser} streamer 
+     * @param {string} command
+     * @param {string} label
+     * @return {Promise<TwitchCommand[]>}
+     */
+    addStreamerCommand(streamer, command, label) {
+        command = command.toLowerCase();
+        label = label.toLowerCase();
+        return new Promise((resolve, reject) => {
+            if (!commands.includes(command)) {
+                reject(command + " is not a recognized TMS command");
+                return;
+            }
+
+            con.query("select id from twitch__command where streamer_id = ? and name = ?;", [streamer.id, label], (err, res) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+
+                if (res.length > 0) {
+                    reject("A command with this label already exists");
+                    return;
+                }
+
+                con.query("insert into twitch__command (streamer_id, name, referenced_command) values (?, ?, ?);", [streamer.id, label, command], err => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        this.streamerCommands.remove(streamer.id);
+                        this.getStreamerCommands(streamer).then(resolve, reject);
+                    }
+                });
+            });
+        });
+    }
+
+    /**
+     * Removes a command from a streamer
+     * @param {TwitchUser} streamer 
+     * @param {string} label
+     * @return {Promise<TwitchCommand[]>}
+     */
+    removeStreamerCommand(streamer, label) {
+        return new Promise((resolve, reject) => {
+            con.query("select id from twitch__command where streamer_id = ? and name = ?;", [streamer.id, label], (err, res) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+
+                if (res.length === 0) {
+                    reject("A command with this label does not exist");
+                    return;
+                }
+
+                con.query("delete from twitch__command where streamer_id = ? and name = ?;", [streamer.id, label], err => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        this.streamerCommands.remove(streamer.id);
+                        this.getStreamerCommands(streamer).then(resolve, reject);
+                    }
+                });
             });
         });
     }
