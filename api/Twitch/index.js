@@ -98,7 +98,7 @@ class Twitch {
                         let row = res[0];
                         resolve(new TwitchUser(
                             row.id,
-                            row.identity_id === null ? null : new Identity(row.identity_id, row.identity_name, row.authenticated, row.admin, row.mod),
+                            row.identity_id === null ? null : new Identity(row.identity_id, row.identity_name, Boolean(row.authenticated), Boolean(row.admin), Boolean(row.moderator)),
                             row.display_name,
                             row.email,
                             row.profile_image_url,
