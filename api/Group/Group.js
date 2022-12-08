@@ -167,16 +167,21 @@ class Group {
                 .setLabel("Start Event")
                 .setStyle("SUCCESS");
 
-            const stopButton = new MessageButton()
-                .setCustomId("stop-group")
-                .setLabel("Stop Event")
-                .setStyle("SUCCESS");
-
             const row = new MessageActionRow()
                 .addComponents(editButton);
 
             if (this.active) {
-                row.addComponents(stopButton);
+                const stopButton = new MessageButton()
+                    .setCustomId("stop-group")
+                    .setLabel("Stop Event")
+                    .setStyle("DANGER");
+
+                const setGroupCommand = new MessageButton()
+                    .setCustomId("set-command")
+                    .setLabel("Set Group Command")
+                    .setStyle("PRIMARY");
+
+                row.addComponents(stopButton, setGroupCommand);
             } else
                 row.addComponents(startButton);
 
@@ -491,6 +496,41 @@ class Group {
                 }
             });
         });
+    }
+
+    /**
+     * Generates a group string based on the active streamer
+     * @param {TwitchUser} streamer 
+     * @return {string}
+     */
+    generateGroupString(streamer = null) {
+        let participants = streamer ? this.participants.filter(x => x.id !== streamer.id) : this.participants;
+        let groupString = "";
+
+        participants.forEach((participant, i) => {
+            if (i + 1 === participants.length && groupString !== "") {
+                groupString += " and ";
+            } else if (groupString !== "") {
+                groupString += ", ";
+            }
+            groupString += participant.display_name;
+        });
+
+        return (streamer ? streamer.display_name : "*Streamer*") + " is playing " + this.game + " with " + groupString;
+    }
+
+    /**
+     * Generates a multitwitch link for the group
+     * @return {string}
+     */
+    generateMultiLink(host) {
+        let groupString = host;
+
+        this.participants.forEach((participant, i) => {
+            groupString += "/" + encodeURI(participant.display_name.toLowerCase());
+        });
+
+        return groupString;
     }
 }
 
