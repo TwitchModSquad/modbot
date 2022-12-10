@@ -1,5 +1,8 @@
 const { MessageEmbed } = require("discord.js");
 const api = require("../../api/index");
+const con = require("../../database");
+
+const {cache} = require("./groupManager");
 
 const listener = {
     name: 'archiveEditModalManager',
@@ -62,6 +65,56 @@ const listener = {
                 api.Logger.warning(err);
                 handleError("Unable to find linked Twitch user");
             });
+        } else if (modal.customId === "group-cmd") {
+            if (cache.hasOwnProperty(modal.user.id)) {
+                const group = cache[modal.user.id].group;
+                const method = cache[modal.user.id].method;
+                const streamer = cache[modal.user.id].streamer;
+
+                const layout = modal.getTextInputValue("layout");
+
+                if (layout.indexOf("{{group}}") !== -1) {
+                    const command = group.generateGroupCommand(streamer, layout);
+                    con.query("insert into group__command (streamer_id, command) values (?, ?) on duplicate key update command = ?;", [streamer.id, layout, layout], err => {
+                        if (err) api.Logger.severe(err);
+                    });
+                    con.query("update group__user set update_command = true where group_id = ? and user_id = ?;", [group.id, streamer.id], err => {
+                        if (err) api.Logger.severe(err);
+                    });
+
+                    delete cache[modal.user.id];
+
+                    if (method === "sendcmd") {
+                        global.client.listen.client.say(streamer.display_name.toLowerCase(), command).then(() => {
+                            let isMod = global.client.listen.isMod(streamer);
+    
+                            let embed = new MessageEmbed()
+                                .setTitle("Message Sent!")
+                                .setDescription(`Sent set command message to \`${streamer.display_name}\`!\nWe will automatically send update commands if participants are added or removed from this group.`);
+    
+                            if (isMod === null) {
+                                embed.addFields([{
+                                    name: "Warning",
+                                    value: "We may not be listening to this channel! We currently only activate commands on channels with greater than 5000 followers and partners.",
+                                }]);
+                            } else if (!isMod) {
+                                embed.addFields([{
+                                    name: "Warning",
+                                    value: "TMS may not be added as a moderator on this channel! This command may have failed!",
+                                }]);
+                            }
+    
+                            modal.reply({content: command, embeds: [embed], ephemeral: true});
+                        }, handleError)
+                    } else {
+                        modal.reply({content: command, ephemeral: true})
+                    }
+                } else {
+                    handleError("Layout must contain `{{group}}`, which is used for substituting group information.")
+                }
+            } else {
+                handleError("Command generator information was not saved in cache. Try again");
+            }
         }
     }
 };
