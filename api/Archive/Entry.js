@@ -201,7 +201,9 @@ class Entry {
                 }
             }
 
-            resolve(row);
+            if (row.components.length > 0) {
+                resolve(row);
+            } else resolve();
         });
     }
 
