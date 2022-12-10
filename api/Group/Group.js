@@ -6,6 +6,21 @@ const con = require("../../database");
 
 const config = require("../../config.json");
 
+const getGroupString = participants => {
+    let groupString = "";
+
+    participants.forEach((participant, i) => {
+        if (i + 1 === participants.length && groupString !== "") {
+            groupString += " and ";
+        } else if (groupString !== "") {
+            groupString += ", ";
+        }
+        groupString += participant.display_name;
+    });
+
+    return groupString;
+}
+
 class Group {
     /**
      * 8-character unique ID for this group, lowercase
@@ -140,8 +155,8 @@ class Group {
                 }
 
                 if (this.endtime) {
-                    const ts = this.starttime.getTime().toString().substring(0, this.endtime.getTime().toString().length - 3);
-                    embed.addFields({name: "End Time", value: `<t:${ts}:f>\nThis event is/was <t:${ts}:R>`, inline: true});
+                    const ts = this.endtime.getTime().toString().substring(0, this.endtime.getTime().toString().length - 3);
+                    embed.addFields({name: "End Time", value: `<t:${ts}:f>\nThis event ended <t:${ts}:R>`, inline: true});
                 }
                 
                 resolve(embed);
@@ -167,23 +182,27 @@ class Group {
                 .setLabel("Start Event")
                 .setStyle("SUCCESS");
 
-            const row = new MessageActionRow()
-                .addComponents(editButton);
+            const row = new MessageActionRow();
 
-            if (this.active) {
-                const stopButton = new MessageButton()
-                    .setCustomId("stop-group")
-                    .setLabel("Stop Event")
-                    .setStyle("DANGER");
+            if (!this.endtime) {
+                row.addComponents(editButton)
 
-                const setGroupCommand = new MessageButton()
-                    .setCustomId("set-command")
-                    .setLabel("Set Group Command")
-                    .setStyle("PRIMARY");
+                
+                if (this.active) {
+                    const stopButton = new MessageButton()
+                        .setCustomId("stop-group")
+                        .setLabel("Stop Event")
+                        .setStyle("DANGER");
 
-                row.addComponents(stopButton, setGroupCommand);
-            } else
-                row.addComponents(startButton);
+                    const setGroupCommand = new MessageButton()
+                        .setCustomId("set-command")
+                        .setLabel("Set Group Command")
+                        .setStyle("PRIMARY");
+
+                    row.addComponents(stopButton, setGroupCommand);
+                } else
+                    row.addComponents(startButton);
+            }
 
             resolve(row);
         });
@@ -242,6 +261,73 @@ class Group {
     }
 
     /**
+     * Updates Group commands of any streamers that have command processing via Nightbot, StreamElements, etc enabled.
+     * @return {Promise<void>}
+     */
+    updateGroupCommands() {
+        return new Promise((resolve, reject) => {
+            if (!this.active) {
+                resolve();
+                return;
+            }
+            con.query("select c.streamer_id, c.command from group__user as u join group__command as c on u.user_id = c.streamer_id where update_command and group_id = ?;", [this.id], async (err, res) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+
+                let success = "";
+                let unmodded = "";
+                let unknown = "";
+                let error = "";
+
+                for (let i = 0; i < res.length; i++) {
+                    const row = res[i];
+                    const streamer = await global.api.Twitch.getUserById(row.streamer_id);
+                    const command = this.generateGroupCommand(streamer, row.command);
+
+                    
+                    try {
+                        await global.client.listen.client.say(streamer.display_name.toLowerCase(), command);
+
+                        let isMod = global.client.listen.isMod(streamer);
+
+                        if (isMod === null) {
+                            unknown += streamer.display_name + "\n";
+                        } else if (isMod) {
+                            success += streamer.display_name + "\n";
+                        } else {
+                            unmodded += streamer.display_name + "\n";
+                        }
+                    } catch (err) {
+                        global.api.Logger.severe(err);
+                        error += streamer.display_name + " : " + err + "\n";
+                    }
+                }
+
+                if (success === "" && unmodded === "" && unknown === "" && error === "") return;
+
+                let embed = new MessageEmbed()
+                    .setTitle("Updated Group Commands")
+                    .setDescription("We updated group commands in the following channels!");
+
+                if (success !== "") 
+                    embed.addFields([{name: "Success", value: "```" + success + "```", inline: false}]);
+                if (unmodded !== "") 
+                    embed.addFields([{name: "Unmodded", value: "```" + unmodded + "```\n[these commands may have failed]", inline: false}]);
+                if (unknown !== "") 
+                    embed.addFields([{name: "Unknown", value: "```" + unknown + "```\n[we may not be listening to this channel]", inline: false}]);
+                if (error !== "") 
+                    embed.addFields([{name: "Error", value: "```" + error + "```[we failed to send the message. probably.]", inline: false}]);
+
+                this.getThread().then(thread => {
+                    thread.send({content: " ", embeds: [embed]}).then(resolve, reject);
+                }, reject)
+            });
+        });
+    }
+
+    /**
      * Updates the Discord message for this group
      * @returns {Promise<void>}
      */
@@ -272,7 +358,7 @@ class Group {
                             global.client.discord.channels.fetch(res[0].thread).then(thread => {
                                 this.thread = thread;
                                 resolve(thread);
-                            }, reject)
+                            }, reject);
                         } else {
                             global.client.discord.channels.fetch(config.groups_channel).then(channel => {
                                 channel.threads.create({
@@ -287,7 +373,7 @@ class Group {
                                     this.thread = thread;
                                     resolve(thread);
                                 }, reject);
-                            }, reject)
+                            }, reject);
                         }
                     }
                 });
@@ -339,6 +425,7 @@ class Group {
                             {name: "New Game", value: "`"+game+"`", inline: true},
                         ]), executor).catch(global.api.Logger.warning);
                     this.game = game;
+                    this.updateGroupCommands().then(() => {}, global.api.Logger.warning);
                     this.updateMessage().then(resolve, reject);
                 }
             });
@@ -439,6 +526,7 @@ class Group {
                             ...this.participants,
                             participant,
                         ]
+                        this.updateGroupCommands().then(() => {}, global.api.Logger.warning);
                         this.updateMessage().then(resolve, reject);
                     }
                 })
@@ -474,6 +562,8 @@ class Group {
                     .addFields([
                         {name: "Removed Participants", value: participantString, inline: true},
                     ]), executor).catch(global.api.Logger.warning);
+                
+                this.updateGroupCommands().then(() => {}, global.api.Logger.warning);
                 this.updateMessage().then(resolve, reject);
             } catch (err) {
                 reject(err);
@@ -492,10 +582,45 @@ class Group {
                 if (err) {
                     reject(err);
                 } else {
+                    this.active = true;
                     this.setStartTime(new Date(), executor).then(resolve, reject);
                 }
             });
         });
+    }
+
+    /**
+     * Stops this event
+     * @param {FullIdentity} executor 
+     * @returns {Promise<void>}
+     */
+    stop(executor = null) {
+        return new Promise((resolve, reject) => {
+            con.query("update `group` set active = false where id = ?;", [this.id], err => {
+                if (err) {
+                    reject(err);
+                } else {
+                    this.active = false;
+                    this.setEndTime(new Date(), executor).then(resolve, reject);
+                }
+            });
+        });
+    }
+
+    /**
+     * Generates a group command based on a streamer's raw command and user
+     * @param {TwitchUser} streamer 
+     * @param {string} rawCommand 
+     * @return {string}
+     */
+    generateGroupCommand(streamer, rawCommand) {
+        const participants = [this.host, ...this.participants].filter(x => x.id !== streamer.id);
+
+        return rawCommand
+            .replace("{{streamer}}", streamer.display_name)
+            .replace("{{host}}", this.host.display_name)
+            .replace("{{game}}", this.game)
+            .replace("{{group}}", getGroupString(participants));
     }
 
     /**
@@ -504,19 +629,9 @@ class Group {
      * @return {string}
      */
     generateGroupString(streamer = null) {
-        let participants = streamer ? this.participants.filter(x => x.id !== streamer.id) : this.participants;
-        let groupString = "";
+        let participants = streamer ? [this.host, ...this.participants].filter(x => x.id !== streamer.id) : [this.host, ...this.participants];
 
-        participants.forEach((participant, i) => {
-            if (i + 1 === participants.length && groupString !== "") {
-                groupString += " and ";
-            } else if (groupString !== "") {
-                groupString += ", ";
-            }
-            groupString += participant.display_name;
-        });
-
-        return (streamer ? streamer.display_name : "*Streamer*") + " is playing " + this.game + " with " + groupString;
+        return (streamer ? streamer.display_name : "*Streamer*") + " is playing " + this.game + " with " + getGroupString(participants);
     }
 
     /**
