@@ -176,6 +176,20 @@ class ListenClient {
 
         this.client.connect().catch(api.Logger.severe);
     }
+
+    /**
+     * Returns if the bot is a moderator in a channel
+     * @param {TwitchUser} streamer 
+     * @return {boolean|null}
+     */
+    isMod(streamer) {
+        const botState = this.client.userstate["#" + streamer.display_name.toLowerCase()];
+        if (botState !== undefined) {
+            return botState.mod;
+        } else {
+            return null;
+        }
+    }
 }
 
 module.exports = ListenClient;
