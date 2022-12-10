@@ -19,7 +19,6 @@ const command = {
                         name: "game",
                         description: "Hosted game for this group",
                         required: true,
-                        autocomplete: true,
                     },
                     {
                         type: 3,
