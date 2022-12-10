@@ -201,9 +201,7 @@ class Entry {
                 }
             }
 
-            if (row.components.length > 0) {
-                resolve(row);
-            } else resolve();
+            resolve(row);
         });
     }
 
@@ -244,7 +242,12 @@ class Entry {
                         global.client.discord.channels.fetch(messageObj.channel_id).then(channel => {
                             channel.messages.fetch(messageObj.id).then(async message => {
                                 let content = ((message.content && message.content.length > 0) ? message.content : " ");
-                                message.edit({content: content, embeds: [newEmbed], components: [await this.createCrossbanRow()]}).then(() => {}, global.api.Logger.warning);
+                                let msg = {content: content, embeds: [newEmbed]};
+                                const row = await this.createCrossbanRow();
+                                if (row.components.length > 0)
+                                    msg.components = [row];
+
+                                message.edit(msg).then(() => {}, global.api.Logger.warning);
                             }, global.api.Logger.warning);
                         });
                     }
@@ -717,7 +720,12 @@ class Entry {
             con.query("delete from archive__messages where archive_id = ? and (reason = 'public-record' or reason = 'sort');", [this.id], async err => {
                 if (err) {global.api.Logger.warning(err);return;}
 
-                channel.send({content: ' ', embeds: [await this.discordEmbed()], components: [await this.createCrossbanRow()]}).then(message => {
+                let msg = {content: ' ', embeds: [await this.discordEmbed()]};
+                const row = await this.createCrossbanRow();
+                if (row.components.length > 0) 
+                    msg.components = [row];
+
+                channel.send(msg).then(message => {
 
                     con.query("insert into archive__logs (archive_id, initiated_by, old_value, new_value, action) values (?, ?, ?, ?, 'move');", [
                         this.id,
