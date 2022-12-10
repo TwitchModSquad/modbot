@@ -172,19 +172,15 @@ class Group {
      */
     generateComponents() {
         return new Promise((resolve, reject) => {
-            const editButton = new MessageButton()
-                .setCustomId("edit-group")
-                .setLabel("Edit")
-                .setStyle("SECONDARY");
-
-            const startButton = new MessageButton()
-                .setCustomId("start-group")
-                .setLabel("Start Event")
-                .setStyle("SUCCESS");
 
             const row = new MessageActionRow();
 
             if (!this.endtime) {
+                const editButton = new MessageButton()
+                    .setCustomId("edit-group")
+                    .setLabel("Edit")
+                    .setStyle("SECONDARY");
+
                 row.addComponents(editButton)
 
                 
@@ -200,8 +196,21 @@ class Group {
                         .setStyle("PRIMARY");
 
                     row.addComponents(stopButton, setGroupCommand);
-                } else
+                } else {
+                    const startButton = new MessageButton()
+                        .setCustomId("start-group")
+                        .setLabel("Start Event")
+                        .setStyle("SUCCESS");
+
                     row.addComponents(startButton);
+                }
+            } else {
+                const recoverGroup = new MessageButton()
+                    .setCustomId("recover-group")
+                    .setLabel("Recover Event")
+                    .setStyle("SECONDARY");
+                
+                row.addComponents();
             }
 
             resolve(row);
