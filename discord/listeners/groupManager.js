@@ -3,9 +3,7 @@ const Discord = require("discord.js");
 const con = require("../../database");
 const api = require("../../api/index");
 
-const DEFAULT_GROUP_COMMAND = "!editcom !group {{group}}";
-
-let cache = {};
+const DEFAULT_GROUP_COMMAND = "!editcom !group {{streamer}} is playing {{game}} with {{group}}";
 
 const getGroupCommand = streamer => {
     return new Promise((resolve, reject) => {
@@ -24,18 +22,31 @@ const getGroupCommand = streamer => {
     });
 }
 
-const completeGroupList = async (group, interaction, handleSuccess, handleError) => {
+const completeGroupList = async (group, interaction, handleError, cache) => {
     const method = cache[interaction.user.id].method;
     const streamer = cache[interaction.user.id].streamer;
 
-    const command = await getGroupCommand(streamer.id);
+    if (method === "gencmd" || method === "sendcmd") {
+        const modal = new Modal()
+            .setCustomId("group-cmd")
+            .setTitle("Edit Command Layout")
+            .addComponents(
+                new TextInputComponent()
+                    .setCustomId("layout")
+                    .setLabel("Command Layout")
+                    .setStyle("SHORT")
+                    .setMinLength(3)
+                    .setMaxLength(128)
+                    .setRequired(true)
+                    .setDefaultValue(await getGroupCommand(streamer)));
 
-    if (method === "gencmd") {
-        interaction.reply(command.replace("{{group}}", group.generateGroupString(streamer)));
-    } else if (method === "sendcmd") {
-        interaction.reply(command.replace("{{group}}", group.generateGroupString(streamer)));
+        showModal(modal, {
+            client: global.client.discord,
+            interaction: interaction,
+        });
     } else if (method === "gengrp") {
-
+        interaction.reply({content: group.generateGroupString(streamer), ephemeral: true})
+        delete listener.cache[interaction.user.id];
     } else {
         handleError("Unknown method: " + method);
     }
@@ -45,6 +56,7 @@ const listener = {
     name: 'groupManager',
     eventName: 'interactionCreate',
     eventType: 'on',
+    cache: {},
     async listener (interaction) {
         const handleSuccess = message => {
             interaction.reply({content: ' ', embeds: [new Discord.MessageEmbed().setTitle(message).setColor(0x2dad3e)], ephemeral: true})
@@ -132,9 +144,50 @@ const listener = {
                     }
                     if (res.length > 0) {
                         api.getGroupById(res[0].id).then(group => {
-                            group.start().then(() => {
-                                handleSuccess("This event has started!");
-                            }, handleError);
+                            api.Discord.getUserById(interaction.user.id).then(user => {
+                                if (user.identity?.id) {
+                                    api.getFullIdentity(user.identity.id).then(identity => {
+                                        group.start(identity).then(() => {
+                                            handleSuccess("This event has started!");
+                                        }, handleError);
+                                    }, err => {
+                                        handleError("You are not properly linked to TMS!");
+                                    });
+                                } else {
+                                    handleError("You are not properly linked to TMS!");
+                                }
+                            }, err => {
+                                handleError("You are not properly linked to TMS!");
+                            });
+                        }, handleError)
+                    } else {
+                        handleError("Could not find a group with this message ID");
+                    }
+                });
+            } else if (interaction.component.customId === "stop-group") {
+                con.query("select id from `group` where message = ?;", [interaction.message.id], (err, res) => {
+                    if (err) {
+                        api.Logger.severe(err);
+                        handleError("An error occurred!");
+                        return;
+                    }
+                    if (res.length > 0) {
+                        api.getGroupById(res[0].id).then(group => {
+                            api.Discord.getUserById(interaction.user.id).then(user => {
+                                if (user.identity?.id) {
+                                    api.getFullIdentity(user.identity.id).then(identity => {
+                                        group.stop(identity).then(() => {
+                                            handleSuccess("This event has been stopped!");
+                                        }, handleError);
+                                    }, err => {
+                                        handleError("You are not properly linked to TMS!");
+                                    });
+                                } else {
+                                    handleError("You are not properly linked to TMS!");
+                                }
+                            }, err => {
+                                handleError("You are not properly linked to TMS!");
+                            });
                         }, handleError)
                     } else {
                         handleError("Could not find a group with this message ID");
@@ -164,6 +217,7 @@ const listener = {
                                                 .setCustomId("cmd-selmethod-" + group.id)
                                                 .setMinValues(1)
                                                 .setMaxValues(1)
+                                                .setPlaceholder("Select Method")
                                                 .setOptions([
                                                     {
                                                         label: "Generate Command",
@@ -184,6 +238,7 @@ const listener = {
                 
                                             const selectStreamer = new Discord.MessageSelectMenu()
                                                 .setCustomId("cmd-selstreamer-" + group.id)
+                                                .setPlaceholder("Select Streamer")
                                                 .setMinValues(1)
                                                 .setMaxValues(1);
     
@@ -196,6 +251,17 @@ const listener = {
                                                             value: String(x.id),
                                                         }})
                                                 );
+                                            });
+
+                                            identity.twitchAccounts.forEach(account => {
+                                                if (group.participants.find(x => x.id === account.id)) {
+                                                    selectStreamer.addOptions([
+                                                        {
+                                                            label: account.display_name,
+                                                            value: String(account.id),
+                                                        },
+                                                    ]);
+                                                }
                                             });
                                             
                                             const row = new Discord.MessageActionRow()
@@ -270,10 +336,11 @@ const listener = {
                 });
             } else if (interaction.component.customId.startsWith("cmd-selmethod-")) {
                 api.getGroupById(interaction.component.customId.replace("cmd-selmethod-", "")).then(async group => {
-                    if (!cache.hasOwnProperty(interaction.user.id)) cache[interaction.user.id] = {};
-                    cache[interaction.user.id].method = interaction.values[0];
-                    if (cache[interaction.user.id].hasOwnProperty("streamer")) {
-                        completeGroupList(group, interaction, handleSuccess, handleError);
+                    if (!listener.cache.hasOwnProperty(interaction.user.id)) listener.cache[interaction.user.id] = {};
+                    listener.cache[interaction.user.id].group = group;
+                    listener.cache[interaction.user.id].method = interaction.values[0];
+                    if (listener.cache[interaction.user.id].hasOwnProperty("streamer")) {
+                        completeGroupList(group, interaction, handleError, listener.cache);
                     } else {
                         interaction.reply("Success").then(message => {
                             interaction.deleteReply().then(() => {}, api.Logger.severe);
@@ -286,10 +353,11 @@ const listener = {
             } else if (interaction.component.customId.startsWith("cmd-selstreamer-")) {
                 api.getGroupById(interaction.component.customId.replace("cmd-selstreamer-", "")).then(async group => {
                     api.Twitch.getUserById(interaction.values[0]).then(streamer => {
-                        if (!cache.hasOwnProperty(interaction.user.id)) cache[interaction.user.id] = {};
-                        cache[interaction.user.id].streamer = streamer;
-                        if (cache[interaction.user.id].hasOwnProperty("method")) {
-                            completeGroupList(group, interaction, handleSuccess, handleError);
+                        if (!listener.cache.hasOwnProperty(interaction.user.id)) listener.cache[interaction.user.id] = {};
+                        listener.cache[interaction.user.id].group = group;
+                        listener.cache[interaction.user.id].streamer = streamer;
+                        if (listener.cache[interaction.user.id].hasOwnProperty("method")) {
+                            completeGroupList(group, interaction, handleError, listener.cache);
                         } else {
                             interaction.reply("Success").then(message => {
                                 interaction.deleteReply().then(() => {}, api.Logger.severe);
