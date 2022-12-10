@@ -80,6 +80,8 @@ global.partFromChannel = partFromChannel;
 
 global.client.ban = banClient;
 
+global.client.listen = listenClient;
+
 module.exports = {
     listenOnChannel: listenOnChannel,
     banClient: banClient,
