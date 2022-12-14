@@ -150,7 +150,7 @@ class Group {
 
                 if (this.starttime) {
                     const ts = this.starttime.getTime().toString().substring(0, this.starttime.getTime().toString().length - 3);
-                    embed.addFields({name: "Start Time", value: `<t:${ts}:f>\nThis event is/was <t:${ts}:R>`, inline: true});
+                    embed.addFields({name: "Start Time", value: `<t:${ts}:f>\nThis event ${this.active || this.endtime ? "started" : "is/was"} <t:${ts}:R>`, inline: true});
                     embed.setTimestamp(this.starttime);
                 }
 
@@ -209,8 +209,13 @@ class Group {
                     .setCustomId("recover-group")
                     .setLabel("Recover Event")
                     .setStyle("SECONDARY");
+
+                const copyGroup = new MessageButton()
+                    .setCustomId("copy-group")
+                    .setLabel("Copy Event")
+                    .setStyle("PRIMARY");
                 
-                row.addComponents();
+                row.addComponents(recoverGroup, copyGroup);
             }
 
             resolve(row);
@@ -251,6 +256,11 @@ class Group {
                 .setLabel("Add Participant")
                 .setStyle("PRIMARY");
 
+            const deleteButton = new MessageButton()
+                .setCustomId("group-delete-" + this.id)
+                .setLabel("Delete")
+                .setStyle("DANGER");
+
             const removeParticipants = new MessageSelectMenu()
                 .setCustomId("group-rempartic-" + this.id)
                 .setMinValues(1)
@@ -261,6 +271,8 @@ class Group {
 
             const buttonRow = new MessageActionRow()
                 .addComponents(setStartTime, setGame, addParticipant);
+
+            if (showDelete) buttonRow.addComponents(deleteButton);
 
             const removeParticipantsRow = new MessageActionRow()
                 .addComponents(removeParticipants);
@@ -581,6 +593,17 @@ class Group {
     }
 
     /**
+     * Returns all participants of this group, including the Host
+     * @return {TwitchUser[]}
+     */
+    allParticipants() {
+        return [
+            this.host,
+            ...this.participants,
+        ];
+    }
+
+    /**
      * Starts this event
      * @param {FullIdentity} executor 
      * @returns {Promise<void>}
@@ -610,9 +633,48 @@ class Group {
                     reject(err);
                 } else {
                     this.active = false;
-                    this.setEndTime(new Date(), executor).then(resolve, reject);
+                    this.setEndTime(new Date(), executor).then(() => {
+                        if (executor) this.sendUpdate(this.getUpdate()
+                            .setColor(0x9e392f)
+                            .setDescription("The event was stopped!"), executor).catch(global.api.Logger.warning);
+                        resolve();
+                    }, reject);
                 }
             });
+        });
+    }
+
+    /**
+     * Deletes this event
+     * @returns {Promise<void>}
+     */
+    delete() {
+        return new Promise((resolve, reject) => {
+            global.client.discord.channels.fetch(config.groups_channel).then(channel => {
+                channel.messages.fetch(this.message).then(async message => {
+                    message.delete().then(() => {
+                        this.getThread().then(thread => {
+                            thread.delete().then(() => {}, global.api.Logger.severe);
+                            
+                            con.query("delete from group__user where group_id = ?;", [this.id], err => {
+                                if (err) {
+                                    reject(err);
+                                    return;
+                                }
+                
+                                con.query("delete from `group` where id = ?;", [this.id], err => {
+                                    if (err) {
+                                        reject(err);
+                                        return;
+                                    }
+                
+                                    resolve();
+                                });
+                            });
+                        }, global.api.Logger.warning);
+                    }, reject);
+                }, reject);
+            }, reject)
         });
     }
 

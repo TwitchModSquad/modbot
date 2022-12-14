@@ -116,6 +116,28 @@ const listener = {
                     client: global.client.discord,
                     interaction: interaction,
                 })
+            } else if (interaction.component.customId.startsWith("group-delete-")) {
+                api.getGroupById(interaction.component.customId.replace("group-delete-", "")).then(group => {
+                    api.Discord.getUserById(interaction.user.id).then(user => {
+                        if (user.identity?.id) {
+                            api.getFullIdentity(user.identity.id).then(identity => {
+                                if (group.created_by.id === identity.id) {
+                                    group.delete().then(() => {
+                                        handleSuccess("Successfully deleted group `" + group.id + "`!");
+                                    }, handleError)
+                                } else {
+                                    handleError("You must be the creator of this group in order to execute this function.");
+                                }
+                            }, err => {
+                                handleError("You are not properly linked to TMS!");
+                            })
+                        } else {
+                            handleError("You are not properly linked to TMS!");
+                        }
+                    }, err => {
+                        handleError("You are not properly linked to TMS!");
+                    });
+                }, handleError);
             } else if (interaction.component.customId.startsWith("group-setgame-")) {
                 let modal = new Modal()
                     .setCustomId(interaction.component.customId)
@@ -245,7 +267,7 @@ const listener = {
                                             streamers.forEach(streamerIdentity => {
                                                 selectStreamer.addOptions(
                                                     streamerIdentity.modForIdentity.twitchAccounts
-                                                        .filter(x => group.participants.find(xy => xy.id === x.id))
+                                                        .filter(x => group.allParticipants().find(xy => xy.id === x.id))
                                                         .map(x => {return {
                                                             label: x.display_name,
                                                             value: String(x.id),
@@ -254,7 +276,7 @@ const listener = {
                                             });
 
                                             identity.twitchAccounts.forEach(account => {
-                                                if (group.participants.find(x => x.id === account.id)) {
+                                                if (group.allParticipants().find(x => x.id === account.id)) {
                                                     selectStreamer.addOptions([
                                                         {
                                                             label: account.display_name,
@@ -286,6 +308,83 @@ const listener = {
                         handleError("Could not find a group with this message ID");
                     }
                 });
+            } else if (interaction.component.customId === "recover-group") {
+                con.query("select id from `group` where message = ?;", [interaction.message.id], (err, res) => {
+                    if (err) {
+                        api.Logger.severe(err);
+                        handleError("An error occurred!");
+                        return;
+                    }
+                    if (res.length > 0) {
+                        api.getGroupById(res[0].id).then(group => {
+                            api.Discord.getUserById(interaction.user.id).then(user => {
+                                if (user.identity?.id) {
+                                    if (group.created_by.id === user.identity.id) {
+                                        const embed = new Discord.MessageEmbed()
+                                            .setTitle("Confirm Recover")
+                                            .setDescription("Recovering a group removes the end time and start time, allowing the group to be restarted.\nThis is not recommended unless the group was started by accident.\nIf you're trying to recreate the same or similar group, please copy this group instead.")
+                                            .setColor(0x772ce8);
+
+                                        const recoverConfirm = new Discord.MessageButton()
+                                            .setCustomId("recover-group-" + group.id)
+                                            .setLabel("Confirm Recover")
+                                            .setStyle("PRIMARY");
+
+                                        const row = new Discord.MessageActionRow()
+                                            .addComponents(recoverConfirm);
+
+                                        interaction.reply({content: ' ', embeds: [embed], components: [row], ephemeral: true});
+                                    } else {
+                                        handleError("You must be the creator of this group in order to execute this function.");
+                                    }
+                                } else {
+                                    handleError("You are not properly linked to TMS!");
+                                }
+                            }, err => {
+                                handleError("You are not properly linked to TMS!");
+                            });
+                        }, handleError)
+                    } else {
+                        handleError("Could not find a group with this message ID");
+                    }
+                });
+            } else if (interaction.component.customId.startsWith("recover-group-")) {
+                api.getGroupById(interaction.component.customId.replace("recover-group-", "")).then(group => {
+                    api.Discord.getUserById(interaction.user.id).then(user => {
+                        if (user.identity?.id) {
+                            api.getFullIdentity(user.identity.id).then(identity => {
+                                if (group.created_by.id === identity.id) {
+                                    con.query("update `group` set active = false, starttime = null, endtime = null where id = ?;", [group.id], err => {
+                                        if (err) {
+                                            handleError("An error occurred: " + err);
+                                            api.Logger.warning(err);
+                                        } else {
+                                            group.active = false;
+                                            group.starttime = null;
+                                            group.endtime = null;
+                                            group.updateMessage().then(() => {
+                                                group.sendUpdate(
+                                                    group.getUpdate()
+                                                        .setColor(0x772ce8)
+                                                        .setDescription("Group was recovered")
+                                                , identity);
+                                                handleSuccess("Group was recovered!");
+                                            }, handleError);
+                                        }
+                                    });
+                                } else {
+                                    handleError("You must be the creator of this group in order to execute this function.");
+                                }
+                            }, err => {
+                                handleError("You are not properly linked to TMS!");
+                            })
+                        } else {
+                            handleError("You are not properly linked to TMS!");
+                        }
+                    }, err => {
+                        handleError("You are not properly linked to TMS!");
+                    });
+                }, handleError);
             }
         }
 
