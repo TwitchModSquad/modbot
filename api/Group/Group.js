@@ -578,6 +578,9 @@ class Group {
                     }
                 }
 
+                if (participantString === "")
+                    participantString = "No participants removed";
+
                 if (executor) this.sendUpdate(this.getUpdate()
                     .setColor(0x9e392f)
                     .addFields([
