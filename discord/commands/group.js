@@ -283,6 +283,9 @@ const command = {
                                                         if (err) api.Logger.warning(err);
                                                     });
                                                 });
+                                                api.getGroupById(id).then(group => {
+                                                    group.getThread().catch(api.Logger.warning);
+                                                }, api.Logger.severe)
                                             }
                                         });
                                     } else {
