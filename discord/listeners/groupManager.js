@@ -586,7 +586,7 @@ const listener = {
 
                                 embed.addFields([{name: "Participants", value: participantList, inline: false}]);
 
-                                delete copyCache[interaction.user.id];
+                                delete listener.copyCache[interaction.user.id];
                                     
                                 interaction.reply({content: ' ', embeds: [embed], components: [row], fetchReply: true}).then(message => {
                                     const postWithId = id => {
