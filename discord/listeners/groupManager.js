@@ -362,6 +362,11 @@ const listener = {
                                                     ]);
                                                 }
                                             });
+
+                                            if (selectStreamer.options.length === 0) {
+                                                handleError("You don't moderate any channels that are participating in this event!");
+                                                return;
+                                            }
                                             
                                             const row = new Discord.MessageActionRow()
                                                 .addComponents(selectMethod);
