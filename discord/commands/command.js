@@ -115,6 +115,7 @@ const command = {
                                     commands.forEach(command => {
                                         activeCommands += `\n${command.command} -> ${command.referencedCommand}`;
                                     })
+                                    if (activeCommands === "") activeCommands = "No active commands!";
                                     interaction.success("Successfully added command `" + label + "`! Active commands in `" + streamer.display_name + "`:```" + activeCommands + "```")
                                 }, interaction.error);
                             } else if (subcommand === "disable") {
@@ -123,6 +124,7 @@ const command = {
                                     commands.forEach(command => {
                                         activeCommands += `\n${command.command} -> ${command.referencedCommand}`;
                                     })
+                                    if (activeCommands === "") activeCommands = "No active commands!";
                                     interaction.success("Successfully removed command `" + label + "`! Active commands in `" + streamer.display_name + "`:```" + activeCommands + "```")
                                 }, interaction.error);
                             }
