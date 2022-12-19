@@ -1,8 +1,8 @@
-const { MessageEmbed } = require("discord.js");
+const { MessageEmbed, MessageSelectMenu, MessageActionRow, MessageButton } = require("discord.js");
 const api = require("../../api/index");
 const con = require("../../database");
 
-const {cache} = require("./groupManager");
+const {cache, copyCache, updateCopyMessage} = require("./groupManager");
 
 const listener = {
     name: 'archiveEditModalManager',
@@ -114,6 +114,145 @@ const listener = {
                 }
             } else {
                 handleError("Command generator information was not saved in cache. Try again");
+            }
+        } else if (modal.customId.startsWith("group-copy-")) {
+            let id = modal.customId.replace("group-copy-", "");
+            let game = modal.getTextInputValue("game");
+            let host = modal.getTextInputValue("host");
+
+            api.getGroupById(id).then(async group => {
+                try {
+                    host = (await api.Twitch.getUserByName(host))[0];
+    
+                    copyCache[modal.user.id] = {
+                        game: game,
+                        oldGroup: group,
+                        host: host,
+                        participants: group.participants,
+                        modal: modal,
+                    };
+
+                    const embed = new MessageEmbed()
+                        .setTitle("Copy Event")
+                        .setDescription("**Copying event** - " + group.game + " hosted by " + group.host.display_name + " *[old data]*")
+                        .addFields([
+                            {
+                                name: "Game",
+                                value: game,
+                                inline: true,
+                            },
+                            {
+                                name: "Host",
+                                value: `[${host.display_name}](https://twitch.tv/${host.display_name.toLowerCase()})`,
+                                inline: true,
+                            },
+                            {
+                                name: "Edit Participants",
+                                value: "Utilize the select menu below to remove any participants that aren't in this group.\nUse the 'Add Participants' button to add participants."
+                            }
+                        ]);
+                    
+                    if (host.id !== group.host.id) { // new host is NOT the old host
+                        copyCache[modal.user.id].participants = copyCache[modal.user.id].participants
+                            .filter(x => x.id !== host.id && x.id !== group.host.id); // removes old host and new host from participants if present
+                        
+                        copyCache[modal.user.id].participants = [
+                            ...copyCache[modal.user.id].participants,
+                            group.host,   // adds old host to participants
+                        ];
+
+                        embed.addFields([
+                            {
+                                name: "Host Note",
+                                value: "You selected a different host than the initial one.\nBy default, we'll add the groups old host as a participant and remove the new host as a participant, if present.\nEnsure the participant list is as desired before creating.",
+                            }
+                        ])
+                    }
+
+                    let participantString = "";
+
+                    for (let i = 0; i < copyCache[modal.user.id].participants.length; i++) {
+                        let participant = copyCache[modal.user.id].participants[i];
+                        if (participantString !== "") participantString += "\n";
+
+                        participantString += `${i+1} - [${participant.display_name}](https://twitch.tv/${participant.display_name.toLowerCase()})`;
+                    }
+
+                    embed.addFields([
+                        {
+                            name: "Participants",
+                            value: participantString,
+                        }
+                    ])
+
+                    const addParticipantsButton = new MessageButton()
+                        .setCustomId("copy-participant-add")
+                        .setLabel("Add Participant")
+                        .setStyle("PRIMARY");
+
+                    const createButton = new MessageButton()
+                        .setCustomId("copy-create")
+                        .setLabel("Create Group")
+                        .setStyle("SUCCESS");
+
+                    const removeParticipantsSelect = new MessageSelectMenu()
+                        .setCustomId("copy-participant-remove")
+                        .setPlaceholder("Remove Participants")
+                        .setMinValues(1)
+                        .setMaxValues(Math.max(1, copyCache[modal.user.id].participants.length - 1));
+            
+                    if (copyCache[modal.user.id].participants.length === 1)
+                        removeParticipantsSelect.setDisabled(true);
+
+                    removeParticipantsSelect.addOptions(copyCache[modal.user.id].participants.map(
+                        x => {
+                            return {
+                                label: x.display_name,
+                                value: String(x.id),
+                            };
+                        }
+                    ));
+
+                    const row = new MessageActionRow()
+                        .addComponents(addParticipantsButton, createButton);
+
+                    const removeParticipantsRow = new MessageActionRow()
+                        .addComponents(removeParticipantsSelect);
+
+                    modal.reply({content: ' ', embeds: [embed], components: [row, removeParticipantsRow], ephemeral: true});
+                } catch (err) {
+                    handleError(err);
+                }
+            }, handleError);
+        } else if (modal.customId === "copy-participant-add") {
+            if (copyCache.hasOwnProperty(modal.user.id)) {
+                let participant;
+    
+                try {
+                    participant = (await api.Twitch.getUserByName(modal.getTextInputValue("participant"), true))[0];
+                } catch (err) {
+                    handleError(err);
+                    return;
+                }
+    
+                if (copyCache[modal.user.id].host.id === participant.id
+                    || copyCache[modal.user.id].participants.find(x => x.id === participant.id)) {
+                    handleError("Participant already exists in this group!")
+                    return;
+                }
+
+                copyCache[modal.user.id].participants = [
+                    ...copyCache[modal.user.id].participants,
+                    participant,
+                ]
+
+                updateCopyMessage(copyCache[modal.user.id]);
+
+                modal.reply("Success!").then(message => {
+                    modal.deleteReply().catch(api.Logger.warning);
+                }, api.Logger.severe)
+            } else {
+                handleError("Lost copy cache. Please try again!")
             }
         }
     }
