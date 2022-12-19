@@ -617,6 +617,9 @@ class Group {
                 if (err) {
                     reject(err);
                 } else {
+                    if (executor) this.sendUpdate(this.getUpdate()
+                        .setColor(0x2dad3e)
+                        .setDescription("The event has started!"), executor).catch(global.api.Logger.warning);
                     this.active = true;
                     this.setStartTime(new Date(), executor).then(resolve, reject);
                 }
