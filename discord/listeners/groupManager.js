@@ -139,9 +139,9 @@ const listener = {
             interaction.reply({content: ' ', embeds: [new Discord.MessageEmbed().setTitle(message).setColor(0x2dad3e)], ephemeral: true})
         }
 
-        const handleError = (err, method = "reply") => {
+        const handleError = (err, method = "reply", content = ' ') => {
             global.api.Logger.warning(err);
-            interaction[method]({content: ' ', embeds: [new Discord.MessageEmbed().setTitle("Uh oh!").setDescription(err).setColor(0x9e392f)], ephemeral: true})
+            interaction[method]({content: content, embeds: [new Discord.MessageEmbed().setTitle("Uh oh!").setDescription(err).setColor(0x9e392f)], ephemeral: true})
         }
 
         if (interaction.isButton()) {
@@ -364,7 +364,8 @@ const listener = {
                                             });
 
                                             if (selectStreamer.options.length === 0) {
-                                                handleError("You don't moderate any channels that are participating in this event!");
+                                                let str = group.generateGroupString();
+                                                handleError("You don't moderate any channels that are participating in this event!\nJust in case we're wrong, here's a raw group list for this event: ```\n" + str + "```", "reply", str);
                                                 return;
                                             }
                                             
