@@ -1,0 +1,54 @@
+body {
+    background-image: 
+        linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.15)),
+        url("/assets/images/banners/banner-large.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+header {
+    margin: 2em;
+    text-align: center;
+}
+
+.logo {
+    width: 1em;
+    height: 1em;
+    border-radius: .5em;
+    margin-right: .2em;
+}
+
+h1 {
+    font-weight: 400;
+    font-size: 1.3rem;
+    margin: 0 0 1em 0;
+    text-align: center;
+}
+
+h1 span {
+    font-weight: 300;
+    color: var(--secondary-text-color);
+}
+
+h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 .4em 0;
+    text-align: center;
+}
+
+main {
+    background-color: var(--secondary-background-color);
+    width: calc(100% - 2.5em);
+    max-width: 25em;
+    margin: 4em auto;
+    padding: 1em;
+    box-shadow: var(--shadow);
+    border-radius: .3em;
+}
+
+main p {
+    text-align: center;
+}
