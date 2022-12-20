@@ -534,7 +534,7 @@ class Group {
      */
     addParticipant(participant, executor = null) {
         return new Promise(async (resolve, reject) => {
-            if (!this.participants.find(x => x.id === participant.id)) {
+            if (!this.allParticipants().find(x => x.id === participant.id)) {
                 con.query("insert into group__user (group_id, user_id) values (?, ?) on duplicate key update host = false;", [this.id, participant.id], err => {
                     if (err) {
                         reject(err);
@@ -552,7 +552,7 @@ class Group {
                     }
                 })
             } else {
-                resolve();
+                reject("This user is already a participant!");
             }
         });
     }
