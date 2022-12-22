@@ -162,6 +162,19 @@ const command = {
                     },
                 ],
             },
+            {
+                type: 1,
+                name: "refresh",
+                description: "Refreshes group embeds",
+                options: [
+                    {
+                        type: 3,
+                        name: "id",
+                        description: "Group ID",
+                        required: true,
+                    },
+                ],
+            },
         ]
     },
     async execute(interaction) {
@@ -308,6 +321,18 @@ const command = {
             }, error => {
                 interaction.error(error);
             });
+        } else if (subcommand === "refresh") {
+            let id = interaction.options.getString("id");
+
+            api.getGroupById(id).then(group => {
+                group.updateMessage().then(() => {
+                    interaction.success(`Group embed for \`${group.id}\` has been updated!`);
+                }, err => {
+                    interaction.error("An error occurred! " + err);
+                })
+            }, err => {
+                interaction.error("An error occurred! " + err);
+            })
         }
     }
 };
