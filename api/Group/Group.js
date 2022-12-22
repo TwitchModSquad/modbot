@@ -173,6 +173,11 @@ class Group {
     generateComponents() {
         return new Promise((resolve, reject) => {
 
+            const setGroupCommand = new MessageButton()
+                .setCustomId("set-command")
+                .setLabel("Set Group Command")
+                .setStyle("PRIMARY");
+
             const row = new MessageActionRow();
 
             if (!this.endtime) {
@@ -190,12 +195,7 @@ class Group {
                         .setLabel("Stop Event")
                         .setStyle("DANGER");
 
-                    const setGroupCommand = new MessageButton()
-                        .setCustomId("set-command")
-                        .setLabel("Set Group Command")
-                        .setStyle("PRIMARY");
-
-                    row.addComponents(stopButton, setGroupCommand);
+                    row.addComponents(stopButton);
                 } else {
                     const startButton = new MessageButton()
                         .setCustomId("start-group")
@@ -204,6 +204,8 @@ class Group {
 
                     row.addComponents(startButton);
                 }
+
+                row.addComponents(setGroupCommand);
             } else {
                 const recoverGroup = new MessageButton()
                     .setCustomId("recover-group")

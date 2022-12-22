@@ -581,9 +581,14 @@ const listener = {
                                     .setCustomId("start-group")
                                     .setLabel("Start Event")
                                     .setStyle("SUCCESS");
+                                    
+                                const setGroupCommand = new MessageButton()
+                                    .setCustomId("set-command")
+                                    .setLabel("Set Group Command")
+                                    .setStyle("PRIMARY");
 
                                 const row = new MessageActionRow()
-                                    .addComponents(editButton, startButton);
+                                    .addComponents(editButton, startButton, setGroupCommand);
 
                                 embed.addFields([{name: "Participants", value: participantList, inline: false}]);
 
