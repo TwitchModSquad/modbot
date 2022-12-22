@@ -10,12 +10,12 @@ const DEFAULT_GROUP_COMMAND = "!editcom !group {{streamer}} is playing {{game}} 
 
 const getGroupCommand = streamer => {
     return new Promise((resolve, reject) => {
-        con.query("select command from group__command where streamer_id = ?;", [streamer.id], (err, res) => {
+        con.query("select command from group__streamer where streamer_id = ?;", [streamer.id], (err, res) => {
             if (err) {
                 api.Logger.severe(err);
                 resolve(DEFAULT_GROUP_COMMAND);
             } else {
-                if (res.length > 0) {
+                if (res.length > 0 && res[0].command !== null) {
                     resolve(res[0].command);
                 } else {
                     resolve(DEFAULT_GROUP_COMMAND);

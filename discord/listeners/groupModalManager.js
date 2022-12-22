@@ -75,7 +75,7 @@ const listener = {
 
                 if (layout.indexOf("{{group}}") !== -1) {
                     const command = group.generateGroupCommand(streamer, layout);
-                    con.query("insert into group__command (streamer_id, command) values (?, ?) on duplicate key update command = ?;", [streamer.id, layout, layout], err => {
+                    con.query("insert into group__streamer (streamer_id, command) values (?, ?) on duplicate key update command = ?;", [streamer.id, layout, layout], err => {
                         if (err) api.Logger.severe(err);
                     });
                     con.query("update group__user set update_command = true where group_id = ? and user_id = ?;", [group.id, streamer.id], err => {

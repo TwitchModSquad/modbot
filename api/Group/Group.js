@@ -293,7 +293,7 @@ class Group {
                 resolve();
                 return;
             }
-            con.query("select c.streamer_id, c.command from group__user as u join group__command as c on u.user_id = c.streamer_id where update_command and group_id = ?;", [this.id], async (err, res) => {
+            con.query("select c.streamer_id, c.command from group__user as u join group__streamer as c on u.user_id = c.streamer_id where update_command and group_id = ?;", [this.id], async (err, res) => {
                 if (err) {
                     reject(err);
                     return;
