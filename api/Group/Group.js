@@ -15,7 +15,7 @@ const getNicknames = participants => {
                 let result = {};
 
                 res.forEach(row => {
-                    result[row.streamer_id] = row.nickname;
+                    if (row.nickname !== null) result[row.streamer_id] = row.nickname;
                 });
 
                 resolve(result);
