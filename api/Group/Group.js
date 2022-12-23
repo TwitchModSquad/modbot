@@ -5,6 +5,7 @@ const TwitchUser = require("../Twitch/TwitchUser");
 const con = require("../../database");
 
 const config = require("../../config.json");
+const Cachable = require("../Cache/Cachable");
 
 const getNicknames = participants => {
     return new Promise((resolve, reject) => {
@@ -45,7 +46,7 @@ const getGroupString = (participants, nicknames = {}) => {
     return groupString;
 }
 
-class Group {
+class Group extends Cachable {
     /**
      * 8-character unique ID for this group, lowercase
      * @type {string}
