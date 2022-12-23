@@ -157,7 +157,7 @@ const listener = {
                                 return;
                             }
                             if (res.length > 0) {
-                                api.getGroupById(res[0].id).then(async group => {
+                                api.Group.getGroupById(res[0].id).then(async group => {
                                     interaction.reply(await group.generateEditMessage(identity.id === group.created_by.id, identity));
                                 }, err => {
                                     api.Logger.severe(err);
@@ -194,7 +194,7 @@ const listener = {
                     interaction: interaction,
                 })
             } else if (interaction.component.customId.startsWith("group-delete-")) {
-                api.getGroupById(interaction.component.customId.replace("group-delete-", "")).then(group => {
+                api.Group.getGroupById(interaction.component.customId.replace("group-delete-", "")).then(group => {
                     api.Discord.getUserById(interaction.user.id).then(user => {
                         if (user.identity?.id) {
                             api.getFullIdentity(user.identity.id).then(identity => {
@@ -242,7 +242,7 @@ const listener = {
                         return;
                     }
                     if (res.length > 0) {
-                        api.getGroupById(res[0].id).then(group => {
+                        api.Group.getGroupById(res[0].id).then(group => {
                             api.Discord.getUserById(interaction.user.id).then(user => {
                                 if (user.identity?.id) {
                                     api.getFullIdentity(user.identity.id).then(identity => {
@@ -271,7 +271,7 @@ const listener = {
                         return;
                     }
                     if (res.length > 0) {
-                        api.getGroupById(res[0].id).then(group => {
+                        api.Group.getGroupById(res[0].id).then(group => {
                             api.Discord.getUserById(interaction.user.id).then(user => {
                                 if (user.identity?.id) {
                                     api.getFullIdentity(user.identity.id).then(identity => {
@@ -300,7 +300,7 @@ const listener = {
                         return;
                     }
                     if (res.length > 0) {
-                        api.getGroupById(res[0].id).then(group => {
+                        api.Group.getGroupById(res[0].id).then(group => {
                             api.Discord.getUserById(interaction.user.id).then(user => {
                                 if (user.identity?.id) {
                                     api.getFullIdentity(user.identity.id).then(identity => {
@@ -399,7 +399,7 @@ const listener = {
                         return;
                     }
                     if (res.length > 0) {
-                        api.getGroupById(res[0].id).then(group => {
+                        api.Group.getGroupById(res[0].id).then(group => {
                             api.Discord.getUserById(interaction.user.id).then(user => {
                                 if (user.identity?.id) {
                                     if (group.created_by.id === user.identity.id) {
@@ -432,7 +432,7 @@ const listener = {
                     }
                 });
             } else if (interaction.component.customId.startsWith("recover-group-")) {
-                api.getGroupById(interaction.component.customId.replace("recover-group-", "")).then(group => {
+                api.Group.getGroupById(interaction.component.customId.replace("recover-group-", "")).then(group => {
                     api.Discord.getUserById(interaction.user.id).then(user => {
                         if (user.identity?.id) {
                             api.getFullIdentity(user.identity.id).then(identity => {
@@ -476,7 +476,7 @@ const listener = {
                         return;
                     }
                     if (res.length > 0) {
-                        api.getGroupById(res[0].id).then(group => {
+                        api.Group.getGroupById(res[0].id).then(group => {
                             api.Discord.getUserById(interaction.user.id).then(user => {
                                 if (user.identity?.id) {
                                     const modal = new Modal()
@@ -616,7 +616,7 @@ const listener = {
                                                                     if (err) api.Logger.warning(err);
                                                                 });
                                                             });
-                                                            api.getGroupById(id).then(group => {
+                                                            api.Group.getGroupById(id).then(group => {
                                                                 group.getThread().catch(api.Logger.warning);
                                                             }, api.Logger.severe)
                                                         }
@@ -650,7 +650,7 @@ const listener = {
                 api.Discord.getUserById(interaction.user.id).then(async discordUser => {
                     if (discordUser.identity?.id) {
                         let identity = await api.getFullIdentity(discordUser.identity.id);
-                        api.getGroupById(interaction.component.customId.replace("group-rempartic-", "")).then(async group => {
+                        api.Group.getGroupById(interaction.component.customId.replace("group-rempartic-", "")).then(async group => {
                             try {
                                 let users = [];
         
@@ -691,7 +691,7 @@ const listener = {
                     handleError("Unable to find linked Twitch user");
                 });
             } else if (interaction.component.customId.startsWith("cmd-selmethod-")) {
-                api.getGroupById(interaction.component.customId.replace("cmd-selmethod-", "")).then(async group => {
+                api.Group.getGroupById(interaction.component.customId.replace("cmd-selmethod-", "")).then(async group => {
                     if (!listener.cache.hasOwnProperty(interaction.user.id)) listener.cache[interaction.user.id] = {};
                     listener.cache[interaction.user.id].group = group;
                     listener.cache[interaction.user.id].method = interaction.values[0];
@@ -707,7 +707,7 @@ const listener = {
                     handleError("An error occurred!");
                 });
             } else if (interaction.component.customId.startsWith("cmd-selstreamer-")) {
-                api.getGroupById(interaction.component.customId.replace("cmd-selstreamer-", "")).then(async group => {
+                api.Group.getGroupById(interaction.component.customId.replace("cmd-selstreamer-", "")).then(async group => {
                     api.Twitch.getUserById(interaction.values[0]).then(streamer => {
                         if (!listener.cache.hasOwnProperty(interaction.user.id)) listener.cache[interaction.user.id] = {};
                         listener.cache[interaction.user.id].group = group;
@@ -728,7 +728,7 @@ const listener = {
                     handleError("An error occurred!");
                 });
             } else if (interaction.component.customId.startsWith("cmd-selstreamer-")) {
-                api.getGroupById(interaction.component.customId.replace("cmd-selstreamer-", "")).then(async group => {
+                api.Group.getGroupById(interaction.component.customId.replace("cmd-selstreamer-", "")).then(async group => {
                     api.Twitch.getUserById(interaction.values[0]).then(streamer => {
                         if (!listener.cache.hasOwnProperty(interaction.user.id)) listener.cache[interaction.user.id] = {};
                         listener.cache[interaction.user.id].group = group;

@@ -17,7 +17,7 @@ module.exports = {
 
         if (badges.broadcaster || badges.moderator) {
             if (args.length > 0) {
-                api.getGroupById(args[0]).then(async group => {
+                api.Group.getGroupById(args[0]).then(async group => {
                     let identity = null;
 
                     if (chatter.identity?.id) {

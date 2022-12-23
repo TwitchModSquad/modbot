@@ -320,7 +320,7 @@ const command = {
                                                         if (err) api.Logger.warning(err);
                                                     });
                                                 });
-                                                api.getGroupById(id).then(group => {
+                                                api.Group.getGroupById(id).then(group => {
                                                     group.getThread().catch(api.Logger.warning);
                                                 }, api.Logger.severe)
                                             }
@@ -343,7 +343,7 @@ const command = {
         } else if (subcommand === "refresh") {
             let id = interaction.options.getString("id", true);
 
-            api.getGroupById(id).then(group => {
+            api.Group.getGroupById(id).then(group => {
                 group.updateMessage().then(() => {
                     interaction.success(`Group embed for \`${group.id}\` has been updated!`);
                 }, err => {

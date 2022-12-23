@@ -14,6 +14,7 @@ class Cache {
 
     /**
      * Time (in milliseconds) to expire a specific record
+     * @type {number}
      */
     expirationTime;
 
@@ -33,17 +34,19 @@ class Cache {
         this.expirationTime = expirationTime;
         this.objectStore = {};
 
-        setInterval(() => {
-            let curTime = new Date().getTime();
+        if (this.expirationTime > 0) {
+            setInterval(() => {
+                let curTime = new Date().getTime();
 
-            let res = {};
-            for (let key in this.objectStore) {
-                if (curTime <= this.objectStore[key].retrieved + this.expirationTime) {
-                    res[key] = this.objectStore[key];
+                let res = {};
+                for (let key in this.objectStore) {
+                    if (curTime <= this.objectStore[key].retrieved + this.expirationTime) {
+                        res[key] = this.objectStore[key];
+                    }
                 }
-            }
-            this.objectStore = res;
-        }, expirationTime / CHECKS_PER_INTERVAL);
+                this.objectStore = res;
+            }, expirationTime / CHECKS_PER_INTERVAL);
+        }
     }
 
     async get(key, retrieve, overrideCache = false, attemptInt = true) {

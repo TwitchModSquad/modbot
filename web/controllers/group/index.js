@@ -6,7 +6,7 @@ const api = require("../../../api/");
 const con = require("../../../database");
 
 router.get("/:id", (req, res) => {
-    api.getGroupById(req.params.id).then(group => {
+    api.Group.getGroupById(req.params.id).then(group => {
         res.render("pages/group/view", {group: group});
     }).catch(err => {
         api.Logger.warning(err);
@@ -23,7 +23,7 @@ router.get("/u/:name", (req, res) => {
                 if (result.length === 0) {
                     result.send("Nope!");
                 } else if (result.length === 1) {
-                    api.getGroupById(result[0].id).then(group => {
+                    api.Group.getGroupById(result[0].id).then(group => {
                         res.render("pages/group/view", {group: group});
                     }, err => {
                         api.Logger.warning(err);
@@ -34,7 +34,7 @@ router.get("/u/:name", (req, res) => {
                     for (let i = 0; i < result.length; i++) {
                         groups = [
                             ...groups,
-                            await api.getGroupById(result[i].id),
+                            await api.Group.getGroupById(result[i].id),
                         ];
                     }
                     res.render("pages/group/multiple", {user: user, groups: groups});
@@ -57,7 +57,7 @@ router.get("/:token/settime", (req, res) => {
             res.send("Nope!");
         } else {
             if (result.length > 0) {
-                api.getGroupById(result[0].id).then(group => {
+                api.Group.getGroupById(result[0].id).then(group => {
                     res.render("pages/group/settime", {group: group});
                 }, err => {
                     api.Logger.warning(err);
@@ -87,7 +87,7 @@ router.post("/:token/settime", (req, res) => {
             res.send("Nope!");
         } else {
             if (result.length > 0) {
-                api.getGroupById(result[0].id).then(async group => {
+                api.Group.getGroupById(result[0].id).then(async group => {
                     let identity = null;
 
                     if (result[0].token_identity) {
