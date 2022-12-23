@@ -120,6 +120,7 @@ class Group extends Cachable {
      * @param {TwitchUser[]} participants
      */
     constructor(id, created_by, message, game, active, starttime, endtime, host, participants) {
+        super();
         this.id = id;
         this.created_by = created_by;
         this.message = message;
