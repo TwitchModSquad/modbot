@@ -27,6 +27,8 @@ const getNicknames = participants => {
 const getGroupString = (participants, nicknames = {}) => {
     let groupString = "";
 
+    participants = participants.sort((a,b) => a.display_name.localeCompare(b.display_name));
+
     participants.forEach((participant, i) => {
         if (i + 1 === participants.length && groupString !== "") {
             groupString += " and ";
