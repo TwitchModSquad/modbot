@@ -162,6 +162,38 @@ const command = {
                     },
                 ],
             },
+            {
+                type: 1,
+                name: "refresh",
+                description: "Refreshes group embeds",
+                options: [
+                    {
+                        type: 3,
+                        name: "id",
+                        description: "Group ID",
+                        required: true,
+                    },
+                ],
+            },
+            {
+                type: 1,
+                name: "setnickname",
+                description: "Sets a streamer's nickname for use in group commands",
+                options: [
+                    {
+                        type: 3,
+                        name: "streamer",
+                        description: "Streamer's twitch name to set",
+                        required: true,
+                        autocomplete: true,
+                    },
+                    {
+                        type: 3,
+                        name: "nickname",
+                        description: "New nickname for this streamer. Omit this option to unset the nickname",
+                    },
+                ],
+            },
         ]
     },
     async execute(interaction) {
@@ -256,8 +288,13 @@ const command = {
                         .setLabel("Start Event")
                         .setStyle("SUCCESS");
 
+                    const setGroupCommand = new MessageButton()
+                        .setCustomId("set-command")
+                        .setLabel("Set Group Command")
+                        .setStyle("PRIMARY");
+
                     const row = new MessageActionRow()
-                        .addComponents(editButton, startButton);
+                        .addComponents(editButton, startButton, setGroupCommand);
 
                     embed.addFields([{name: "Participants", value: participantList, inline: false}]);
                         
@@ -302,6 +339,45 @@ const command = {
                 }
             }, error => {
                 interaction.error(error);
+            });
+        } else if (subcommand === "refresh") {
+            let id = interaction.options.getString("id", true);
+
+            api.getGroupById(id).then(group => {
+                group.updateMessage().then(() => {
+                    interaction.success(`Group embed for \`${group.id}\` has been updated!`);
+                }, err => {
+                    interaction.error("An error occurred! " + err);
+                })
+            }, err => {
+                interaction.error("An error occurred! " + err);
+            })
+        } else if (subcommand === "setnickname") {
+            let streamer = interaction.options.getString("streamer", true);
+            let nickname = interaction.options.getString("nickname");
+
+            api.Twitch.getUserByName(streamer).then(users => {
+                let streamer = users[0];
+
+                if (nickname) {
+                    con.query("insert into group__streamer (streamer_id, nickname) values (?, ?) on duplicate key update nickname = ?;", [streamer.id, nickname, nickname], err => {
+                        if (err) {
+                            interaction.error("An error occurred! " + err);
+                        } else {
+                            interaction.success(`Nickname for \`${streamer.display_name}\` set! Streamer will be displayed as:\`\`\`\n${streamer.display_name} (${nickname})\`\`\``)
+                        }
+                    });
+                } else {
+                    con.query("update group__streamer set nickname = null where streamer_id = ?;", [streamer.id], err => {
+                        if (err) {
+                            interaction.error("An error occurred! " + err);
+                        } else {
+                            interaction.success(`Nickname for \`${streamer.display_name}\` has been unset! Streamer will be displayed as:\`\`\`\n${streamer.display_name}\`\`\``)
+                        }
+                    });
+                }
+            }, err => {
+                interaction.error("An error occurred! " + err);
             });
         }
     }

@@ -6,7 +6,25 @@ const con = require("../../database");
 
 const config = require("../../config.json");
 
-const getGroupString = participants => {
+const getNicknames = participants => {
+    return new Promise((resolve, reject) => {
+        con.query("select streamer_id, nickname from group__streamer where streamer_id in (?);", [participants.map(x => x.id)], (err, res) => {
+            if (err) {
+                reject(err);
+            } else {
+                let result = {};
+
+                res.forEach(row => {
+                    result[row.streamer_id] = row.nickname;
+                });
+
+                resolve(result);
+            }
+        });
+    });
+}
+
+const getGroupString = (participants, nicknames = {}) => {
     let groupString = "";
 
     participants.forEach((participant, i) => {
@@ -15,7 +33,11 @@ const getGroupString = participants => {
         } else if (groupString !== "") {
             groupString += ", ";
         }
-        groupString += participant.display_name;
+
+        if (nicknames.hasOwnProperty(participant.id)) {
+            groupString += `${participant.display_name} (${nicknames[participant.id]})`;
+        } else
+            groupString += participant.display_name;
     });
 
     return groupString;
@@ -173,6 +195,11 @@ class Group {
     generateComponents() {
         return new Promise((resolve, reject) => {
 
+            const setGroupCommand = new MessageButton()
+                .setCustomId("set-command")
+                .setLabel("Set Group Command")
+                .setStyle("PRIMARY");
+
             const row = new MessageActionRow();
 
             if (!this.endtime) {
@@ -190,12 +217,7 @@ class Group {
                         .setLabel("Stop Event")
                         .setStyle("DANGER");
 
-                    const setGroupCommand = new MessageButton()
-                        .setCustomId("set-command")
-                        .setLabel("Set Group Command")
-                        .setStyle("PRIMARY");
-
-                    row.addComponents(stopButton, setGroupCommand);
+                    row.addComponents(stopButton);
                 } else {
                     const startButton = new MessageButton()
                         .setCustomId("start-group")
@@ -204,6 +226,8 @@ class Group {
 
                     row.addComponents(startButton);
                 }
+
+                row.addComponents(setGroupCommand);
             } else {
                 const recoverGroup = new MessageButton()
                     .setCustomId("recover-group")
@@ -291,7 +315,7 @@ class Group {
                 resolve();
                 return;
             }
-            con.query("select c.streamer_id, c.command from group__user as u join group__command as c on u.user_id = c.streamer_id where update_command and group_id = ?;", [this.id], async (err, res) => {
+            con.query("select c.streamer_id, c.command from group__user as u join group__streamer as c on u.user_id = c.streamer_id where update_command and group_id = ?;", [this.id], async (err, res) => {
                 if (err) {
                     reject(err);
                     return;
@@ -305,7 +329,7 @@ class Group {
                 for (let i = 0; i < res.length; i++) {
                     const row = res[i];
                     const streamer = await global.api.Twitch.getUserById(row.streamer_id);
-                    const command = this.generateGroupCommand(streamer, row.command);
+                    const command = await this.generateGroupCommand(streamer, row.command);
 
                     
                     try {
@@ -688,27 +712,39 @@ class Group {
      * Generates a group command based on a streamer's raw command and user
      * @param {TwitchUser} streamer 
      * @param {string} rawCommand 
-     * @return {string}
+     * @return {Promise<string>}
      */
     generateGroupCommand(streamer, rawCommand) {
-        const participants = [this.host, ...this.participants].filter(x => x.id !== streamer.id);
-
-        return rawCommand
-            .replace("{{streamer}}", streamer.display_name)
-            .replace("{{host}}", this.host.display_name)
-            .replace("{{game}}", this.game)
-            .replace("{{group}}", getGroupString(participants));
+        return new Promise(async (resolve, reject) => {
+            try {
+                const participants = [this.host, ...this.participants].filter(x => x.id !== streamer.id);
+        
+                resolve(rawCommand
+                    .replace("{{streamer}}", streamer.display_name)
+                    .replace("{{host}}", this.host.display_name)
+                    .replace("{{game}}", this.game)
+                    .replace("{{group}}", getGroupString(participants, await getNicknames(participants))))
+            } catch(err) {
+                reject(err);
+            }
+        });
     }
 
     /**
      * Generates a group string based on the active streamer
      * @param {TwitchUser} streamer 
-     * @return {string}
+     * @return {Promise<string>}
      */
     generateGroupString(streamer = null) {
-        let participants = streamer ? [this.host, ...this.participants].filter(x => x.id !== streamer.id) : [this.host, ...this.participants];
-
-        return (streamer ? streamer.display_name : "*Streamer*") + " is playing " + this.game + " with " + getGroupString(participants);
+        return new Promise(async (resolve, reject) => {
+            try {
+                let participants = streamer ? [this.host, ...this.participants].filter(x => x.id !== streamer.id) : [this.host, ...this.participants];
+        
+                resolve((streamer ? streamer.display_name : "*Streamer*") + " is playing " + this.game + " with " + getGroupString(participants, await getNicknames(participants)));
+            } catch(err) {
+                reject(err);
+            }
+        });
     }
 
     /**

@@ -17,8 +17,8 @@ module.exports = {
                 if (res.length === 0) {
                     global.client.ban.say(streamer.display_name.toLowerCase(), streamer.display_name + " is not attached to an active group!")
                 } else if (res.length === 1) {
-                    api.getGroupById(res[0].id).then(group => {
-                        global.client.ban.say(streamer.display_name.toLowerCase(), group.generateGroupString(streamer));
+                    api.getGroupById(res[0].id).then(async group => {
+                        global.client.ban.say(streamer.display_name.toLowerCase(), await group.generateGroupString(streamer));
                     }, handleError)
                 } else {
                     global.client.ban.say(streamer.display_name.toLowerCase(), `${streamer.display_name} is attached to more than one group! Visit ${config.pub_domain.replace("https://", "").replace("http://", "")}g/u/${encodeURI(streamer.display_name.toLowerCase())} for more information!`)

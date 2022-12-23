@@ -1,16 +1,5 @@
 const api = require("../../api/");
 
-const getTwitchCommands = () => {
-    let result = [];
-    for (const name in global.twitchCommands) {
-        result = [
-            ...result,
-            global.twitchCommands[name],
-        ]
-    }
-    return result;
-}
-
 const listener = {
     name: 'commandAutocomplete',
     eventName: 'interactionCreate',
