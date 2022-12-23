@@ -79,6 +79,30 @@ class GroupService {
             });
         }, false, false);
     }
+
+    /**
+     * Retrieves all loaded groups from the cache. This WILL NOT be complete
+     * @returns {Group[]}
+     */
+    getGroups() {
+        let result = [];
+        for (const id in this.groupCache.objectStore) {
+            result = [
+                ...result,
+                this.groupCache.objectStore[id],
+            ];
+        }
+        return result;
+    }
+
+    /**
+     * Retrieves all loaded active groups from the cache. This should be complete
+     * @returns {Group[]}
+     */
+    getActiveGroups() {
+        let result = this.getGroups().filter(x => x.active);
+        return result;
+    }
     
 }
 
