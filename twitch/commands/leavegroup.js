@@ -29,7 +29,7 @@ module.exports = {
                             let left = 0;
 
                             for (let i = 0; i < res.length; i++) {
-                                const group = await api.getGroupById(res[i].group_id);
+                                const group = await api.Group.getGroupById(res[i].group_id);
                                 if (group.host.id !== streamer.id) {
                                     await group.removeParticipants([streamer], identity);
                                     left++;

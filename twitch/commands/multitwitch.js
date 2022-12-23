@@ -17,7 +17,7 @@ module.exports = {
                 if (res.length === 0) {
                     global.client.ban.say(streamer.display_name.toLowerCase(), streamer.display_name + " is not attached to an active group!")
                 } else if (res.length === 1) {
-                    api.getGroupById(res[0].id).then(group => {
+                    api.Group.getGroupById(res[0].id).then(group => {
                         global.client.ban.say(streamer.display_name.toLowerCase(), `View the stream on multitwitch at ${group.generateMultiLink("multitwitch.tv")}`);
                     }, handleError)
                 } else {

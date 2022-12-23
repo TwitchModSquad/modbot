@@ -33,7 +33,7 @@ const listener = {
                 if (discordUser.identity?.id) {
                     let identity = await api.getFullIdentity(discordUser.identity.id);
                     
-                    api.getGroupById(id).then(group => {
+                    api.Group.getGroupById(id).then(group => {
                         group.addParticipant(participant, identity).then(() => {
                             handleSuccess("Successfully added participant!");
                         }, handleError);
@@ -53,7 +53,7 @@ const listener = {
                 if (discordUser.identity?.id) {
                     let identity = await api.getFullIdentity(discordUser.identity.id);
                     
-                    api.getGroupById(id).then(group => {
+                    api.Group.getGroupById(id).then(group => {
                         group.setGame(game, identity).then(() => {
                             handleSuccess("Successfully set game!");
                         }, handleError);
@@ -120,7 +120,7 @@ const listener = {
             let game = modal.getTextInputValue("game");
             let host = modal.getTextInputValue("host");
 
-            api.getGroupById(id).then(async group => {
+            api.Group.getGroupById(id).then(async group => {
                 try {
                     host = (await api.Twitch.getUserByName(host))[0];
     
