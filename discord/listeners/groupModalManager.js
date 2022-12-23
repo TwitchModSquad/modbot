@@ -74,7 +74,7 @@ const listener = {
                 const layout = modal.getTextInputValue("layout");
 
                 if (layout.indexOf("{{group}}") !== -1) {
-                    const command = group.generateGroupCommand(streamer, layout);
+                    const command = await group.generateGroupCommand(streamer, layout);
                     con.query("insert into group__streamer (streamer_id, command) values (?, ?) on duplicate key update command = ?;", [streamer.id, layout, layout], err => {
                         if (err) api.Logger.severe(err);
                     });

@@ -48,7 +48,7 @@ const completeGroupList = async (group, interaction, handleError, cache) => {
             interaction: interaction,
         });
     } else if (method === "gengrp") {
-        interaction.reply({content: group.generateGroupString(streamer), ephemeral: true})
+        interaction.reply({content: await group.generateGroupString(streamer), ephemeral: true})
         delete listener.cache[interaction.user.id];
     } else {
         handleError("Unknown method: " + method);
@@ -304,12 +304,12 @@ const listener = {
                             api.Discord.getUserById(interaction.user.id).then(user => {
                                 if (user.identity?.id) {
                                     api.getFullIdentity(user.identity.id).then(identity => {
-                                        identity.getActiveModeratorChannels().then(streamers => {
+                                        identity.getActiveModeratorChannels().then(async streamers => {
                                             const embed = new Discord.MessageEmbed()
                                                 .setTitle("Generate Group Command")
                                                 .setDescription("Utilize any of the following methods to generate a group command for your streamer.")
                                                 .addFields([
-                                                    {name: "General Group Command", value: group.generateGroupString(), inline: false},
+                                                    {name: "General Group Command", value: await group.generateGroupString(), inline: false},
                                                     {name: "TMS-Hosted Command", value: "In order to manage TMS-hosted commands to allow for immediate change to TMS groups, utilize the Discord slash commands `/command enable` and `/command disable`.", inline: false}]);
                 
                                             const selectMethod = new Discord.MessageSelectMenu()
@@ -364,7 +364,7 @@ const listener = {
                                             });
 
                                             if (selectStreamer.options.length === 0) {
-                                                let str = group.generateGroupString();
+                                                let str = await group.generateGroupString();
                                                 handleError("You don't moderate any channels that are participating in this event!\nJust in case we're wrong, here's a raw group list for this event: ```\n" + str + "```", "reply", str);
                                                 return;
                                             }

@@ -26,8 +26,8 @@ module.exports = {
                         } catch (err) {}
                     }
 
-                    group.addParticipant(streamer, identity).then(() => {
-                        global.client.ban.say(streamer.display_name.toLowerCase(), `${chatter.display_name}, success! ${group.generateGroupString(streamer)}`)
+                    group.addParticipant(streamer, identity).then(async () => {
+                        global.client.ban.say(streamer.display_name.toLowerCase(), `${chatter.display_name}, success! ${await group.generateGroupString(streamer)}`)
                     }, handleError);
                 }, err => {
                     handleExpectedError("could not find group with ID '" + args[0] + "'");
