@@ -62,7 +62,7 @@ class Twitch {
      * 
      * @type {Cache}
      */
-    userCache = new Cache();
+    userCache = new Cache(600000);
 
     /**
      * Streamer command cache
