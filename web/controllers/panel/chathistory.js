@@ -55,11 +55,6 @@ function parseDate(date) {
 }
 
 router.get("/", async (req, res) => {
-    const start = Date.now();
-    const printElapsed = setpoint => {
-        api.Logger.severe("Reached " + setpoint + " at " + (Date.now() - start) + "ms");
-    }
-
     let data = {
         streamers: [],
         selectedStreamer: req.query?.streamer,
@@ -72,20 +67,17 @@ router.get("/", async (req, res) => {
         session: req.session,
     };
 
-printElapsed("start");
     try {
         if (data.selectedChatter) {
             data.streamers = await con.pquery("select twitch__chat_chatters.*, twitch__user.display_name from twitch__chat_chatters join twitch__user on twitch__user.id = twitch__chat_chatters.streamer_id where chatter_id = ? order by chat_count desc;", [data.selectedChatter]);
         } else
             data.streamers = cachedStreamers;
         
-printElapsed("selected chatter");
         if (data.selectedStreamer) {
             data.chatters = await con.pquery("select chatter_id, chat_count, twitch__user.display_name from twitch__chat_chatters join twitch__user on twitch__user.id = twitch__chat_chatters.chatter_id where streamer_id = ? order by chat_count desc limit 100;", [data.selectedStreamer]);
         } else 
             data.chatters = cachedChatters;
 
-printElapsed("selected streamer");
         if (data.selectedChatter && !data.chatters.find(x => x.chatter_id == data.selectedChatter)) {
             let extended;
             if (data.selectedStreamer) {
@@ -98,7 +90,6 @@ printElapsed("selected streamer");
                 ...extended
             ]
         }
-printElapsed("extended");
     } catch (err) {
         global.api.Logger.warning(err);
     }
@@ -136,10 +127,8 @@ printElapsed("extended");
             ]
         }
 
-printElapsed("build query");
         const chat = await con.pquery(`select * from twitch__chat${query} order by timesent desc limit 100;`, vars);
         
-printElapsed("complete query: " + query);
         async function addUser(id) {
             if (!data.users.hasOwnProperty(id)) {
                 data.users[id] = await api.Twitch.getUserById(id);
@@ -224,7 +213,6 @@ printElapsed("complete query: " + query);
                 },
             ]
         }
-printElapsed("we did it :)");
     } catch(err) {
         global.api.Logger.warning(err);
     }
