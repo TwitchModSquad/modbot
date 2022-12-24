@@ -55,11 +55,13 @@ printElapsed("start");
         } else
             data.streamers = await con.pquery("select twitch__chat_streamers.*, twitch__user.display_name from twitch__chat_streamers join twitch__user on twitch__user.id = twitch__chat_streamers.streamer_id order by chat_count desc;");
         
+printElapsed("selected chatter");
         if (data.selectedStreamer) {
             data.chatters = await con.pquery("select chatter_id, chat_count, twitch__user.display_name from twitch__chat_chatters join twitch__user on twitch__user.id = twitch__chat_chatters.chatter_id where streamer_id = ? order by chat_count desc limit 100;", [data.selectedStreamer]);
         } else
             data.chatters = await con.pquery("select chatter_id, sum(chat_count) as chat_count, twitch__user.display_name from twitch__chat_chatters join twitch__user on twitch__user.id = twitch__chat_chatters.chatter_id group by chatter_id order by chat_count desc limit 100;");
 
+printElapsed("selected streamer");
         if (data.selectedChatter && !data.chatters.find(x => x.chatter_id == data.selectedChatter)) {
             let extended;
             if (data.selectedStreamer) {
@@ -72,6 +74,7 @@ printElapsed("start");
                 ...extended
             ]
         }
+printElapsed("extended");
     } catch (err) {
         global.api.Logger.warning(err);
     }
@@ -112,7 +115,7 @@ printElapsed("start");
 printElapsed("build query");
         const chat = await con.pquery(`select * from twitch__chat${query} order by timesent desc limit 100;`, vars);
         
-printElapsed("complete query");
+printElapsed("complete query: " + query);
         async function addUser(id) {
             if (!data.users.hasOwnProperty(id)) {
                 data.users[id] = await api.Twitch.getUserById(id);
