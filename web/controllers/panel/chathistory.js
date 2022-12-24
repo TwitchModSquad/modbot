@@ -33,7 +33,7 @@ function parseDate(date) {
 router.get("/", async (req, res) => {
     const start = Date.now();
     const printElapsed = setpoint => {
-        console.log("Reached " + setpoint + " at " + (Date.now() - start) + "ms");
+        api.Logger.severe("Reached " + setpoint + " at " + (Date.now() - start) + "ms");
     }
 
     let data = {
