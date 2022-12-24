@@ -10,6 +10,30 @@ const BADGES_URL = "/assets/images/badges/";
 const TWITCH_BADGES_URL = BADGES_URL + "twitch/";
 const TMS_BADGES_URL = BADGES_URL + "tms/";
 
+let cachedChatters = [];
+let cachedStreamers = [];
+
+const updateCache = () => {
+    con.query("select chatter_id, sum(chat_count) as chat_count, twitch__user.display_name from twitch__chat_chatters join twitch__user on twitch__user.id = twitch__chat_chatters.chatter_id group by chatter_id order by chat_count desc limit 100;", (err, res) => {
+        if (err) {
+            api.Logger.severe(err);
+        } else {
+            cachedChatters = res;
+        }
+    });
+
+    con.query("select twitch__chat_streamers.*, twitch__user.display_name from twitch__chat_streamers join twitch__user on twitch__user.id = twitch__chat_streamers.streamer_id order by chat_count desc;", (err, res) => {
+        if (err) {
+            api.Logger.severe(err);
+        } else {
+            cachedStreamers = res;
+        }
+    });
+}
+
+setInterval(updateCache, 600000);
+updateCache();
+
 function parseDate(date) {
     let mon = date.getMonth() + "";
     let day = date.getDate() + "";
@@ -53,13 +77,13 @@ printElapsed("start");
         if (data.selectedChatter) {
             data.streamers = await con.pquery("select twitch__chat_chatters.*, twitch__user.display_name from twitch__chat_chatters join twitch__user on twitch__user.id = twitch__chat_chatters.streamer_id where chatter_id = ? order by chat_count desc;", [data.selectedChatter]);
         } else
-            data.streamers = await con.pquery("select twitch__chat_streamers.*, twitch__user.display_name from twitch__chat_streamers join twitch__user on twitch__user.id = twitch__chat_streamers.streamer_id order by chat_count desc;");
+            data.streamers = cachedStreamers;
         
 printElapsed("selected chatter");
         if (data.selectedStreamer) {
             data.chatters = await con.pquery("select chatter_id, chat_count, twitch__user.display_name from twitch__chat_chatters join twitch__user on twitch__user.id = twitch__chat_chatters.chatter_id where streamer_id = ? order by chat_count desc limit 100;", [data.selectedStreamer]);
-        } else
-            data.chatters = await con.pquery("select chatter_id, sum(chat_count) as chat_count, twitch__user.display_name from twitch__chat_chatters join twitch__user on twitch__user.id = twitch__chat_chatters.chatter_id group by chatter_id order by chat_count desc limit 100;");
+        } else 
+            data.chatters = cachedChatters;
 
 printElapsed("selected streamer");
         if (data.selectedChatter && !data.chatters.find(x => x.chatter_id == data.selectedChatter)) {
