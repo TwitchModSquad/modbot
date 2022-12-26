@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Twitch Mod Squad - Participating Streamers</title>
+    
+    <%- include("../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/public.css">
+    <link rel="stylesheet" href="/assets/css/button.css">
+
+</head>
+<body>
+    
+    <%- include("../partials/public/header") %>
+
+    <section class="landing landing-small">
+        <div class="wrapper">
+            <h1>Twitch Mod Squad</h1>
+        </div>
+    </section>
+
+    <main>
+        <section>
+            <h2>Participating Streamers</h2>
+            
+            <p>These streamers have joined the TMS community, or has moderators who have!</p>
+
+            <p><small><% if (sortByFollower) { %><a href="/streamers/az">Sort list alphabetically</a><% } else { %><a href="/streamers/followers">Sort list by follower count</a><% } %></small></p>
+
+            <div class="wrapper">
+                <div class="streamers streamers-large">
+                    <% streamers.forEach(streamer => { %>
+                        <a class="streamer" href="https://twitch.tv/<%= streamer.display_name.toLowerCase() %>" target="__blank">
+                            <img src="<%= streamer.profile_image_url %>" alt="Twitch profile picture for <%= streamer.display_name %>">
+                            <div class="streamer-info">
+                                <h3><%= streamer.display_name %><% if (streamer.affiliation === "partner") { %> <img src="/assets/images/badges/twitch/partner.png" alt="twitch partner" class="partner-badge"><% } %></h3>
+                                <div class="stats"><%= formatNumber(streamer.follower_count) %> followers</div>
+                            </div>
+                        </a>
+                    <% }) %>
+                </div>
+            </div>
+        </section>
+
+        <section class="transparent">
+            <div class="wrapper">
+                <h2>Contact Us</h2>
+
+                <p>
+                    Have questions? Want to learn how to join TMS? Click below!
+                </p>
+
+                <div class="button-holder">
+                    <a href="/contact-us" class="button">Contact Us</a>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <%- include("../partials/public/footer") %>
+    
+    <%- include("../partials/js") %>
+
+    <script src="/assets/js/public.js"></script>
+</body>
+</html>

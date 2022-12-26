@@ -2,13 +2,100 @@
 <html lang="en">
 <head>
     <title>Twitch Mod Squad</title>
-
+    
     <%- include("../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/public.css">
+    <link rel="stylesheet" href="/assets/css/button.css">
 
 </head>
 <body>
-    <h1 style="max-width: 30em;text-align: center;font-weight: 300;position:absolute;top: 50%;left:50%;transform: translate(-50%, -50%);">Hey! Our public webfront currently isn't up. If you have questions or concerns, feel free to message @Twijn#8888 on Discord.</h1>
+    
+    <%- include("../partials/public/header") %>
+
+    <section class="landing">
+        <div class="wrapper">
+            <h1>Twitch Mod Squad</h1>
+            <p>Discord moderation community <span id="landing-message"><% landingMessages.forEach((message,i) => { %><span><span><%= message %></span></span><% }) %></span></p>
+        </div>
+    </section>
+
+    <main>
+        <section>
+            <h2>Featured Streamers</h2>
+            
+            <p>A few small streamers that are being promoted by TMS!</p>
+
+            <p><small>Trust us, these streamers are good! Check them out!</small></p>
+
+            <div class="streamers">
+                <% featuredStreamers.forEach((streamer, i) => { %>
+                    <a class="streamer<%= (i === 0 || i === 4) ? " small" : "" %><%= (i === 2) ? " big" : "" %>" href="https://twitch.tv/<%= streamer.display_name.toLowerCase() %>" target="__blank">
+                        <img src="<%= streamer.profile_image_url %>" alt="Twitch profile picture for <%= streamer.display_name %>">
+                        <div class="streamer-info">
+                            <h3><%= streamer.display_name %><% if (streamer.affiliation === "partner") { %> <img src="/assets/images/badges/twitch/partner.png" alt="twitch partner" class="partner-badge"><% } %></h3>
+                            <div class="stats"><%= formatNumber(streamer.follower_count) %> followers</div>
+                        </div>
+                    </a>
+                <% }) %>
+            </div>
+        </section>
+
+        <section class="transparent">
+            <div class="wrapper">
+                <h2>Hosting Services</h2>
+
+                <p>
+                    In order to fully utilize our servers, we offer hosting to streamers and their communities for game servers, websites, and more! Click below to see more information!
+                </p>
+
+                <div class="button-holder">
+                    <a href="/hosting" class="button">View Hosting Services</a>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Participating Streamers</h2>
+            
+            <p>These streamers have joined the TMS community, or has moderators who have!</p>
+
+            <div class="streamers">
+                <% participatingStreamers.forEach((streamer, i) => { %>
+                    <a class="streamer<%= (i === 0 || i === 4) ? " small" : "" %><%= (i === 2) ? " big" : "" %>" href="https://twitch.tv/<%= streamer.display_name.toLowerCase() %>" target="__blank">
+                        <img src="<%= streamer.profile_image_url %>" alt="Twitch profile picture for <%= streamer.display_name %>">
+                        <div class="streamer-info">
+                            <h3><%= streamer.display_name %><% if (streamer.affiliation === "partner") { %> <img src="/assets/images/badges/twitch/partner.png" alt="twitch partner" class="partner-badge"><% } %></h3>
+                            <div class="stats"><%= formatNumber(streamer.follower_count) %> followers</div>
+                        </div>
+                    </a>
+                <% }) %>
+            </div>
+
+            <div class="button-holder">
+                <a href="/streamers/az" class="button">View All Streamers</a>
+            </div>
+        </section>
+
+        <section class="transparent">
+            <div class="wrapper">
+                <h2>Contact Us</h2>
+
+                <p>
+                    Have questions? Want to learn how to join TMS? Click below!
+                </p>
+
+                <div class="button-holder">
+                    <a href="/contact-us" class="button">Contact Us</a>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <%- include("../partials/public/footer") %>
     
     <%- include("../partials/js") %>
+
+    <script src="/assets/js/public.js"></script>
 </body>
 </html>
