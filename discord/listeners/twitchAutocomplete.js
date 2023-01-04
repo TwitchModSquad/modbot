@@ -29,7 +29,7 @@ const listener = {
                                 ]
                             });
 
-                            interaction.respond(result);
+                            interaction.respond(result).catch(global.api.Logger.severe);
                         });
                     }
                 }
