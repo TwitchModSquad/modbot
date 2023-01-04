@@ -8,10 +8,9 @@ const tmi = require('tmi.js');
 const con = require("../database");
 
 const discordClient = require("../discord/discord");
-const Discord = require("discord.js");
 const ListenClient = require("./ListenClient");
 
-let disallowed_channels = ["ludwig", "tarzaned", "flexingseal", "miki", "dirtybird", "alttprandomizer"];
+let disallowed_channels = ["ludwig", "tarzaned", "flexingseal", "miki", "dirtybird", "alttprandomizer", "pro_kesadia", "ellum"];
 
 let listenClient = new ListenClient();
 
@@ -70,7 +69,7 @@ con.query("select distinct lower(twitch__user.display_name) as name from identit
         listenOnChannel(res[i].name);
     }
 
-    global.api.Logger.info("Startup completed!");
+    api.Logger.info("Startup completed!");
     
     listenClient.connect();
 });
@@ -80,6 +79,8 @@ global.listenOnChannel = listenOnChannel;
 global.partFromChannel = partFromChannel;
 
 global.client.ban = banClient;
+
+global.client.listen = listenClient;
 
 module.exports = {
     listenOnChannel: listenOnChannel,

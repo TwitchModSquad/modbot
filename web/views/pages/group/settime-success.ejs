@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>TMS Set Group Time - Success</title>
+
+    <%- include("../../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/group.css">
+    <link rel="stylesheet" href="/assets/css/button.css">
+</head>
+<body>
+    <main>
+        <h1><img class="logo" src="/assets/images/logos/logo.webp" alt="Twitch Mod Squad Logo"> Twitch Mod Squad <span>group time</span></h1>
+        <p>Set time for <code><%= group.game %></code> group hosted by <code><%= group.host.display_name %></code></p>
+        <p>The time was set successfully!</p>
+        <pre style="text-align: center;"><%= time %></pre>
+        <small>Please close this window.</small>
+    </main>
+
+    <%- include("../../partials/footer") %>
+    
+    <%- include("../../partials/js") %>
+</body>
+</html>

@@ -7,7 +7,7 @@ const listener = {
     eventType: 'on',
     listener (interaction) {
         if (interaction.isAutocomplete()) {
-            if (interaction.commandName === "archive" || interaction.commandName === "mention") {
+            if (interaction.commandName === "archive" || interaction.commandName === "mention" || interaction.commandName === "group") {
                 let focused = interaction.options.getFocused(true);
 
                 if (focused) {

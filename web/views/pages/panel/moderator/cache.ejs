@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>TMS Panel - Cached Objects</title>
+
+    <%- include("../../../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/panel.css">
+    <link rel="stylesheet" href="/assets/css/sidebar.css">
+</head>
+<body>
+    <%- include("../../../partials/panel/header") %>
+
+    <div class="sidebar-container">
+        <%- include("../../../partials/panel/sidebar", {page: "moderator/cache", session: session}) %>
+        <main>
+            <section>
+                <h2>Cached Objects</h2>
+
+                <pre>Discord Users: <%= discord.user %>
+Discord Guilds: <%= discord.guild %>
+
+Twitch Users: <%= twitch.user %>
+Streamer Commands: <%= twitch.streamercommands %>
+
+Groups: <%= group %>
+Session: <%= sessions %></pre>
+            </section>
+
+            <%- include("../../../partials/footer") %>
+        </main>
+    </div>
+    
+    <%- include("../../../partials/js") %>
+
+    <script src="/assets/js/panel.js"> </script>
+</body>
+</html>

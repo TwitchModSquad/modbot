@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>TMS Group - <%= user.display_name %></title>
+
+    <%- include("../../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/group.css">
+</head>
+<body>
+    <main>
+        <h1><img class="logo" src="/assets/images/logos/logo.webp" alt="Twitch Mod Squad Logo"> Twitch Mod Squad <span>group list</span></h1>
+        <p>Multiple groups found</p>
+        <h2>Streamer</h2>
+        <%- include("../../partials/panel/user/twitch", {account: user, twitchLink: true}) %>
+        <h2>Groups</h2>
+        <% groups.forEach(group => { %>
+            <p><a href="/g/<%= group.id %>">Playing <%= group.game %>, hosted by <%= group.host.display_name %></a></p>
+        <% }); %>
+    </main>
+
+    <%- include("../../partials/footer") %>
+    
+    <%- include("../../partials/js") %>
+</body>
+</html>

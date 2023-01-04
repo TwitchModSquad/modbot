@@ -3,6 +3,7 @@ const con = require("../database");
 const Twitch = require("./Twitch/");
 const Discord = require("./Discord/");
 const SessionService = require("./Session/");
+const GroupService = require("./Group/");
 const Archive = require("./Archive/");
 const Authentication = require("./Authentication/");
 
@@ -35,6 +36,12 @@ class API {
      * @type {Archive}
      */
     Archive = new Archive();
+
+    /**
+     * Base Group API
+     * @type {GroupService}
+     */
+    Group = new GroupService();
 
     /**
      * Base Authentication API

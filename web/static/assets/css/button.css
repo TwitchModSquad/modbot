@@ -1,4 +1,4 @@
-button {
+button, .button {
     background: var(--primary-tms-color);
     color: var(--primary-text-color);
     font-size: 1rem;
@@ -7,4 +7,10 @@ button {
     border: none;
     box-shadow: var(--shadow);
     cursor: pointer;
+    text-decoration: none;
+}
+
+.button-holder {
+    text-align: center;
+    margin: 2.5em 0;
 }

@@ -14,6 +14,7 @@
     <nav>
        <% if (locals.session?.identity?.mod || locals.session?.identity?.admin) { %><div class="separator">TMS Moderation Panel</div><!--
     --><a href="/panel/moderator/logs" <%- page === "moderator/logs" ? ' class="active"' : '' %>><i class="fa-regular fa-cabinet-filing"></i>&nbsp;ModBot Logs</a><!--
+    --><a href="/panel/moderator/cache" <%- page === "moderator/cache" ? ' class="active"' : '' %>><i class="fa-regular fa-database"></i>&nbsp;Cached Objects</a><!--
     --><% } %><div class="separator">Records</div><!--
     --><a href="/panel/" <%- page === "home" ? ' class="active"' : '' %>><i class="fa-solid fa-house"></i>&nbsp;Home</a><!--
     --><a href="/panel/chat-history" <%- page === "chat-history" ? ' class="active"' : '' %>><i class="fa-solid fa-comments"></i>&nbsp;Chat History</a><!--

@@ -19,7 +19,7 @@ class Discord {
      * 
      * @type {Cache}
      */
-    userCache = new Cache();
+    userCache = new Cache(600000);
 
     /**
      * Discord guild cache (ID)
