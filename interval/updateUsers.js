@@ -47,7 +47,7 @@ module.exports = () => {
             }
 
             con.query("update twitch__user set login = ?, display_name = ?, description = ?, profile_image_url = ?, offline_image_url = ?, view_count = ?, affiliation = ?, last_updated = now() where id = ?;", [
-                helixUser.login,
+                helixUser.name,
                 helixUser.displayName,
                 helixUser.description,
                 helixUser.profilePictureUrl,
