@@ -1,0 +1,47 @@
+header {
+    background-color: var(--primary-tms-color);
+    box-shadow: var(--shadow);
+}
+
+.wrapper {
+    position: relative;
+    width: calc(100% - 3em);
+    max-width: 60em;
+    padding: 1em;
+    margin: 0 auto;
+}
+
+header nav {
+    position: absolute;
+    top: 50%;
+    right: .2em;
+    transform: translateY(-50%);
+}
+
+header a {
+    color: var(--primary-text-color);
+    text-decoration: none;
+    transition: 250ms;
+    padding: .4em .8em;
+    border-radius: .3em;
+    opacity: 1;
+}
+
+header nav a:hover,
+header nav a:focus {
+    opacity: .9;
+}
+
+header nav a.highlight {
+    background-color: var(--primary-text-color);
+    color: var(--secondary-tms-color);
+    box-shadow: var(--shadow);
+}
+
+header .heading {
+    font-size: 1.2em;
+}
+
+footer {
+    color: var(--secondary-text-color);
+}

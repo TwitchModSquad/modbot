@@ -7,11 +7,14 @@ const NORMAL_SCOPES = "user:read:email moderator:manage:banned_users";
 const STREAMER_SCOPES = "user:read:email moderator:manage:banned_users moderation:read";
 const ADD_MODERATOR_SCOPES = "user:read:email channel:manage:moderators";
 
+const DATABASE_SCOPES = "channel:read:editors channel:read:vips moderation:read";
+
 class TwitchAuthentication {
 
     TWITCH_URL = `https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=${config.twitch.client_id}&redirect_uri=${encodeURIComponent(config.api_domain + "auth/twitch")}&scope=${encodeURIComponent(NORMAL_SCOPES)}`;
     TWITCH_STREAMER_URL = `https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=${config.twitch.client_id}&redirect_uri=${encodeURIComponent(config.api_domain + "auth/twitch")}&scope=${encodeURIComponent(STREAMER_SCOPES)}`;
     TWITCH_ADDMOD_URL = `https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=${config.twitch.client_id}&redirect_uri=${encodeURIComponent(config.api_domain + "auth/twitch")}&scope=${encodeURIComponent(ADD_MODERATOR_SCOPES)}`;
+    DATABASE_TWITCH_URL = `https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=${config.twitch.client_id}&redirect_uri=${encodeURIComponent(config.db_domain + "auth/twitch")}&scope=${encodeURIComponent(DATABASE_SCOPES)}`
     TWITCH_REDIRECT = config.api_domain + "auth/twitch";
     
     /**
