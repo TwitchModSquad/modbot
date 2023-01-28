@@ -10,7 +10,7 @@ const con = require("../database");
 const discordClient = require("../discord/discord");
 const ListenClient = require("./ListenClient");
 
-let disallowed_channels = ["ludwig", "tarzaned", "flexingseal", "miki", "dirtybird", "alttprandomizer", "pro_kesadia", "ellum", "fortuneschaos", "mj_vst", "nfhavoc", "stellakosmistr", "detective_nathan_grim"];
+let disallowed_channels = ["ludwig", "tarzaned", "flexingseal", "miki", "dirtybird", "alttprandomizer", "pro_kesadia", "ellum", "fortuneschaos", "mj_vst", "nfhavoc", "stellakosmistr", "detective_nathan_grim", "asleepypeach"];
 
 let listenClient = new ListenClient();
 

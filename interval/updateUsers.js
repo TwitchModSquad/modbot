@@ -46,7 +46,8 @@ module.exports = () => {
                 con.query("insert into twitch__username (id, display_name) values (?, ?) on duplicate key update display_name = ?;", [user.id, helixUser.displayName, helixUser.displayName]);
             }
 
-            con.query("update twitch__user set display_name = ?, description = ?, profile_image_url = ?, offline_image_url = ?, view_count = ?, affiliation = ?, last_updated = now() where id = ?;", [
+            con.query("update twitch__user set login = ?, display_name = ?, description = ?, profile_image_url = ?, offline_image_url = ?, view_count = ?, affiliation = ?, last_updated = now() where id = ?;", [
+                helixUser.name,
                 helixUser.displayName,
                 helixUser.description,
                 helixUser.profilePictureUrl,

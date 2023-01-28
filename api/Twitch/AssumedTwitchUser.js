@@ -17,7 +17,7 @@ class AssumedTwitchUser extends TwitchUser {
      * @param {Assumption[]} assumptions
      */
      constructor(user, assumptions) {
-        super(user.id, user.identity, user.display_name, user.email, user.profile_image_url, user.offline_image_url, user.description, user.view_count, user.follower_count, user.affiliation);
+        super(user.id, user.identity, user.login, user.display_name, user.email, user.profile_image_url, user.offline_image_url, user.description, user.view_count, user.follower_count, user.affiliation);
         this.assumptions = assumptions;
     }
 

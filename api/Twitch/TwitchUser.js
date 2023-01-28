@@ -68,6 +68,12 @@ class TwitchUser extends User {
     display_name;
 
     /**
+     * The login for the user
+     * @type {string}
+     */
+    login;
+
+    /**
      * The email for the user. Only present in users which have authenticated with TMS.
      * @type {?string}
      */
@@ -114,6 +120,7 @@ class TwitchUser extends User {
      * 
      * @param {number} id 
      * @param {?Identity} identity 
+     * @param {string} login 
      * @param {string} display_name 
      * @param {?string} email 
      * @param {?string} profile_image_url 
@@ -124,9 +131,16 @@ class TwitchUser extends User {
      * @param {?string} affiliation 
      */
 
-    constructor(id, identity, display_name, email, profile_image_url, offline_image_url, description, view_count, follower_count, affiliation) {
+    constructor(id, identity, login, display_name, email, profile_image_url, offline_image_url, description, view_count, follower_count, affiliation) {
         super(id, identity);
 
+        if (login === null) {
+            console.trace(display_name);
+        }
+        if (display_name === null) {
+            console.trace(login);
+        }
+        this.login = login;
         this.display_name = display_name;
         this.email = email;
         this.profile_image_url = profile_image_url;
@@ -510,8 +524,9 @@ class TwitchUser extends User {
      */
     post() {
         return new Promise(async (resolve, reject) => {
-            con.query("insert into twitch__user (id, display_name, identity_id, email, profile_image_url, offline_image_url, description, view_count, follower_count, affiliation) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) on duplicate key update display_name = ?, identity_id = ?, email = ?, profile_image_url = ?, offline_image_url = ?, description = ?, view_count = ?, follower_count = ?, affiliation = ?;", [
+            con.query("insert into twitch__user (id, login, display_name, identity_id, email, profile_image_url, offline_image_url, description, view_count, follower_count, affiliation) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) on duplicate key update login = ?, display_name = ?, identity_id = ?, email = ?, profile_image_url = ?, offline_image_url = ?, description = ?, view_count = ?, follower_count = ?, affiliation = ?;", [
                 this.id,
+                this.login,
                 this.display_name,
                 this.identity?.id,
                 this.email,
@@ -521,6 +536,7 @@ class TwitchUser extends User {
                 this.view_count,
                 this.follower_count,
                 this.affiliation,
+                this.login,
                 this.display_name,
                 this.identity?.id,
                 this.email,
