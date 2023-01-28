@@ -1,1 +1,7 @@
-<footer>Twitch Mod Squad is not affiliated with Twitch Interactive Inc., Amazon, or other any official entity</footer>
+<footer>
+    Twitch Mod Squad is not affiliated with Twitch Interactive Inc., Amazon, or any other official entity
+    <% if (locals?.user && locals?.user !== null) { %>
+        <br />
+        Logged in as <a href="https://twitch.tv/<%= locals.user.login %>" target="__blank" title="<%= locals.user.login %>"><%= locals.user.display_name %></a>
+    <% } %>
+</footer>

@@ -11,8 +11,13 @@
 </head>
 <body>
     
-    <%- include("../../partials/database/header", {twitch_uri: twitch_uri, user: locals?.user}) %>
+    <%- include("../../partials/database/header", {twitch_uri: twitch_uri, domain: domain, user: locals?.user}) %>
 
+    <main class="wrapper">
+        <h1>
+            <i class="fa-solid fa-house"></i> Home
+        </h1>
+    </main>
 
     <%- include("../../partials/database/footer", {user: locals?.user}) %>
 

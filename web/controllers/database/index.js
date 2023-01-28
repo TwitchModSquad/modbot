@@ -4,7 +4,10 @@ const router = express.Router();
 const api = require("../../../api/");
 const con = require("../../../database");
 
+const config = require("../../../config.json");
+
 const login = require("./login");
+const user = require("./user/");
 
 router.use("/", (req, _, next) => {
     req.user = null;
@@ -30,15 +33,15 @@ router.use("/", (req, _, next) => {
         } else {
             api.Logger.warning(err);
         }
-        console.log(req.user);
         next();
     });
 });
 
 router.get("/", (req, res) => {
-    res.render("pages/database/index", {twitch_uri: api.Authentication.Twitch.DATABASE_TWITCH_URL});
+    res.render("pages/database/index", {twitch_uri: api.Authentication.Twitch.DATABASE_TWITCH_URL, domain: config.db_domain, user: req.user});
 });
 
 router.use("/auth", login);
+router.use("/user", user);
 
 module.exports = router;

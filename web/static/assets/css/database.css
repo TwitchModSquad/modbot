@@ -32,6 +32,13 @@ header nav a:focus {
     opacity: .9;
 }
 
+header nav a img {
+    width: 1.4em;
+    height: 1.4em;
+    border-radius: .7em;
+    vertical-align: bottom;
+}
+
 header nav a.highlight {
     background-color: var(--primary-text-color);
     color: var(--secondary-tms-color);
@@ -42,6 +49,15 @@ header .heading {
     font-size: 1.2em;
 }
 
+h1 {
+    font-weight: 300;
+}
+
 footer {
     color: var(--secondary-text-color);
+}
+
+footer a {
+    color: var(--secondary-text-color);
+    text-decoration: underline;
 }
