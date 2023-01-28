@@ -83,7 +83,7 @@ class Twitch {
                 let helixUser = await api.helix.users.getUserById(id);
 
                 if (helixUser) {
-                    let user = new TwitchUser(helixUser.id, null, helixUser.displayName, null, helixUser.profilePictureUrl, helixUser.offlinePlaceholderUrl, helixUser.description, helixUser.views, null, (helixUser.broadcasterType === "" ? null : helixUser.broadcasterType));
+                    let user = new TwitchUser(helixUser.id, null, helixUser.login, helixUser.displayName, null, helixUser.profilePictureUrl, helixUser.offlinePlaceholderUrl, helixUser.description, helixUser.views, null, (helixUser.broadcasterType === "" ? null : helixUser.broadcasterType));
                     await user.refreshFollowers();
                     user.post();
     
@@ -118,6 +118,7 @@ class Twitch {
                         resolve(new TwitchUser(
                             row.id,
                             row.identity_id === null ? null : new Identity(row.identity_id, row.identity_name, Boolean(row.authenticated), Boolean(row.admin), Boolean(row.moderator)),
+                            row.login,
                             row.display_name,
                             row.email,
                             row.profile_image_url,
@@ -151,7 +152,7 @@ class Twitch {
                 let helixUser = await api.helix.users.getUserByName(display_name);
 
                 if (helixUser) {
-                    let user = new TwitchUser(helixUser.id, null, helixUser.displayName, null, helixUser.profilePictureUrl, helixUser.offlinePlaceholderUrl, helixUser.description, helixUser.views, null, (helixUser.broadcasterType === "" ? null : helixUser.broadcasterType));
+                    let user = new TwitchUser(helixUser.id, null, helixUser.login, helixUser.displayName, null, helixUser.profilePictureUrl, helixUser.offlinePlaceholderUrl, helixUser.description, helixUser.views, null, (helixUser.broadcasterType === "" ? null : helixUser.broadcasterType));
                     await user.refreshFollowers();
                     await user.post();
 
