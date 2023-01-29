@@ -20,6 +20,7 @@ app.set('views', path.join(__dirname, '/views'));
 
 app.use(express.static("web/static"));
 app.use("/join", express.static("web/static"))
+app.use("/db", express.static("web/static"));
 
 app.use('/', (req, res, next) => {
     let elapsed_start = Date.now();
