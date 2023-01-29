@@ -49,8 +49,8 @@ const parse = {
         discord(object) {
             return `<a class="discord-user" href="/panel/user/${object.id}"><img src="${object.avatar_url}" /><div class="user-info"><div class="user-name">${object.name}<span class="discriminator">#${object.discriminator}</span></div><div class="user-stats">${object.id}</div></div></a>`;
         },
-        twitch(object) {
-            return `<a class="twitch-user" href="/panel/user/${object.id}"><img src="${object.profile_image_url}" /><div class="user-info"><div class="user-name">${object.display_name}</div><div class="user-stats">${object.id} <span class="bullet">&bullet;</span> ${object.follower_count}&nbsp;follower${object.follower_count == 1 ? "" : "s"} <span class="bullet">&bullet;</span> ${object.view_count}&nbsp;view${object.view_count == 1 ? "" : "s"}</div></div></a>`;
+        twitch(object, url = "/panel/user/{{id}}") {
+            return `<a class="twitch-user" href="${url.replace("{{id}}", object.id)}"><img src="${object.profile_image_url}" /><div class="user-info"><div class="user-name">${object.display_name}</div><div class="user-stats">${object.id} <span class="bullet">&bullet;</span> ${object.follower_count}&nbsp;follower${object.follower_count == 1 ? "" : "s"} <span class="bullet">&bullet;</span> ${object.view_count}&nbsp;view${object.view_count == 1 ? "" : "s"}</div></div></a>`;
         },
     },
 };
