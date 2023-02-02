@@ -149,7 +149,7 @@ updateStreamers();
 updateValues();
 
 const comma = x => {
-    if (!x) return "";
+    if (!x) return "0";
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
