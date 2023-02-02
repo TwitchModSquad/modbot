@@ -50,6 +50,16 @@ a.discord-user, a.twitch-user, a.identity {
     opacity: .5;
 }
 
+@media only screen and (max-width: 600px) {
+
+    .discord-user .title,
+    .twitch-user .title,
+    .identity .title {
+        top: 25%;
+    }
+    
+}
+
 .user-info .user-name {
     font-size: 1.2rem;
     font-weight: 300;
