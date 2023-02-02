@@ -124,6 +124,123 @@ class TwitchAuthentication {
         });
     }
 
+    /**
+     * Gets a role via path, access token, and broadcaster ID
+     * @param {string} path 
+     * @param {string} accessToken 
+     * @param {number} broadcasterId 
+     * @returns {Promise<TwitchUser>}
+     */
+    getRole(path, accessToken, broadcasterId) {
+        return new Promise(async (resolve, reject) => {
+            let result = [];
+            const get = async cursor => {
+                return await fetch("https://api.twitch.tv/helix/"+path+"?first=100&broadcaster_id=" + encodeURIComponent(broadcasterId) + (cursor !== null ? "&after=" + cursor : ""), {
+                    method: 'GET',
+                    headers: {
+                        ["Client-ID"]: config.twitch.client_id,
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                });
+            }
+
+            try {
+                let cursor = null;
+                while(true) {
+                    let json = await (await get(cursor)).json();
+
+                    for (let i = 0; i < json.data.length; i++) {
+                        result = [
+                            ...result,
+                            await global.api.Twitch.getUserById(json.data[i].user_id, false, true)
+                        ]
+                    }
+
+                    if (json.pagination?.cursor) {
+                        cursor = json.pagination.cursor;
+                    } else break;
+                }
+                resolve(result);
+            } catch(err) {
+                reject(err);
+                return;
+            }
+        });
+    }
+
+    /**
+     * Returns a list of VIPs for a user access token
+     * @param {string} accessToken 
+     * @param {number} broadcasterId
+     * @returns {Promise<TwitchUser[]>}
+     */
+    getVIPs(accessToken, broadcasterId) {
+        return this.getRole("channels/vips", accessToken, broadcasterId)
+    }
+
+    /**
+     * Returns a list of moderators for a user access token
+     * @param {string} accessToken 
+     * @param {number} broadcasterId
+     * @returns {Promise<TwitchUser[]>}
+     */
+    getMods(accessToken, broadcasterId) {
+        return this.getRole("moderation/moderators", accessToken, broadcasterId)
+    }
+
+    /**
+     * Returns a list of editors for a user access token
+     * @param {string} accessToken 
+     * @param {number} broadcasterId
+     * @returns {Promise<TwitchUser[]>}
+     */
+    getEditors(accessToken, broadcasterId) {
+        return this.getRole("channels/editors", accessToken, broadcasterId)
+    }
+
+    /**
+     * Gets bans via access token and broadcaster ID
+     * @param {string} accessToken 
+     * @param {number} broadcasterId 
+     * @returns {Promise<TwitchUser>}
+     */
+    getBans(accessToken, broadcasterId) {
+        return new Promise(async (resolve, reject) => {
+            let result = [];
+            const get = async cursor => {
+                return await fetch("https://api.twitch.tv/helix/moderation/banned?first=100&broadcaster_id=" + encodeURIComponent(broadcasterId) + (cursor !== null ? "&after=" + cursor : ""), {
+                    method: 'GET',
+                    headers: {
+                        ["Client-ID"]: config.twitch.client_id,
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                });
+            }
+
+            try {
+                let cursor = null;
+                while(true) {
+                    let json = await (await get(cursor)).json();
+
+                    for (let i = 0; i < json.data.length; i++) {
+                        result = [
+                            ...result,
+                            await global.api.Twitch.getUserById(json.data[i].user_id, false, true)
+                        ]
+                    }
+
+                    if (json.pagination?.cursor) {
+                        cursor = json.pagination.cursor;
+                    } else break;
+                }
+                resolve(result);
+            } catch(err) {
+                reject(err);
+                return;
+            }
+        });
+    }
+
 }
 
 module.exports = TwitchAuthentication;
