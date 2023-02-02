@@ -18,7 +18,7 @@ const generateSession = async () => {
 }
 
 router.get("/twitch", async (req, res) => {
-    const { query } = req;
+    const { query, cookies } = req;
     const { code } = query;
 
     if (code) {
@@ -43,6 +43,26 @@ router.get("/twitch", async (req, res) => {
         }
 
         api.Twitch.getUserById(user.id, true, true).then(async twitchUser => {
+            con.query("select * from twitch__token where user_id = ? and scopes = ?;", [user.id, oauthData.scope.join("-")], (err, res) => {
+                if (!err) {
+                    if (res.length === 0) {
+                        con.query("insert into twitch__token (user_id, token, scopes) values (?, ?, ?);", [user.id, oauthData.refresh_token, oauthData.scope.join("-")], err => {
+                            if (err) {
+                                api.Logger.severe(err);
+                            }
+                        });
+                    }
+                } else {
+                    api.Logger.severe(err);
+                }
+            });
+
+            try {
+                await twitchUser.refreshStreamerRoles(oauthData.access_token);
+            } catch(err) {
+                api.Logger.severe(err);
+            }
+
             let session = await generateSession();
             con.query("insert into database__session (id, user_id) values (?, ?);", [session, user.id], err => {
                 if (err) {
@@ -53,7 +73,12 @@ router.get("/twitch", async (req, res) => {
                         domain: config.main_domain,
                         secure: true,
                     });
-                    res.redirect(config.db_domain);
+
+                    if (cookies && cookies.db_return_to) {
+                        res.redirect(cookies.db_return_to);
+                    } else {
+                        res.redirect(config.db_domain);
+                    }
                 }
             });
         }, err => {
