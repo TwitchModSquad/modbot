@@ -1,4 +1,8 @@
 const API_URI = "https://tms.to/api/";
+const DB_URI = "http://localhost:8080/db/";
+const DB_API_URI = DB_URI + "api/";
+
+const COOKIE_DOMAIN = "localhost";
 
 function createCookie(name, value, days) {
     if (days) {
@@ -26,6 +30,12 @@ function eraseCookie(name) {
     createCookie(name, "", -1);
 }
 
+$(function() {
+    $(".login").on("click", function() {
+        createCookie("db_return_to", window.location.href, 1/24);
+    });
+});
+
 const api = {
     get: function(uri) {
         return new Promise((resolve, reject) => {
@@ -45,7 +55,7 @@ const api = {
 }
 
 function comma(x) {
-    if (!x) return "";
+    if (!x) return "0";
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
