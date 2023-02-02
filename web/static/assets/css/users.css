@@ -1,4 +1,5 @@
 .discord-user, .twitch-user, .identity {
+    position: relative;
     border: .1em solid rgba(255,255,255,0.05);
     background-color: rgba(255,255,255,0.025);
     color: var(--primary-text-color);
@@ -34,6 +35,19 @@ a.discord-user, a.twitch-user, a.identity {
 
 .identity img {
     border-color: var(--secondary-tms-color);
+}
+
+.discord-user .title,
+.twitch-user .title,
+.identity .title {
+    font-size: 1.2em;
+    font-weight: 600;
+    position: absolute;
+    top: 50%;
+    right: 1em;
+    transform: translateY(-50%);
+    text-transform: uppercase;
+    opacity: .5;
 }
 
 .user-info .user-name {

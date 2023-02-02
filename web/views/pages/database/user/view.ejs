@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>TMS : User Database : View User <%= view.display_name %></title>
+    
+    <%- include("../../../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/database.css">
+    <link rel="stylesheet" href="/assets/css/button.css">
+
+</head>
+<body>
+    
+    <%- include("../../../partials/database/header", {twitch_uri: twitch_uri, domain: domain, user: locals?.user}) %>
+
+    <main class="wrapper">
+
+        <h1>
+            <i class="fa-light fa-user"></i> <%= view.display_name %>
+        </h1>
+        
+        <div class="container container-md">
+            <div class="col-4">
+                <section class="profile">
+                    <h2><i class="fa-solid fa-user"></i> Profile</h2>
+
+                    <img src="<%= view.profile_image_url %>" alt="Profile picture for <%= view.display_name %>" class="pfp">
+
+                    <h3>
+                        <%= view.display_name %>
+                        <% if (view.affiliation === "partner") { %><img src="/assets/images/badges/twitch/partner.png" alt="twitch partner" class="partner-badge"><% } %>
+                        <% if (view.identity?.authenticated) { %><img src="/assets/images/logo.webp" alt="TMS Logo" title="Twitch Mod Squad Member" class="tms-member"><% } %>
+                    </h3>
+
+                    <small class="id"><%= view.id %></small>
+
+                    <h4>General Information</h4>
+
+                    <pre><strong>Followers: </strong><%= comma(view.follower_count) %><br/><strong>Views: </strong><%= comma(view.view_count) %><br/><strong>Usernames: </strong><%= info.usernames.map(x => x.name).join(", ") %></pre>
+
+                    <h4>Chat Information</h4>
+
+                    <pre><strong>Chat Messages: </strong><%= comma(info.chatCount) %><br/><strong>Communities: </strong><%= comma(info.communities.length) %><br/><br/><strong>Bans: </strong><%= comma(info.bans.length) %><br/><strong>Timeouts: </strong><%= comma(info.timeouts.length) %></pre>
+
+                    <small>This only encompasses information in streamers whose moderators are in TMS.</small>
+
+                </section>
+            </div>
+            <div class="col-8">
+                <section>
+                    <h2><i class="fa-solid fa-star"></i> Roles in Other Channels</h2>
+
+                    <% if (info.roles.filter(x => x.user.id === view.id).length === 0) { %>
+                        <small>No detected roles in other communities!</small>
+                    <% } %>
+
+                    <% info.roles.filter(x => x.user.id === view.id && x.role === "editor").forEach(role => { %>
+                        <%- include("../../../partials/panel/user/twitch", {account: role.streamer, custom: domain + "user/{{id}}", title: role.role}) %>
+                    <% }) %>
+
+                    <% info.roles.filter(x => x.user.id === view.id && x.role === "moderator").forEach(role => { %>
+                        <%- include("../../../partials/panel/user/twitch", {account: role.streamer, custom: domain + "user/{{id}}", title: role.role}) %>
+                    <% }) %>
+
+                    <% info.roles.filter(x => x.user.id === view.id && x.role === "vip").forEach(role => { %>
+                        <%- include("../../../partials/panel/user/twitch", {account: role.streamer, custom: domain + "user/{{id}}", title: role.role}) %>
+                    <% }) %>
+                </section>
+                <section>
+                    <h2><i class="fa-solid fa-star"></i> Roles in This Channel</h2>
+
+                    <% if (info.roles.filter(x => x.streamer.id === view.id).length === 0) { %>
+                        <small>No detected roles in this community!</small>
+                    <% } %>
+
+                    <% info.roles.filter(x => x.streamer.id === view.id && x.role === "editor").forEach(role => { %>
+                        <%- include("../../../partials/panel/user/twitch", {account: role.user, custom: domain + "user/{{id}}", title: role.role}) %>
+                    <% }) %>
+
+                    <% info.roles.filter(x => x.streamer.id === view.id && x.role === "moderator").forEach(role => { %>
+                        <%- include("../../../partials/panel/user/twitch", {account: role.user, custom: domain + "user/{{id}}", title: role.role}) %>
+                    <% }) %>
+
+                    <% info.roles.filter(x => x.streamer.id === view.id && x.role === "vip").forEach(role => { %>
+                        <%- include("../../../partials/panel/user/twitch", {account: role.user, custom: domain + "user/{{id}}", title: role.role}) %>
+                    <% }) %>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <%- include("../../../partials/database/footer", {user: locals?.user}) %>
+
+    <%- include("../../../partials/js") %>
+
+</body>
+</html>

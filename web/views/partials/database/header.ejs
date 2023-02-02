@@ -7,7 +7,7 @@
             <% if (locals?.user && locals.user !== null) { %>
                 <a href="<%= domain %>user/<%= user.id %>" class="highlight"><img src="<%= user.profile_image_url %>" alt="Profile picture for <%= user.display_name %>"> <%= user.display_name %></a>
             <% } else { %>
-                <a href="<%= twitch_uri %>" class="highlight"><i class="fa-brands fa-twitch"></i> Login</a>
+                <a href="<%= twitch_uri %>" class="highlight login"><i class="fa-brands fa-twitch"></i> Login</a>
             <% } %>
         </nav>
     </div>

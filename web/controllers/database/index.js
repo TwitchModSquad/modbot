@@ -8,6 +8,7 @@ const config = require("../../../config.json");
 
 const login = require("./login");
 const user = require("./user/");
+const apiRoute = require("./api/");
 
 router.use("/", (req, _, next) => {
     req.user = null;
@@ -43,5 +44,6 @@ router.get("/", (req, res) => {
 
 router.use("/auth", login);
 router.use("/user", user);
+router.use("/api", apiRoute);
 
 module.exports = router;
