@@ -133,13 +133,7 @@ class TwitchUser extends User {
 
     constructor(id, identity, login, display_name, email, profile_image_url, offline_image_url, description, view_count, follower_count, affiliation) {
         super(id, identity);
-
-        if (login === null) {
-            console.trace(display_name);
-        }
-        if (display_name === null) {
-            console.trace(login);
-        }
+        
         this.login = login;
         this.display_name = display_name;
         this.email = email;
