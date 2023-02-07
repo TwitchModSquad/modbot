@@ -309,7 +309,7 @@ class TwitchUser extends User {
                             let identity = new FullIdentity(null, users[y].display_name, false, false, false, [users[y]], []);
                             await identity.post();
                         }
-console.log('adding')
+                        
                         con.query("insert into twitch__role (user_id, streamer_id, role, source) values (?, ?, 'moderator', 'legacy') on duplicate key update updated = now();", [users[y].id, this.id], err => {
                             if (err) global.api.Logger.warning(err);
                         });

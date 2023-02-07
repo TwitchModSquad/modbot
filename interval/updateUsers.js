@@ -73,7 +73,6 @@ module.exports = () => {
                 if (followers.total >= GET_MODS_THRESHOLD) {
                     let user = await api.Twitch.getUserById(userId);
                     await user.refreshMods(false);
-                    console.log("reached mod threshold");
                 }
 
                 con.query("update twitch__user set follower_count = ? where id = ?;", [followers.total, userId]);
