@@ -565,7 +565,7 @@ const command = {
                         banStr += `#${b+1} ${ban.user.display_name} banned in #${ban.channel.login} on ${new Date(ban.time).toLocaleDateString()}`;
                     }
 
-                    if (banStr.length > 900) {
+                    if (banStr.length > 800) {
                         addField();
                     }
                 }
