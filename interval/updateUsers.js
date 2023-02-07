@@ -1,7 +1,7 @@
 const con = require("../database");
 const api = require("../api/index");
 
-const GET_MODS_THRESHOLD = 500;
+const GET_MODS_THRESHOLD = 3500;
 
 let waiting = false;
 
