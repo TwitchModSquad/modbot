@@ -309,7 +309,9 @@ class TwitchUser extends User {
                             await identity.post();
                         }
 
-                        con.query("insert into twitch__role (user_id, streamer_id, role, source) values (?, ?, 'moderator', 'legacy') on duplicate key update updated = now();", [users[y].id, this.id]);
+                        con.query("insert into twitch__role (user_id, streamer_id, role, source) values (?, ?, 'moderator', 'legacy') on duplicate key update updated = now();", [users[y].id, this.id], err => {
+                            if (err) global.api.Logger.warning(err);
+                        });
 
                         if (this.identity?.id && users[y].identity?.id) {
                             con.query("insert into identity__moderator (identity_id, modfor_id, active) values (?, ?, ?) on duplicate key update active = ?;", [users[y].identity.id, this.identity.id, this.follower_count >= FOLLOWER_REQUIREMENT, this.follower_count >= FOLLOWER_REQUIREMENT]);
