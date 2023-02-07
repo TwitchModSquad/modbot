@@ -396,11 +396,8 @@ const command = {
         } else if (subcommand === "search") {
             let query = interaction.options.getString("query", true);
 
-            let twitchResults = "";
-            let discordResults = "";
-            let rawResults = "";
-
             let entries = [];
+            let bans = [];
 
             const directTwitchQuery = await con.pquery("select id from twitch__user where id = ? or display_name = ?;", [query, query]);
             let fuzzyTwitchQuery = [];
@@ -460,7 +457,10 @@ const command = {
                     twitchUsers = [...twitchUsers, user];
                     const twitchEntries = await con.pquery("select archive_id from archive__users where type = 'twitch' and user and value = ?;", [id]);
 
-                    twitchResults += `\n${user.display_name} [${user.id}]`;
+                    bans = [
+                        ...bans,
+                        ...(await user.getBans()),
+                    ];
 
                     for (let ei = 0; ei < twitchEntries.length; ei++) {
                         const archiveId = twitchEntries[ei].archive_id;
@@ -484,8 +484,6 @@ const command = {
                     discordUsers = [...discordUsers, user];
                     const discordEntries = await con.pquery("select archive_id from archive__users where type = 'discord' and user and value = ?;", [id]);
 
-                    discordResults += `\n${user.name}#${user.discriminator} [${user.id}]`;
-
                     for (let ei = 0; ei < discordEntries.length; ei++) {
                         const archiveId = discordEntries[ei].archive_id;
                         if (!entries.find(e => e.id === archiveId)) {
@@ -504,8 +502,6 @@ const command = {
                 const id = rawQueries[ri];
                 try {
                     const rawEntries = await con.pquery("select archive_id from archive__users where value = ?;", [id]);
-
-                    rawResults += `\n${id}`;
 
                     for (let ei = 0; ei < rawEntries.length; ei++) {
                         const archiveId = rawEntries[ei].archive_id;
@@ -549,18 +545,39 @@ const command = {
                         .setColor(0xff4d4d),
                 ];
             }
-            
-            if (twitchResults !== "")
-                embed.addField("Twitch Results", "```"+twitchResults+"```");
-    
-            if (discordResults !== "")
-                embed.addField("Discord Results", "```"+discordResults+"```");
 
-            if (rawResults !== "")
-                embed.addField("Raw Results", "```"+rawResults+"```")
+            if (bans.length > 0) {
+                let banStr = "";
 
-            if (twitchResults === "" && discordResults === "" && rawResults === "")
+                const addField = () => {
+                    embed.addField("Bans", banStr, true);
+                    banStr = "";
+                }
+
+                for (let b = 0; b < bans.length; b++) {
+                    const ban = bans[b];
+
+                    if (banStr !== "") banStr += "\n";
+
+                    if (ban.discord_message) {
+                        banStr += `[#${b+1} ${ban.user.display_name} banned in #${ban.channel.login} on ${new Date(ban.time).toLocaleDateString()}${ban.active ? "" : " \[inactive\]"}](https://discord.com/channels/${config.modsquad_discord}/${config.liveban_channel}/${ban.discord_message})`;
+                    } else {
+                        banStr += `#${b+1} ${ban.user.display_name} banned in #${ban.channel.login} on ${new Date(ban.time).toLocaleDateString()}`;
+                    }
+
+                    if (banStr.length > 900) {
+                        addField();
+                    }
+                }
+
+                addField();
+            }
+
+            if (twitchUsers.length === 0 && discordUsers.length === 0 && entries.length === 0) {
                 embed.setDescription("**Nothing was found on this user!**\nThis means we don't have any record of this user in participating Twitch channels, and there's no ban archive involving them.")
+            } else {
+                embed.setDescription(`We found \`${twitchUsers.length}\` twitch and \`${discordUsers.length}\` discord users with similar names to \`${query}\`.\n**Archive Entries:** ${entries.length} • **Twitch Bans:** ${bans.length}`)
+            }
 
             const twitchUserSelect = new MessageSelectMenu()
                     .setCustomId("archive-search-twitch")
