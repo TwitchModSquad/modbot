@@ -279,9 +279,10 @@ class TwitchUser extends User {
      * Refresh the moderators under a channel name.
      * Warning: This may take an extended amount of time!
      * 
+     * @param {boolean} createIdentities
      * @returns {Promise<TwitchUser[]>}
      */
-    refreshMods() {
+    refreshMods(createIdentities = true) {
         return new Promise(async (resolve, reject) => {
             if (!connected) {
                 while (!connected) {
@@ -290,7 +291,7 @@ class TwitchUser extends User {
                 }
             }
 
-            if (this.identity === null) {
+            if (this.identity === null && createIdentities) {
                 let identity = new FullIdentity(null, this.display_name, false, false, false, [this], []);
                 await identity.post();
             }
@@ -304,16 +305,16 @@ class TwitchUser extends User {
                     let users = await global.api.Twitch.getUserByName(mods[i], true);
 
                     for (let y = 0; y < users.length; y++) {
-                        if (users[y].identity === null) {
+                        if (users[y].identity === null && createIdentities) {
                             let identity = new FullIdentity(null, users[y].display_name, false, false, false, [users[y]], []);
                             await identity.post();
                         }
-
+console.log('adding')
                         con.query("insert into twitch__role (user_id, streamer_id, role, source) values (?, ?, 'moderator', 'legacy') on duplicate key update updated = now();", [users[y].id, this.id], err => {
                             if (err) global.api.Logger.warning(err);
                         });
 
-                        if (this.identity?.id && users[y].identity?.id) {
+                        if (this.identity?.id && users[y].identity?.id && createIdentities) {
                             con.query("insert into identity__moderator (identity_id, modfor_id, active) values (?, ?, ?) on duplicate key update active = ?;", [users[y].identity.id, this.identity.id, this.follower_count >= FOLLOWER_REQUIREMENT, this.follower_count >= FOLLOWER_REQUIREMENT]);
                         }
                     }
