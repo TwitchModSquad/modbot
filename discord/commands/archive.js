@@ -394,6 +394,8 @@ const command = {
                 interaction.error(error);
             });
         } else if (subcommand === "search") {
+            await interaction.deferReply({ephemeral: interaction.channel.id !== config.channels.archive_name_checker});
+
             let query = interaction.options.getString("query", true);
 
             let entries = [];
@@ -610,7 +612,7 @@ const command = {
             if (twitchUsers.length > 0) rows = [...rows, twitchUserRow];
             if (discordUsers.length > 0) rows = [...rows, discordUserRow];
 
-            interaction.reply({content: ' ', embeds: embeds, components: rows, ephemeral: interaction.channel.id !== config.channels.archive_name_checker});
+            interaction.editReply({content: ' ', embeds: embeds, components: rows});
         }
     }
 };
