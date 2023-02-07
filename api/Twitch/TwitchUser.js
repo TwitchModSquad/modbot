@@ -488,6 +488,7 @@ class TwitchUser extends User {
             const streamers = await this.getStreamers();
             const mods = await this.getMods();
             const activeCommunities = await this.getActiveCommunities();
+            const bans = await this.getBans();
 
             if (streamers.length > 0) {
                 let streamerStr = "";
@@ -495,7 +496,10 @@ class TwitchUser extends User {
                     if (streamerStr !== "") streamerStr += "\n";
                     streamerStr += `**${streamer.display_name}** : [Profile](https://twitch.tv/${streamer.display_name.toLowerCase()})`;
                 });
-                embed.addField("Streamers", streamerStr, true);
+
+                if (streamerStr.length <= 1024) {
+                    embed.addField("Streamers", streamerStr, true);
+                } else global.api.Logger.warning("Exceeded character count for streamers");
             }
 
             if (mods.length > 0) {
@@ -504,7 +508,47 @@ class TwitchUser extends User {
                     if (modsStr !== "") modsStr += "\n";
                     modsStr += `**${mod.display_name}** : [Profile](https://twitch.tv/${mod.display_name.toLowerCase()})`;
                 });
-                embed.addField("Moderators", modsStr, true);
+
+                if (modsStr.length <= 1024) {
+                    embed.addField("Moderators", modsStr, true);
+                } else global.api.Logger.warning("Exceeded character count for mods");
+            }
+
+            if (activeCommunities.length > 0) {
+                let rows = activeCommunities
+                    .map(x => [x.user.display_name, new Date(x.lastActive).toLocaleDateString(), String(x.chatCount)])
+                    .slice(0, 20);
+
+                rows = [
+                    ["Streamer", "Last Active", "Messages"],
+                    ...rows,
+                ]
+
+                let communitiesStr = global.api.stringTable(rows, 3, 5);
+
+                if (communitiesStr.length <= 1024) {
+                    embed.addField("Active Communities", "```\n" + communitiesStr + "```", false);
+                } else global.api.Logger.warning("Exceeded character count for active communities");
+            }
+
+            if (bans.length > 0) {
+                let result = "";
+
+                bans.forEach(ban => {
+                    if (result.length < 800) {
+                        if (result !== "") result += "\n";
+
+                        if (ban.discord_message && bans.length <= 8) {
+                            result += `[${ban.channel.display_name} on ${new Date(ban.time).toLocaleDateString()}${ban.active ? "" : " \[inactive\]"}](https://discord.com/channels/${config.modsquad_discord}/${config.liveban_channel}/${ban.discord_message})`;
+                        } else {
+                            result += ban.channel.display_name + " on " + new Date(ban.time).toLocaleDateString();
+                        }
+                    }
+                });
+
+                if (result.length <= 1024) {
+                    embed.addField("Bans", result, true);
+                } else global.api.Logger.warning("Exceeded character count for bans");
             }
 
             resolve(embed);
