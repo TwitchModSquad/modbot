@@ -1,6 +1,8 @@
 const con = require("../database");
 const api = require("../api/index");
 
+const GET_MODS_THRESHOLD = 500;
+
 let waiting = false;
 
 module.exports = () => {
@@ -67,6 +69,11 @@ module.exports = () => {
 
             try {
                 let followers = await api.Twitch.Direct.helix.users.getFollows({followedUser: userId});
+
+                if (followers >= GET_MODS_THRESHOLD) {
+                    let user = await api.Twitch.getUserById(userId);
+                    await user.refreshMods();
+                }
 
                 con.query("update twitch__user set follower_count = ? where id = ?;", [followers.total, userId]);
             } catch (err) {
