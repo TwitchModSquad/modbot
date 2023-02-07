@@ -70,7 +70,7 @@ module.exports = () => {
             try {
                 let followers = await api.Twitch.Direct.helix.users.getFollows({followedUser: userId});
 
-                if (followers >= GET_MODS_THRESHOLD) {
+                if (followers.total >= GET_MODS_THRESHOLD) {
                     let user = await api.Twitch.getUserById(userId);
                     await user.refreshMods(false);
                     console.log("reached mod threshold");
