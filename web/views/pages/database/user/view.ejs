@@ -50,40 +50,44 @@
                 <section>
                     <h2><i class="fa-solid fa-star"></i> Roles in Other Channels</h2>
 
-                    <% if (info.roles.filter(x => x.user.id === view.id).length === 0) { %>
-                        <small>No detected roles in other communities!</small>
-                    <% } %>
-
-                    <% info.roles.filter(x => x.user.id === view.id && x.role === "editor").forEach(role => { %>
-                        <%- include("../../../partials/panel/user/twitch", {account: role.streamer, custom: domain + "user/{{id}}", title: role.role}) %>
-                    <% }) %>
-
-                    <% info.roles.filter(x => x.user.id === view.id && x.role === "moderator").forEach(role => { %>
-                        <%- include("../../../partials/panel/user/twitch", {account: role.streamer, custom: domain + "user/{{id}}", title: role.role}) %>
-                    <% }) %>
-
-                    <% info.roles.filter(x => x.user.id === view.id && x.role === "vip").forEach(role => { %>
-                        <%- include("../../../partials/panel/user/twitch", {account: role.streamer, custom: domain + "user/{{id}}", title: role.role}) %>
-                    <% }) %>
+                    <div class="scroll-container">
+                        <% if (info.roles.filter(x => x.user.id === view.id).length === 0) { %>
+                            <small>No detected roles in other communities!</small>
+                        <% } %>
+    
+                        <% info.roles.filter(x => x.user.id === view.id && x.role === "editor").forEach(role => { %>
+                            <%- include("../../../partials/panel/user/twitch", {account: role.streamer, custom: domain + "user/{{id}}", title: role.role}) %>
+                        <% }) %>
+    
+                        <% info.roles.filter(x => x.user.id === view.id && x.role === "moderator").forEach(role => { %>
+                            <%- include("../../../partials/panel/user/twitch", {account: role.streamer, custom: domain + "user/{{id}}", title: role.role}) %>
+                        <% }) %>
+    
+                        <% info.roles.filter(x => x.user.id === view.id && x.role === "vip").forEach(role => { %>
+                            <%- include("../../../partials/panel/user/twitch", {account: role.streamer, custom: domain + "user/{{id}}", title: role.role}) %>
+                        <% }) %>
+                    </div>
                 </section>
                 <section>
                     <h2><i class="fa-solid fa-star"></i> Roles in This Channel</h2>
 
-                    <% if (info.roles.filter(x => x.streamer.id === view.id).length === 0) { %>
-                        <small>No detected roles in this community!</small>
-                    <% } %>
-
-                    <% info.roles.filter(x => x.streamer.id === view.id && x.role === "editor").forEach(role => { %>
-                        <%- include("../../../partials/panel/user/twitch", {account: role.user, custom: domain + "user/{{id}}", title: role.role}) %>
-                    <% }) %>
-
-                    <% info.roles.filter(x => x.streamer.id === view.id && x.role === "moderator").forEach(role => { %>
-                        <%- include("../../../partials/panel/user/twitch", {account: role.user, custom: domain + "user/{{id}}", title: role.role}) %>
-                    <% }) %>
-
-                    <% info.roles.filter(x => x.streamer.id === view.id && x.role === "vip").forEach(role => { %>
-                        <%- include("../../../partials/panel/user/twitch", {account: role.user, custom: domain + "user/{{id}}", title: role.role}) %>
-                    <% }) %>
+                    <div class="scroll-container">
+                        <% if (info.roles.filter(x => x.streamer.id === view.id).length === 0) { %>
+                            <small>No detected roles in this community!</small>
+                        <% } %>
+    
+                        <% info.roles.filter(x => x.streamer.id === view.id && x.role === "editor").forEach(role => { %>
+                            <%- include("../../../partials/panel/user/twitch", {account: role.user, custom: domain + "user/{{id}}", title: role.role}) %>
+                        <% }) %>
+    
+                        <% info.roles.filter(x => x.streamer.id === view.id && x.role === "moderator").forEach(role => { %>
+                            <%- include("../../../partials/panel/user/twitch", {account: role.user, custom: domain + "user/{{id}}", title: role.role}) %>
+                        <% }) %>
+    
+                        <% info.roles.filter(x => x.streamer.id === view.id && x.role === "vip").forEach(role => { %>
+                            <%- include("../../../partials/panel/user/twitch", {account: role.user, custom: domain + "user/{{id}}", title: role.role}) %>
+                        <% }) %>
+                    </div>
                 </section>
             </div>
         </div>

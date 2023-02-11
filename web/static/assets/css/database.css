@@ -149,3 +149,8 @@ button.button {
     height: 1.2em;
     vertical-align: bottom;
 }
+
+.scroll-container {
+    max-height: 20em;
+    overflow-y: auto;
+}
