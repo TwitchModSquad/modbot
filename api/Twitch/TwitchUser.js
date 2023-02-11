@@ -296,7 +296,13 @@ class TwitchUser extends User {
                 await identity.post();
             }
 
-            let mods = await modClient.mods(this.display_name);
+            let mods = null;
+            try {
+                mods = await modClient.mods(this.display_name);
+            } catch(err) {
+                reject(err);
+                return;
+            }
 
             let finalMods = [];
 
