@@ -69,3 +69,16 @@ const parse = {
         },
     },
 };
+
+$(function() {
+    $(".time").each((i,x) => {
+        x = $(x);
+        if (x.attr("data-time")) {
+            let str = new Date(Number(x.attr("data-time"))).toLocaleString();
+            if (str !== "Invalid Date") {
+                x.text(str);
+                x.attr("title", "Local time");
+            }
+        }
+    });
+});

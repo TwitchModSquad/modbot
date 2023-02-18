@@ -7,7 +7,7 @@
 
     <link rel="stylesheet" href="/assets/css/database.css">
     <link rel="stylesheet" href="/assets/css/button.css">
-
+    <link rel="stylesheet" href="/assets/css/table.css">
 </head>
 <body>
     
@@ -88,6 +88,35 @@
                             <%- include("../../../partials/panel/user/twitch", {account: role.user, custom: domain + "user/{{id}}", title: role.role}) %>
                         <% }) %>
                     </div>
+                </section>
+            </div>
+        </div>
+
+        <div class="container container-md">
+            <div class="col-8">
+                <section>
+                    <h2><i class="fa-solid fa-users"></i> Active Communities</h2>
+
+                    <% if (info.communities.length > 0) { %>
+                    <div class="scroll-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Community</th>
+                                    <th>Messages</th>
+                                    <th>Last Active</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% info.communities.forEach(community => { %>
+                                    <%- include("../../../partials/panel/user/community", {community: community, hideChat: true}) %>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                    <% } else { %>
+                    <small>This user isn't active in any TMS communities!</small>
+                    <% } %>
                 </section>
             </div>
         </div>

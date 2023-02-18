@@ -1,6 +1,8 @@
 <tr>
     <td><img class="small-profile-picture" src="<%= community.user.profile_image_url %>" alt="<%= community.user.display_name %> profile picture"><%= community.user.display_name %></td>
     <td><%= comma(community.chatCount) %></td>
-    <td><%= new Date(community.lastActive).toLocaleString() %></td>
+    <td><span class="time" data-time="<%= community.lastActive %>"><%= new Date(community.lastActive).toLocaleString() %></span></td>
+    <% if (!locals?.hideChat) { %>
     <td><a href="/panel/chat-history?streamer=<%= community.user.id %>&chatter=<%= user.id %>">View Chat Log</a></td>
+    <% } %>
 </tr>
