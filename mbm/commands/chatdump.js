@@ -1,9 +1,9 @@
-const {MessageEmbed, MessageAttachment} = require("discord.js");
+const {EmbedBuilder, MessageAttachment} = require("discord.js");
 
 const con = require("../../database");
 
 const errorEmbed = message => {
-    return {content: ' ', embeds: [new MessageEmbed()
+    return {embeds: [new EmbedBuilder()
             .setTitle("Error:")
             .setDescription(message)
             .setColor(0xed3734)], ephemeral: true};
@@ -158,7 +158,7 @@ const command = {
             
             const attachment = new MessageAttachment(Buffer.from(str, 'utf-8'), "dump-" + Date.now() + ".txt", {description: "Stuff!", content_type: "text/plain"});
             
-            interaction.editReply({content: ' ', ephemeral: ephemeral, files: [attachment]});
+            interaction.editReply({ephemeral: ephemeral, files: [attachment]});
         });
     }
 };

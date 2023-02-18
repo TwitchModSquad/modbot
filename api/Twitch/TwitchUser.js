@@ -2,7 +2,7 @@ const con = require("../../database");
 
 require("../index");
 
-const {MessageEmbed} = require("discord.js");
+const {EmbedBuilder} = require("discord.js");
 
 const User = require("../User");
 const Identity = require("../Identity");
@@ -482,11 +482,11 @@ class TwitchUser extends User {
     /**
      * Generated a Discord Embed for the user.
      * 
-     * @returns {Promise<MessageEmbed>}
+     * @returns {Promise<EmbedBuilder>}
      */
     discordEmbed() {
         return new Promise(async (resolve, reject) => {
-            const embed = new MessageEmbed()
+            const embed = new EmbedBuilder()
                     .setAuthor({name: this.display_name, iconURL: this.profile_image_url, url: this.getShortlink()})
                     .setColor(0x772ce8)
                     .setThumbnail(this.profile_image_url)

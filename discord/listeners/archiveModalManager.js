@@ -1,4 +1,4 @@
-const { MessageEmbed, MessageActionRow, MessageButton } = require("discord.js");
+const { EmbedBuilder, MessageActionRow, ButtonBuilder } = require("discord.js");
 const api = require("../../api/index");
 const {cache} = require("../commands/archive");
 
@@ -67,7 +67,7 @@ const listener = {
                         }).then(thread => {
                             cache[user.identity.id].thread = thread;
                             thread.members.add(modal.member).then(() => {
-                                const overview = new MessageEmbed()
+                                const overview = new EmbedBuilder()
                                     .setTitle("Add Archive Entry Overview")
                                     .setDescription("Here's what we have so far!")
                                     .setColor(0x772ce8)
@@ -79,12 +79,12 @@ const listener = {
                                     if (unresolvable !== "")
                                         overview.addField("Unresolved Users", "```" + unresolvable + "```");
 
-                                const embed = new MessageEmbed()
+                                const embed = new EmbedBuilder()
                                     .setTitle("Add related links, images, or files!")
                                     .setDescription("Utilize Discord's upload file feature or type links to upload files to this archive submission.")
                                     .setColor(0xa970ff);
 
-                                const submit = new MessageButton()
+                                const submit = new ButtonBuilder()
                                     .setCustomId("submit-archive")
                                     .setLabel("Submit")
                                     .setStyle("SUCCESS");
@@ -92,12 +92,12 @@ const listener = {
                                 const row = new MessageActionRow()
                                     .addComponents(submit);
 
-                                thread.send({content: ' ', embeds: [overview, embed], components: [row]}).then(message => {
-                                    const continueEmbed = new MessageEmbed()
+                                thread.send({embeds: [overview, embed], components: [row]}).then(message => {
+                                    const continueEmbed = new EmbedBuilder()
                                         .setTitle("Add files, images, and URLs!")
                                         .setDescription("We've created a new thread to add documents!\n\nVisit it [here](" + message.url + ").")
                                         .setFooter({text: "Information message. This embed will expire in 20 seconds.", iconURL: "https://tms.to/assets/images/logos/logo.webp"});
-                                    modal.reply({content: ' ', embeds: [continueEmbed]}).then(() => {
+                                    modal.reply({embeds: [continueEmbed]}).then(() => {
                                         setTimeout(() => {
                                             try {
                                                 modal.deleteReply();

@@ -1,6 +1,6 @@
 const api = require("../api/");
 const con = require("../database");
-const {MessageEmbed} = require("discord.js");
+const {EmbedBuilder} = require("discord.js");
 const config = require("../config.json");
 
 module.exports = () => {
@@ -48,7 +48,7 @@ module.exports = () => {
                             await con.pquery("insert into twitch__username (id, display_name) values (?, ?) on duplicate key update display_name = ?;", [user.id, helixUser.displayName, helixUser.displayName]);
                             await con.pquery("update twitch__user set display_name = ? where id = ?;", [helixUser.displayName, user.id]);
 
-                            const embed = new MessageEmbed()
+                            const embed = new EmbedBuilder()
                                 .setTitle("Twitch Name Change")
                                 .setURL(user.getShortlink())
                                 .setDescription("The following name change was detected!")
@@ -114,7 +114,7 @@ module.exports = () => {
                     await con.pquery("insert into discord__username (id, name, discriminator) values (?, ?, ?) on duplicate key update name = ?, discriminator = ?;", [user.id, retrievedUser.username, retrievedUser.discriminator, retrievedUser.username, retrievedUser.discriminator]);
                     await con.pquery("update discord__user set name = ?, discriminator = ? where id = ?;", [retrievedUser.username, retrievedUser.discriminator, retrievedUser.id]);
 
-                    const embed = new MessageEmbed()
+                    const embed = new EmbedBuilder()
                         .setTitle("Discord Name Change")
                         .setURL(user.getShortlink())
                         .setDescription("The following name change was detected for " + retrievedUser.toString() + "!")

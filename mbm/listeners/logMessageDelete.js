@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js");
+const { EmbedBuilder } = require("discord.js");
 const {Discord} = require("../../api/index");
 const con = require("../../database");
 
@@ -59,7 +59,7 @@ const listener = {
     
                                     if (executor) author = executor;
     
-                                    const embed = new MessageEmbed()
+                                    const embed = new EmbedBuilder()
                                             .setTitle("Message Deleted")
                                             .addField("Channel", message.channel.toString(), true)
                                             .addField("Author", message.author.toString(), true)
@@ -73,7 +73,7 @@ const listener = {
                                     if (message?.content && message.content.trim() !== "") {
                                         embed.addField("Message Content", "```\n" + message.content.replace(/`/g, "/`") + "```", false);
                                     }
-                                    channel.send({content: ' ', embeds: [embed]});
+                                    channel.send({embeds: [embed]});
                                 }).catch(global.api.Logger.warning);
                             }
                         }).catch(global.api.Logger.warning);

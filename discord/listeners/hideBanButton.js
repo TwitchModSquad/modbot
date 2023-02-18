@@ -1,5 +1,4 @@
-const {Modal, TextInputComponent, showModal} = require("discord-modals");
-const Discord = require("discord.js");
+const { EmbedBuilder, ModalBuilder, TextInputBuilder } = require("discord.js");
 const api = require("../../api/");
 const config = require("../../config.json");
 const con = require("../../database");
@@ -12,7 +11,7 @@ const listener = {
         if (interaction.isButton() && !interaction.component?.customId) return;
 
         const handleError = (err, method = "reply") => {
-            interaction[method]({content: ' ', embeds: [new Discord.MessageEmbed().setTitle("Uh oh!").setDescription(err).setColor(0x9e392f)], ephemeral: true})
+            interaction[method]({embeds: [new EmbedBuilder().setTitle("Uh oh!").setDescription(err).setColor(0x9e392f)], ephemeral: true})
         }
 
         if (interaction.isButton() && interaction.component.customId === "hide-ban") {
@@ -87,11 +86,11 @@ const listener = {
 
                 if (title.length > 45) title = "Hide ban: " + chatter.display_name;
 
-                const modal = new Modal()
+                const modal = new ModalBuilder()
                     .setCustomId("hide-ban")
                     .setTitle(title)
                     .addComponents(
-                        new TextInputComponent()
+                        new TextInputBuilder()
                             .setCustomId("reason")
                             .setLabel("Hide Reason")
                             .setPlaceholder("Why is this ban being hidden?")
@@ -101,10 +100,7 @@ const listener = {
                             .setRequired(true)
                     );
         
-                showModal(modal, {
-                    client: global.client.discord,
-                    interaction: interaction,
-                });
+                interaction.showModal(modal);
             });
         }
     }

@@ -11,12 +11,12 @@ const listener = {
     eventType: 'on',
     async listener (modal) {
         const handleSuccess = message => {
-            modal.reply({content: ' ', embeds: [new Discord.MessageEmbed().setTitle(message).setColor(0x2dad3e)], ephemeral: true})
+            modal.reply({embeds: [new Discord.EmbedBuilder().setTitle(message).setColor(0x2dad3e)], ephemeral: true})
         }
 
         const handleError = (err, method = "reply") => {
             global.api.Logger.warning(err);
-            modal[method]({content: ' ', embeds: [new Discord.MessageEmbed().setTitle("Uh oh!").setDescription(""+err).setColor(0x9e392f)], ephemeral: true})
+            modal[method]({embeds: [new Discord.EmbedBuilder().setTitle("Uh oh!").setDescription(""+err).setColor(0x9e392f)], ephemeral: true})
         }
 
         let reason = modal.getTextInputValue("reason");
@@ -90,13 +90,13 @@ const listener = {
                 }
 
                 const banEmbed = await formatting.parseBanEmbed(streamer, chatter, null, timebanned);
-                const hiddenEmbed = new Discord.MessageEmbed()
+                const hiddenEmbed = new Discord.EmbedBuilder()
                     .setTitle("Hidden Ban Log")
                     .setDescription(`This record was hidden by ${modal.member} on \`${formatting.parseDate(Date.now())}\``)
                     .setColor(0xfa4b3e)
                     .addField("Hide Reason", "```" + reason + "```");
 
-                const reinstateButton = new Discord.MessageButton()
+                const reinstateButton = new Discord.ButtonBuilder()
                         .setCustomId("reinstate-ban")
                         .setLabel("Reinstate Ban")
                         .setStyle("PRIMARY");
@@ -108,7 +108,7 @@ const listener = {
                 modal.member.guild.channels.fetch(config.hiddenban_channel).then(hiddenBanChannel => {
                     // Hide ban
                     modal.message.delete().then(() => {
-                        hiddenBanChannel.send({content: ' ', embeds: [banEmbed, hiddenEmbed], components: [row]}).then(message => {
+                        hiddenBanChannel.send({embeds: [banEmbed, hiddenEmbed], components: [row]}).then(message => {
                             con.query("update twitch__ban set discord_message = ?, hide_reason = ? where discord_message = ?;", [message.id, reason, oldMessageId], err => {
                                 if (err) {
                                     handleError(err);

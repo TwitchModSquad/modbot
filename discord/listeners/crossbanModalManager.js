@@ -12,7 +12,7 @@ const listener = {
     async listener (modal) {
         const handleError = (err, method = "reply") => {
             global.api.Logger.warning(err);
-            modal[method]({content: ' ', embeds: [new Discord.MessageEmbed().setTitle("Uh oh!").setDescription(""+err).setColor(0x9e392f)], ephemeral: true})
+            modal[method]({embeds: [new Discord.EmbedBuilder().setTitle("Uh oh!").setDescription(""+err).setColor(0x9e392f)], ephemeral: true})
         }
 
 
@@ -90,7 +90,7 @@ const listener = {
                 }
             }
 
-            let embed = new Discord.MessageEmbed()
+            let embed = new Discord.EmbedBuilder()
                     .setTitle("Crossban Results")
                     .setDescription("Do not forget to dismiss the crossban messages!")
                     .setColor(0x4aab37);
@@ -102,7 +102,7 @@ const listener = {
                 embed.addField("Unsuccessful Bans", "```" + errors + "```", true);
             }
 
-            modal.editReply({content: ' ', embeds: [embed], ephemeral: true})
+            modal.editReply({embeds: [embed], ephemeral: true})
         }
     }
 };

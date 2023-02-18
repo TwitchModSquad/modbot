@@ -1,4 +1,4 @@
-const { MessageEmbed, MessageSelectMenu, MessageActionRow, MessageButton } = require("discord.js");
+const { EmbedBuilder, MessageSelectMenu, MessageActionRow, ButtonBuilder } = require("discord.js");
 const api = require("../../api/index");
 const con = require("../../database");
 
@@ -10,12 +10,12 @@ const listener = {
     eventType: 'on',
     async listener (modal) {
         const handleSuccess = message => {
-            modal.reply({content: ' ', embeds: [new MessageEmbed().setTitle(message).setColor(0x2dad3e)], ephemeral: true})
+            modal.reply({embeds: [new EmbedBuilder().setTitle(message).setColor(0x2dad3e)], ephemeral: true})
         }
 
         const handleError = (err) => {
             global.api.Logger.warning(err);
-            modal.reply({content: ' ', embeds: [new MessageEmbed().setTitle("Uh oh!").setDescription(err).setColor(0x9e392f)], ephemeral: true})
+            modal.reply({embeds: [new EmbedBuilder().setTitle("Uh oh!").setDescription(err).setColor(0x9e392f)], ephemeral: true})
         }
 
         if (modal.customId.startsWith("group-addpartic-")) {
@@ -88,7 +88,7 @@ const listener = {
                         global.client.listen.client.say(streamer.display_name.toLowerCase(), command).then(() => {
                             let isMod = global.client.listen.isMod(streamer);
     
-                            let embed = new MessageEmbed()
+                            let embed = new EmbedBuilder()
                                 .setTitle("Message Sent!")
                                 .setDescription(`Sent set command message to \`${streamer.display_name}\`!\nWe will automatically send update commands if participants are added or removed from this group.`);
     
@@ -132,7 +132,7 @@ const listener = {
                         modal: modal,
                     };
 
-                    const embed = new MessageEmbed()
+                    const embed = new EmbedBuilder()
                         .setTitle("Copy Event")
                         .setDescription("**Copying event** - " + group.game + " hosted by " + group.host.display_name + " *[old data]*")
                         .addFields([
@@ -185,12 +185,12 @@ const listener = {
                         }
                     ])
 
-                    const addParticipantsButton = new MessageButton()
+                    const addParticipantsButton = new ButtonBuilder()
                         .setCustomId("copy-participant-add")
                         .setLabel("Add Participant")
                         .setStyle("PRIMARY");
 
-                    const createButton = new MessageButton()
+                    const createButton = new ButtonBuilder()
                         .setCustomId("copy-create")
                         .setLabel("Create Group")
                         .setStyle("SUCCESS");
@@ -219,7 +219,7 @@ const listener = {
                     const removeParticipantsRow = new MessageActionRow()
                         .addComponents(removeParticipantsSelect);
 
-                    modal.reply({content: ' ', embeds: [embed], components: [row, removeParticipantsRow], ephemeral: true});
+                    modal.reply({embeds: [embed], components: [row, removeParticipantsRow], ephemeral: true});
                 } catch (err) {
                     handleError(err);
                 }

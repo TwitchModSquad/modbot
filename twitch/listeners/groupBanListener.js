@@ -27,7 +27,7 @@ const listener = {
                 try {
                     const embed = await formatting.parseBanEmbed(streamer, chatter, bpm, timebanned);
 
-                    const crossbanButton = new Discord.MessageButton()
+                    const crossbanButton = new Discord.ButtonBuilder()
                             .setCustomId("cb-" + chatter.id)
                             .setLabel("Crossban")
                             .setStyle("DANGER");

@@ -1,9 +1,9 @@
-const {MessageEmbed} = require("discord.js");
+const {EmbedBuilder} = require("discord.js");
 
 const settings = require("../settings.json");
 
 const errorEmbed = message => {
-    return {content: ' ', embeds: [new MessageEmbed()
+    return {embeds: [new EmbedBuilder()
             .setTitle("Error:")
             .setDescription(message)
             .setColor(0xed3734)], ephemeral: true};
@@ -25,7 +25,7 @@ choices = [
 ];
 
 const view = async (guild, interaction, settingChanged = null) => {
-    let embed = new MessageEmbed()
+    let embed = new EmbedBuilder()
             .setTitle("Current Settings")
             .setColor(0x555555);
 
@@ -43,7 +43,7 @@ const view = async (guild, interaction, settingChanged = null) => {
 
     embed.setDescription(description);
 
-    interaction.reply({content: ' ', embeds: [embed], ephemeral: true}).then(global.api.Logger.info, global.api.Logger.warning);
+    interaction.reply({embeds: [embed], ephemeral: true}).then(global.api.Logger.info, global.api.Logger.warning);
 }
 
 const command = {

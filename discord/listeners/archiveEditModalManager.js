@@ -1,4 +1,4 @@
-const {MessageEmbed} = require("discord.js");
+const {EmbedBuilder} = require("discord.js");
 const api = require("../../api/index");
 const {temporaryMessage} = require("../commands/archive");
 

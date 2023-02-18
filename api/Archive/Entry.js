@@ -1,4 +1,4 @@
-const {MessageEmbed, TextChannel, GuildMember, MessageButton, MessageActionRow, MessageSelectMenu, Message} = require("discord.js");
+const {EmbedBuilder, TextChannel, GuildMember, ButtonBuilder, MessageActionRow, MessageSelectMenu, Message} = require("discord.js");
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 const fs = require("fs");
 const mime = require("mime-types");
@@ -22,7 +22,7 @@ const EntryFile = require("./EntryFile");
 const FILE_ENDPOINT = config.api_domain + "file/";
 
 const createCrossbanButton = user => {
-    const crossbanButton = new MessageButton()
+    const crossbanButton = new ButtonBuilder()
             .setCustomId("cb-" + user.id)
             .setLabel("Crossban " + user.display_name)
             .setStyle("DANGER");
@@ -94,7 +94,7 @@ class Entry {
 
     /**
      * Generates a Discord Embed for this entry
-     * @returns {Promise<MessageEmbed>}
+     * @returns {Promise<EmbedBuilder>}
      */
     discordEmbed() {
         return new Promise(async (resolve, reject) => {
@@ -152,7 +152,7 @@ class Entry {
                 }
             }
             
-            const embed = new MessageEmbed()
+            const embed = new EmbedBuilder()
                 .setColor(0x772ce8)
                 .setTitle("Ban Entry")
                 .addField("Offense", "```" + this.offense + "```")
@@ -547,17 +547,17 @@ class Entry {
      * Command used to parse the edit message for this Entry. Allows easy edit to Entry edit messages.
      */
     async parseEditMessage() {
-        const editEmbed = new MessageEmbed()
+        const editEmbed = new EmbedBuilder()
             .setTitle("Edit this entry!")
             .setDescription("Utilize the buttons below to make edits to this entry.")
             .setColor(0xab5df5);
 
-        const editOffense = new MessageButton()
+        const editOffense = new ButtonBuilder()
             .setCustomId("edit-offense")
             .setLabel("Edit Offense")
             .setStyle("PRIMARY");
 
-        const editDescription = new MessageButton()
+        const editDescription = new ButtonBuilder()
             .setCustomId("edit-description")
             .setLabel("Edit Description")
             .setStyle("SECONDARY");
@@ -578,12 +578,12 @@ class Entry {
         const row2 = new MessageActionRow()
             .addComponents(removeUsers);
 
-        const addTwitchUser = new MessageButton()
+        const addTwitchUser = new ButtonBuilder()
             .setCustomId("add-twitch-user")
             .setLabel("Add Twitch User")
             .setStyle("PRIMARY");
 
-        const addDiscordUser = new MessageButton()
+        const addDiscordUser = new ButtonBuilder()
             .setCustomId("add-discord-user")
             .setLabel("Add Discord User")
             .setStyle("SECONDARY");
@@ -604,12 +604,12 @@ class Entry {
         const row4 = new MessageActionRow()
             .addComponents(removeFiles);
 
-        const addFile = new MessageButton()
+        const addFile = new ButtonBuilder()
             .setCustomId("add-file")
             .setLabel("Add File")
             .setStyle("SECONDARY");
 
-        const cancelButton = new MessageButton()
+        const cancelButton = new ButtonBuilder()
             .setCustomId("cancel-edit")
             .setLabel("Cancel")
             .setStyle("DANGER");
@@ -624,7 +624,7 @@ class Entry {
         components = [...components, row5];
         
 
-        return {content: ' ', embeds: [await this.discordEmbed(), editEmbed], components: components};
+        return {embeds: [await this.discordEmbed(), editEmbed], components: components};
     }
 
     /**
@@ -720,7 +720,7 @@ class Entry {
             con.query("delete from archive__messages where archive_id = ? and (reason = 'public-record' or reason = 'sort');", [this.id], async err => {
                 if (err) {global.api.Logger.warning(err);return;}
 
-                let msg = {content: ' ', embeds: [await this.discordEmbed()]};
+                let msg = {embeds: [await this.discordEmbed()]};
                 const row = await this.createCrossbanRow();
                 if (row.components.length > 0) 
                     msg.components = [row];
@@ -765,7 +765,7 @@ class Entry {
                                             from = " from #" + oldChannel.name;
                                         }
 
-                                        const embed = new MessageEmbed()
+                                        const embed = new EmbedBuilder()
                                             .setTitle("Archive entry was moved!")
                                             .setDescription(executorString + " moved archive entry `" + this.id + "`" + from + " to [#" + message.channel.name + "](" + message.url + ")")
                                             .setColor(0x772ce8)
@@ -779,13 +779,13 @@ class Entry {
                                         }
 
                                         const fallbackFunc = () => {
-                                            dmChannel.send({content: ' ', embeds: [embed]}).then(addMessage, global.api.Logger.warning);
+                                            dmChannel.send({embeds: [embed]}).then(addMessage, global.api.Logger.warning);
                                         }
 
                                         if (receiptMessage) {
                                             try {
                                                 receiptMessage = await dmChannel.messages.fetch(receiptMessage);
-                                                receiptMessage.reply({content: ' ', embeds: [embed]}).then(addMessage, fallbackFunc);
+                                                receiptMessage.reply({embeds: [embed]}).then(addMessage, fallbackFunc);
                                             } catch (e) {
                                                 fallbackFunc();
                                             }

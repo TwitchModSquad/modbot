@@ -1,6 +1,5 @@
-const { MessageEmbed, MessageSelectMenu, MessageActionRow, MessageButton } = require("discord.js");
-const {Modal, TextInputComponent, showModal} = require("discord-modals");
-const Discord = require("discord.js");
+const { EmbedBuilder, StringSelectMenuBuilder, ActionRowBuilder, ButtonBuilder } = require("discord.js");
+
 const con = require("../../database");
 const api = require("../../api/index");
 
@@ -62,7 +61,7 @@ const listener = {
     cache: {},
     copyCache: {},
     updateCopyMessage: cache => {
-        const embed = new MessageEmbed()
+        const embed = new EmbedBuilder()
             .setTitle("Copy Event")
             .setDescription("**Copying event** - " + cache.oldGroup.game + " hosted by " + cache.oldGroup.host.display_name + " *[old data]*")
             .addFields([
@@ -82,17 +81,17 @@ const listener = {
                 }
             ]);
 
-        const addParticipantsButton = new MessageButton()
+        const addParticipantsButton = new ButtonBuilder()
             .setCustomId("copy-participant-add")
             .setLabel("Add Participant")
             .setStyle("PRIMARY");
 
-        const createButton = new MessageButton()
+        const createButton = new ButtonBuilder()
             .setCustomId("copy-create")
             .setLabel("Create Group")
             .setStyle("SUCCESS");
 
-        const removeParticipantsSelect = new MessageSelectMenu()
+        const removeParticipantsSelect = new StringSelectMenuBuilder()
             .setCustomId("copy-participant-remove")
             .setPlaceholder("Remove Participants")
             .setMinValues(1)
@@ -126,22 +125,22 @@ const listener = {
             }
         ])
 
-        const row = new MessageActionRow()
+        const row = new ActionRowBuilder()
             .addComponents(addParticipantsButton, createButton);
 
-        const removeParticipantsRow = new MessageActionRow()
+        const removeParticipantsRow = new ActionRowBuilder()
             .addComponents(removeParticipantsSelect);
 
-        cache.modal.editReply({content: ' ', embeds: [embed], components: [row, removeParticipantsRow], ephemeral: true});
+        cache.modal.editReply({embeds: [embed], components: [row, removeParticipantsRow], ephemeral: true});
     },
     async listener (interaction) {
         const handleSuccess = message => {
-            interaction.reply({content: ' ', embeds: [new Discord.MessageEmbed().setTitle(message).setColor(0x2dad3e)], ephemeral: true})
+            interaction.reply({embeds: [new EmbedBuilder().setTitle(message).setColor(0x2dad3e)], ephemeral: true})
         }
 
         const handleError = (err, method = "reply", content = ' ') => {
             global.api.Logger.warning(err);
-            interaction[method]({content: content, embeds: [new Discord.MessageEmbed().setTitle("Uh oh!").setDescription(err).setColor(0x9e392f)], ephemeral: true})
+            interaction[method]({content: content, embeds: [new EmbedBuilder().setTitle("Uh oh!").setDescription(err).setColor(0x9e392f)], ephemeral: true})
         }
 
         if (interaction.isButton()) {
@@ -305,14 +304,14 @@ const listener = {
                                 if (user.identity?.id) {
                                     api.getFullIdentity(user.identity.id).then(identity => {
                                         identity.getActiveModeratorChannels().then(async streamers => {
-                                            const embed = new Discord.MessageEmbed()
+                                            const embed = new EmbedBuilder()
                                                 .setTitle("Generate Group Command")
                                                 .setDescription("Utilize any of the following methods to generate a group command for your streamer.")
                                                 .addFields([
                                                     {name: "General Group Command", value: await group.generateGroupString(), inline: false},
                                                     {name: "TMS-Hosted Command", value: "In order to manage TMS-hosted commands to allow for immediate change to TMS groups, utilize the Discord slash commands `/command enable` and `/command disable`.", inline: false}]);
                 
-                                            const selectMethod = new Discord.MessageSelectMenu()
+                                            const selectMethod = new StringSelectMenuBuilder()
                                                 .setCustomId("cmd-selmethod-" + group.id)
                                                 .setMinValues(1)
                                                 .setMaxValues(1)
@@ -335,7 +334,7 @@ const listener = {
                                                     },
                                                 ]);
                 
-                                            const selectStreamer = new Discord.MessageSelectMenu()
+                                            const selectStreamer = new StringSelectMenuBuilder()
                                                 .setCustomId("cmd-selstreamer-" + group.id)
                                                 .setPlaceholder("Select Streamer")
                                                 .setMinValues(1)
@@ -369,13 +368,13 @@ const listener = {
                                                 return;
                                             }
                                             
-                                            const row = new Discord.MessageActionRow()
+                                            const row = new ActionRowBuilder()
                                                 .addComponents(selectMethod);
 
-                                            const row2 = new Discord.MessageActionRow()
+                                            const row2 = new ActionRowBuilder()
                                                 .addComponents(selectStreamer);
                 
-                                            interaction.reply({content: ' ', embeds: [embed], components: [row, row2], ephemeral: true});
+                                            interaction.reply({embeds: [embed], components: [row, row2], ephemeral: true});
                                         }, handleError)
                                     }, err => {
                                         handleError("You are not properly linked to TMS!");
@@ -403,20 +402,20 @@ const listener = {
                             api.Discord.getUserById(interaction.user.id).then(user => {
                                 if (user.identity?.id) {
                                     if (group.created_by.id === user.identity.id) {
-                                        const embed = new Discord.MessageEmbed()
+                                        const embed = new EmbedBuilder()
                                             .setTitle("Confirm Recover")
                                             .setDescription("Recovering a group removes the end time and start time, allowing the group to be restarted.\nThis is not recommended unless the group was started by accident.\nIf you're trying to recreate the same or similar group, please copy this group instead.")
                                             .setColor(0x772ce8);
 
-                                        const recoverConfirm = new Discord.MessageButton()
+                                        const recoverConfirm = new ButtonBuilder()
                                             .setCustomId("recover-group-" + group.id)
                                             .setLabel("Confirm Recover")
                                             .setStyle("PRIMARY");
 
-                                        const row = new Discord.MessageActionRow()
+                                        const row = new ActionRowBuilder()
                                             .addComponents(recoverConfirm);
 
-                                        interaction.reply({content: ' ', embeds: [embed], components: [row], ephemeral: true});
+                                        interaction.reply({embeds: [embed], components: [row], ephemeral: true});
                                     } else {
                                         handleError("You must be the creator of this group in order to execute this function.");
                                     }
@@ -546,7 +545,7 @@ const listener = {
                                     hostIdentity = await api.getFullIdentity(cache.host.identity.id);
                                 }
 
-                                const embed = new MessageEmbed()
+                                const embed = new EmbedBuilder()
                                     .setTitle(cache.game + " hosted by " + cache.host.display_name)
                                     .setAuthor({iconURL: cache.host.profile_image_url, name: cache.host.display_name})
                                     .setColor(0x772ce8)
@@ -572,29 +571,29 @@ const listener = {
                                     }
                                 }
 
-                                const editButton = new MessageButton()
+                                const editButton = new ButtonBuilder()
                                     .setCustomId("edit-group")
                                     .setLabel("Edit")
                                     .setStyle("SECONDARY");
 
-                                const startButton = new MessageButton()
+                                const startButton = new ButtonBuilder()
                                     .setCustomId("start-group")
                                     .setLabel("Start Event")
                                     .setStyle("SUCCESS");
                                     
-                                const setGroupCommand = new MessageButton()
+                                const setGroupCommand = new ButtonBuilder()
                                     .setCustomId("set-command")
                                     .setLabel("Set Group Command")
                                     .setStyle("PRIMARY");
 
-                                const row = new MessageActionRow()
+                                const row = new ActionRowBuilder()
                                     .addComponents(editButton, startButton, setGroupCommand);
 
                                 embed.addFields([{name: "Participants", value: participantList, inline: false}]);
 
                                 delete listener.copyCache[interaction.user.id];
                                     
-                                interaction.reply({content: ' ', embeds: [embed], components: [row], fetchReply: true}).then(message => {
+                                interaction.reply({embeds: [embed], components: [row], fetchReply: true}).then(message => {
                                     const postWithId = id => {
                                         con.query("select * from `group` where id = ?;", [id], (err, res) => {
                                             if (err) {
@@ -603,7 +602,7 @@ const listener = {
                                                 if (res.length === 0) {
                                                     embed.setURL(config.pub_domain + "g/" + id);
                                                     embed.setFooter({text: "ID: " + id, iconURL: "https://tms.to/assets/images/logos/logo.webp"});
-                                                    message.edit({content: ' ', embeds: [embed], components: [row]}).then(() => {}, api.Logger.warning);
+                                                    message.edit({embeds: [embed], components: [row]}).then(() => {}, api.Logger.warning);
                                                     con.query("insert into `group` (id, message, created_by, game) values (?, ?, ?, ?);", [id, message.id, identity.id, cache.game], err => {
                                                         if (err) {
                                                             api.Logger.severe(err);

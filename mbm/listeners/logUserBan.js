@@ -1,4 +1,4 @@
-const {MessageEmbed} = require("discord.js");
+const {EmbedBuilder} = require("discord.js");
 const {Discord} = require("../../api/index");
 const config = require("../../config.json");
 
@@ -52,7 +52,7 @@ const listener = {
                         guild.getSetting("lde-channel", "channel").then(async channel => {
                             let author = ban.user;
     
-                            let embed = new MessageEmbed()
+                            let embed = new EmbedBuilder()
                                     .setTitle("User Banned")
                                     .setDescription(`User ${ban.user} was banned from the guild`)
                                     .setColor(0xb53131)
@@ -66,14 +66,14 @@ const listener = {
                                 embed.addField("Moderator", banInfo.executor.toString(), true);
                             }
     
-                            channel.send({content: ' ', embeds: [embed]});
+                            channel.send({embeds: [embed]});
                         }).catch(global.api.Logger.warning);
                     }
                 }).catch(global.api.Logger.warning);
             }).catch(global.api.Logger.warning);
 
             global.client.discord.channels.fetch(config.liveban_channel).then(banChannel => {
-                const embed = new MessageEmbed()
+                const embed = new EmbedBuilder()
                         .setTitle("Discord user was Banned!")
                         .setDescription(`User ${ban.user} was banned from the guild \`${ban.guild.name}\``)
                         .setURL(`https://tms.to/d/${ban.user.id}`)
@@ -84,7 +84,7 @@ const listener = {
 
                 if (banInfo?.executor) embed.addField("Moderator", banInfo.executor.toString(), true);
 
-                banChannel.send({content: ' ', embeds: [embed]});
+                banChannel.send({embeds: [embed]});
             });
         }).catch(global.api.Logger.warning);
     }

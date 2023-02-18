@@ -1,5 +1,6 @@
+const { ModalBuilder, TextInputBuilder } = require("discord.js");
+
 const {cache} = require("../commands/archive");
-const {Modal, TextInputComponent, showModal} = require("discord-modals");
 const api = require("../../api/index");
 
 const fs = require("fs");
@@ -11,11 +12,11 @@ const listener = {
     listener (interaction) {
         if (interaction.isButton()) {
             if (interaction.component.customId === "set-label") {
-                const modal = new Modal()
+                const modal = new ModalBuilder()
                     .setCustomId("set-label-" + interaction.message.id)
                     .setTitle("Set File Label")
                     .addComponents(
-                        new TextInputComponent()
+                        new TextInputBuilder()
                             .setCustomId("label")
                             .setLabel("Label")
                             .setStyle("SHORT")
@@ -23,11 +24,8 @@ const listener = {
                             .setMaxLength(64)
                             .setRequired(true)
                     );
-
-                showModal(modal, {
-                    client: global.client.discord,
-                    interaction: interaction,
-                });
+                
+                interaction.showModal(modal);
             } else if (interaction.component.customId === "remove-file") {
                 api.Discord.getUserById(interaction.member.id).then(user => {
                     let file = cache[user.identity.id].files.find(x => x.message.id === interaction.message.id);

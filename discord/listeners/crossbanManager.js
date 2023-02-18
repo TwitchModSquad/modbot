@@ -1,5 +1,4 @@
-const {Modal, TextInputComponent, SelectMenuComponent, showModal} = require("discord-modals");
-const Discord = require("discord.js");
+const { EmbedBuilder, StringSelectMenuBuilder, ActionRowBuilder, ModalBuilder, TextInputBuilder } = require("discord.js");
 const api = require("../../api/index");
 const config = require("../../config.json");
 const con = require("../../database");
@@ -24,12 +23,12 @@ const listener = {
     storedCrossBanUser: [],
     async listener (interaction) {
         const handleSuccess = message => {
-            interaction.reply({content: ' ', embeds: [new Discord.MessageEmbed().setTitle(message).setColor(0x2dad3e)], ephemeral: true})
+            interaction.reply({embeds: [new EmbedBuilder().setTitle(message).setColor(0x2dad3e)], ephemeral: true})
         }
 
         const handleError = (err, method = "reply") => {
             global.api.Logger.warning(err);
-            interaction[method]({content: ' ', embeds: [new Discord.MessageEmbed().setTitle("Uh oh!").setDescription(err).setColor(0x9e392f)], ephemeral: true})
+            interaction[method]({embeds: [new EmbedBuilder().setTitle("Uh oh!").setDescription(err).setColor(0x9e392f)], ephemeral: true})
         }
 
         if (interaction.isButton() && !interaction.component?.customId) return;
@@ -66,22 +65,22 @@ const listener = {
                         }
 
                         if (options.length > 0) {
-                            const selectMenu = new Discord.MessageSelectMenu()
+                            const selectMenu = new StringSelectMenuBuilder()
                                 .setCustomId("cbsel-" + twitchId)
                                 .addOptions(options)
                                 .setPlaceholder("Select streamer channels to carry out the crossban on.")
                                 .setMinValues(1)
                                 .setMaxValues(options.length);
 
-                            const row = new Discord.MessageActionRow()
+                            const row = new ActionRowBuilder()
                                     .addComponents(selectMenu);
 
-                            const embed = new Discord.MessageEmbed()
+                            const embed = new EmbedBuilder()
                                     .setTitle("Select the streamers you'd like to crossban for.")
                                     .setColor(0xe83b3b)
                                     .setDescription("This list is a list of users you mod for that have TwitchModSquad authenticated. It may take several hours for a channel to show up if it recently met these requirements.");
 
-                            interaction.reply({content: ' ', embeds: [embed], components: [row], ephemeral: true});
+                            interaction.reply({embeds: [embed], components: [row], ephemeral: true});
                         } else {
                             handleError("No streamers you mod for have TwitchModSquad added as a moderator.");
                         }
@@ -95,11 +94,11 @@ const listener = {
             listener.storedCrossBanChannels[interaction.member.id] = interaction.values;
 
             api.Twitch.getUserById(twitchId).then(async user => {
-                const modal = new Modal()
+                const modal = new ModalBuilder()
                 .setCustomId("cb-ban-" + user.id)
                 .setTitle("Ban User " + user.display_name)
                 .addComponents(
-                    new TextInputComponent()
+                    new TextInputBuilder()
                         .setCustomId("reason")
                         .setLabel("Ban Reason")
                         .setPlaceholder("This reason is sent to Twitch and is viewable by the user")
@@ -107,7 +106,7 @@ const listener = {
                         .setMinLength(3)
                         .setMaxLength(64)
                         .setRequired(false),
-                    new TextInputComponent()
+                    new TextInputBuilder()
                         .setCustomId("include-thumbprint")
                         .setLabel("Include Thumbprint (yes/no)")
                         .setDefaultValue("Yes")
@@ -117,10 +116,7 @@ const listener = {
                         .setRequired(false)
                 );
     
-                showModal(modal, {
-                    client: global.client.discord,
-                    interaction: interaction,
-                });
+                interaction.showModal(modal);
             }, err => {
                 handleError(err);
             });

@@ -1,7 +1,7 @@
 const con = require("../database");
 const config = require("../config.json");
 
-const {MessageEmbed} = require("discord.js");
+const {EmbedBuilder} = require("discord.js");
 
 const api = require("../api/index");
 
@@ -82,7 +82,7 @@ module.exports = () => {
                         con.query("insert into live (identity_id) values (?);", [identity.id], async err => {
                             if (err) global.api.Logger.warning(err);
 
-                            const embed = new MessageEmbed()
+                            const embed = new EmbedBuilder()
                                 .setAuthor({name: `🔴 ${user.display_name} is now live!`})
                                 .setTitle(stream.title)
                                 .setColor(0x7d3bdc)
@@ -93,7 +93,7 @@ module.exports = () => {
                                 .setTimestamp(stream.startDate)
                                 .setFooter({text: `${user.display_name} : Live 🔴`, iconURL: user.profile_image_url});
                 
-                            channel.send({content: ' ', embeds: [embed]});
+                            channel.send({embeds: [embed]});
 
                             con.query("select id from discord__guild where represents_id = ?;", [identity.id], (err, res) => {
                                 if (!err) {
@@ -132,14 +132,14 @@ module.exports = () => {
 
                     let user = identity.twitchAccounts[0];
 
-                    const embed = new MessageEmbed()
+                    const embed = new EmbedBuilder()
                         .setTitle(`${user.display_name} has gone offline!`)
                         .setColor(0x451b7f)
                         .setURL("https://twitch.tv/" + user.display_name.toLowerCase())
                         .setTimestamp(new Date())
                         .setFooter({text: `${user.display_name} : Offline`, iconURL: user.profile_image_url});
         
-                    channel.send({content: ' ', embeds: [embed]});
+                    channel.send({embeds: [embed]});
                 });
             });
         });

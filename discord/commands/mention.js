@@ -1,60 +1,61 @@
-const Discord = require("discord.js");
+const { EmbedBuilder, SlashCommandBuilder, SlashCommandStringOption, SlashCommandBooleanOption, ChatInputCommandInteraction } = require("discord.js");
 const api = require("../../api/index");
 
 const command = {
-    data: {
-        name: 'mention'
-        , description: 'Mention moderators of a specific channel or channel.'
-        , options: [
-            {
-                type: 5,
-                name: "mention-streamer",
-                description: "Whether the Streamer in question should be mentioned or not",
-                required: true,
-            },
-            {
-                type: 3,
-                name: "streamer1",
-                description: "Streamer's Twitch name to mention",
-                autocomplete: true,
-                required: true,
-            },
-            {
-                type: 3,
-                name: "streamer2",
-                description: "Streamer's Twitch name to mention",
-                autocomplete: true,
-            },
-            {
-                type: 3,
-                name: "streamer3",
-                description: "Streamer's Twitch name to mention",
-                autocomplete: true,
-            },
-            {
-                type: 3,
-                name: "streamer4",
-                description: "Streamer's Twitch name to mention",
-                autocomplete: true,
-            },
-            {
-                type: 3,
-                name: "streamer5",
-                description: "Streamer's Twitch name to mention",
-                autocomplete: true,
-            },
-        ]
-    },
+    data: new SlashCommandBuilder()
+        .setName("mention")
+        .setDescription("Mention moderators of a specific channel or channels")
+        .addBooleanOption(
+            new SlashCommandBooleanOption()
+                .setName("mention-streamer")
+                .setDescription("Whether the streamer in question should be mentioned or not")
+                .setRequired(true)
+        )
+        .addStringOption(
+            new SlashCommandStringOption()
+                .setName("streamer-1")
+                .setDescription("Streamer's twitch name to mention")
+                .setRequired(true)
+                .setAutocomplete(true)
+        )
+        .addStringOption(
+            new SlashCommandStringOption()
+                .setName("streamer-2")
+                .setDescription("Streamer's twitch name to mention")
+                .setAutocomplete(true)
+        )
+        .addStringOption(
+            new SlashCommandStringOption()
+                .setName("streamer-3")
+                .setDescription("Streamer's twitch name to mention")
+                .setAutocomplete(true)
+        )
+        .addStringOption(
+            new SlashCommandStringOption()
+                .setName("streamer-4")
+                .setDescription("Streamer's twitch name to mention")
+                .setAutocomplete(true)
+        )
+        .addStringOption(
+            new SlashCommandStringOption()
+                .setName("streamer-5")
+                .setDescription("Streamer's twitch name to mention")
+                .setAutocomplete(true)
+        ),
+    /**
+     * Execution function for this command
+     * @param {ChatInputCommandInteraction} interaction 
+     */
     async execute(interaction) {
         const handleError = err => {
-            interaction.reply({content: ' ', embeds: [new Discord.MessageEmbed().setTitle(err).setColor(0x9e392f)], ephemeral: true})
+            interaction.reply({embeds: [new EmbedBuilder().setTitle(err).setColor(0x9e392f)], ephemeral: true})
         }
 
-        const streamer1 = interaction.options.getString("streamer1");
-        const streamer2 = interaction.options.getString("streamer2");
-        const streamer3 = interaction.options.getString("streamer3");
-        const streamer4 = interaction.options.getString("streamer4");
-        const streamer5 = interaction.options.getString("streamer5");
+        const streamer1 = interaction.options.getString("streamer-1");
+        const streamer2 = interaction.options.getString("streamer-2");
+        const streamer3 = interaction.options.getString("streamer-3");
+        const streamer4 = interaction.options.getString("streamer-4");
+        const streamer5 = interaction.options.getString("streamer-5");
 
         const mentionStreamer = interaction.options.getBoolean("mention-streamer");
 
@@ -116,7 +117,7 @@ const command = {
             return;
         }
 
-        let embed = new Discord.MessageEmbed()
+        let embed = new EmbedBuilder()
                 .setTitle("Mention Users")
                 .setDescription(`The following ${mentionStreamer ? "streamers and their " : ""}moderators were mentioned.`)
                 .setColor(0xa970ff);

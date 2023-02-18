@@ -1,4 +1,4 @@
-const {MessageEmbed} = require("discord.js");
+const {EmbedBuilder} = require("discord.js");
 const {Discord} = require("../../api/index");
 const config = require("../../config.json");
 
@@ -42,7 +42,7 @@ const listener = {
                     if (enabled && unbanEnabled) {
                         guild.getSetting("lde-channel", "channel").then(async channel => {
                             let author = ban.user;
-                            channel.send({content: ' ', embeds: [new MessageEmbed()
+                            channel.send({embeds: [new EmbedBuilder()
                                     .setTitle("User Unbanned")
                                     .setDescription(`User ${ban.user} was unbanned from the guild`)
                                     .setColor(0x595959)
@@ -53,7 +53,7 @@ const listener = {
             }).catch(global.api.Logger.warning);
 
             global.client.discord.channels.fetch(config.liveban_channel).then(banChannel => {
-                const embed = new MessageEmbed()
+                const embed = new EmbedBuilder()
                         .setTitle("Discord User Unbanned!")
                         .setDescription(`User ${ban.user} was unbanned from the guild \`${ban.guild.name}\``)
                         .setURL(`https://tms.to/d/${ban.user.id}`)
@@ -64,7 +64,7 @@ const listener = {
 
                 if (unbanInfo?.executor) embed.addField("Moderator", unbanInfo.executor.toString(), true);
 
-                banChannel.send({content: ' ', embeds: [embed]});
+                banChannel.send({embeds: [embed]});
             });
         }).catch(global.api.Logger.warning);
     }

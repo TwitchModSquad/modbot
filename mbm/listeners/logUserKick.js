@@ -1,4 +1,4 @@
-const {MessageEmbed} = require("discord.js");
+const {EmbedBuilder} = require("discord.js");
 const {Discord} = require("../../api/index");
 
 const getKickInfo = member => {
@@ -54,7 +54,7 @@ const listener = {
 
                                 if (!((kickInfo && kickEnabled) || (!kickInfo && leaveEnabled))) return;
         
-                                let embed = new MessageEmbed()
+                                let embed = new EmbedBuilder()
                                         .setTitle("Member Left the Guild")
                                         .setDescription(`User ${member} ${kickInfo ? "was kicked from" : "has left"} the guild.`)
                                         .setColor(0xb53131)
@@ -68,7 +68,7 @@ const listener = {
                                     embed.addField("Moderator", kickInfo.executor.toString(), true);
                                 }
         
-                                channel.send({content: ' ', embeds: [embed]});
+                                channel.send({embeds: [embed]});
                             }).catch(global.api.Logger.warning);
                         }).catch(global.api.Logger.warning);
                     }).catch(global.api.Logger.warning);

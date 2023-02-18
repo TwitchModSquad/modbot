@@ -1,6 +1,6 @@
 const con = require("../database");
 
-const {MessageEmbed} = require("discord.js");
+const {EmbedBuilder} = require("discord.js");
 
 const Identity = require("./Identity");
 
@@ -95,7 +95,7 @@ class FullIdentity extends Identity {
     /**
      * Generated a Discord Embed for the user.
      * 
-     * @returns {Promise<MessageEmbed[]>}
+     * @returns {Promise<EmbedBuilder[]>}
      */
     discordEmbed() {
         return new Promise(async (resolve, reject) => {
@@ -103,7 +103,7 @@ class FullIdentity extends Identity {
 
             let embeds = [];
 
-            const identityEmbed = new MessageEmbed()
+            const identityEmbed = new EmbedBuilder()
                     .setAuthor({name: this.name, iconURL: this.avatar_url, url: this.getShortlink()})
                     .setDescription(this.name)
                     .setFooter({text: "TMS Identity #" + this.id, iconURL: "https://tms.to/assets/images/logos/logo.webp"})

@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js");
+const { EmbedBuilder } = require("discord.js");
 const {Discord} = require("../../api/index");
 const con = require("../../database");
 
@@ -36,7 +36,7 @@ const listener = {
                     guild.getSetting("lde-user-update-nickname", "boolean").then(updateUsernameEnabled => {
                         if (enabled && updateUsernameEnabled) {
                             guild.getSetting("lde-channel", "channel").then(async channel => {
-                                const embed = new MessageEmbed()
+                                const embed = new EmbedBuilder()
                                     .setTitle("Nickname Changed")
                                     .addField("User", newMember.toString(), true)
                                     .setColor(0x4c80d4)
@@ -47,7 +47,7 @@ const listener = {
                                 
                                 embed.addField("Old Nickname", "```\n" + (oldMember.nickname ? oldMember.nickname.replace(/\\`/g, "`").replace(/`/g, "\\`") : "[unset]") + "```", false)
                                 embed.addField("New Nickname", "```\n" + (newMember.nickname ? newMember.nickname.replace(/\\`/g, "`").replace(/`/g, "\\`") : "[unset]") + "```", false)
-                                channel.send({content: ' ', embeds: [embed]});
+                                channel.send({embeds: [embed]});
                             }).catch(global.api.Logger.warning);
                         }
                     }).catch(global.api.Logger.warning);

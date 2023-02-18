@@ -1,7 +1,7 @@
-const {MessageEmbed} = require("discord.js");
+const {EmbedBuilder} = require("discord.js");
 
 const errorEmbed = message => {
-    return {content: ' ', embeds: [new MessageEmbed()
+    return {embeds: [new EmbedBuilder()
             .setTitle("Error:")
             .setDescription(message)
             .setColor(0xed3734)], ephemeral: true};
@@ -92,7 +92,7 @@ const command = {
                         ];
                     }
 
-                    interaction.reply({content: ' ', embeds: embeds, ephemeral: true});
+                    interaction.reply({embeds: embeds, ephemeral: true});
                 } catch (err) {
                     global.api.Logger.warning(err);
                     interaction.reply(errorEmbed(err.toString()));

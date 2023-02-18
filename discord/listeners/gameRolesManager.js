@@ -13,11 +13,11 @@ const listener = {
             let buttonId = interaction.component.customId;
 
             const handleSuccess = message => {
-                interaction.reply({content: ' ', embeds: [new Discord.MessageEmbed().setTitle(message).setColor(0x2dad3e)], ephemeral: true})
+                interaction.reply({embeds: [new Discord.EmbedBuilder().setTitle(message).setColor(0x2dad3e)], ephemeral: true})
             }
 
             const handleError = err => {
-                interaction.reply({content: ' ', embeds: [new Discord.MessageEmbed().setTitle(err).setColor(0x9e392f)], ephemeral: true})
+                interaction.reply({embeds: [new Discord.EmbedBuilder().setTitle(err).setColor(0x9e392f)], ephemeral: true})
             }
 
             if (buttonId === "set-roles" || buttonId === "remove-roles" || buttonId === "add-roles") {
@@ -47,17 +47,17 @@ const listener = {
             storedGameLists[interaction.member.id] = interaction.values;
             
 
-            const addButton = new Discord.MessageButton()
+            const addButton = new Discord.ButtonBuilder()
                     .setCustomId("add-roles")
                     .setLabel("Add Roles")
                     .setStyle("SUCCESS");
 
-            const removeButton = new Discord.MessageButton()
+            const removeButton = new Discord.ButtonBuilder()
                     .setCustomId("remove-roles")
                     .setLabel("Remove Roles")
                     .setStyle("DANGER");
 
-            const setButton = new Discord.MessageButton()
+            const setButton = new Discord.ButtonBuilder()
                     .setCustomId("set-roles")
                     .setLabel("Set Roles")
                     .setStyle("PRIMARY");
@@ -65,7 +65,7 @@ const listener = {
             const row = new Discord.MessageActionRow()
                     .addComponents(addButton, removeButton, setButton);
 
-            interaction.reply({content: ' ', embeds: [new Discord.MessageEmbed().setTitle("Saved Game Choices!").setDescription(`You've selected ${interaction.values.length} game${interaction.values.length === 1 ? "" : "s"}. Use a button below to save.`).setColor(0x2dad3e)], components: [row], ephemeral: true});
+            interaction.reply({embeds: [new Discord.EmbedBuilder().setTitle("Saved Game Choices!").setDescription(`You've selected ${interaction.values.length} game${interaction.values.length === 1 ? "" : "s"}. Use a button below to save.`).setColor(0x2dad3e)], components: [row], ephemeral: true});
         }
     }
 };

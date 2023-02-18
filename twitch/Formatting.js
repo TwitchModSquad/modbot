@@ -1,7 +1,7 @@
 const con = require("../database");
 
 const TwitchUser = require("../api/Twitch/TwitchUser");
-const {MessageEmbed} = require("discord.js");
+const {EmbedBuilder} = require("discord.js");
 
 const refreshTokens = require("./RefreshTokens");
 const Discord = require("discord.js");
@@ -74,7 +74,7 @@ class Formatting {
      * @param {TwitchUser} chatter
      * @param {number} bpm
      * @param {number} timebanned 
-     * @returns {Promise<MessageEmbed>}
+     * @returns {Promise<EmbedBuilder>}
      */
     parseBanEmbed(streamer, chatter, bpm, timebanned) {
         return new Promise((resolve, reject) => {
@@ -83,7 +83,7 @@ class Formatting {
                 chatter.id
             ], async (err, res) => {
                 // Build the skeleton embed for the ban message 
-                const embed = new Discord.MessageEmbed()
+                const embed = new Discord.EmbedBuilder()
                         .setTitle(`User was Banned!`)
                         .setURL(chatter.getShortlink())
                         .setAuthor({name: streamer.display_name, iconURL: streamer.profile_image_url, url: "https://twitch.tv/" + streamer.display_name.toLowerCase()})

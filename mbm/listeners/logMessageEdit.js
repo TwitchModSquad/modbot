@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js");
+const { EmbedBuilder } = require("discord.js");
 const {Discord} = require("../../api/index");
 const con = require("../../database");
 
@@ -30,7 +30,7 @@ const listener = {
                     guild.getSetting("lde-message-edit", "boolean").then(messageEditEnabled => {
                         if (enabled && messageEditEnabled) {
                             guild.getSetting("lde-channel", "channel").then(channel => {
-                                channel.send({content: ' ', embeds: [new MessageEmbed()
+                                channel.send({embeds: [new EmbedBuilder()
                                         .setTitle("Message Edited")
                                         .addField("Channel", oldMessage.channel.toString(), true)
                                         .addField("Author", oldMessage.author.toString(), true)

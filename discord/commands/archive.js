@@ -1,5 +1,4 @@
-const {MessageEmbed, MessageSelectMenu, MessageActionRow} = require("discord.js");
-const {Modal, TextInputComponent, showModal} = require("discord-modals");
+const {EmbedBuilder, StringSelectMenuBuilder, ActionRowBuilder, ChatInputCommandInteraction, SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandStringOption, SlashCommandUserOption, ModalBuilder, TextInputBuilder} = require("discord.js");
 const api = require("../../api/index");
 const con = require("../../database");
 
@@ -17,13 +16,13 @@ const vd = () => {};
 const command = {
     cache: {},
     temporaryMessage (obj, method, message, timeout = 5000, description = null) {
-        const embed = new MessageEmbed()
+        const embed = new EmbedBuilder()
             .setTitle(message)
             .setFooter({text: `Information message. This message will expire in ${(timeout/1000)} second${timeout === 1000 ? "" : "s"}.`, iconURL: "https://tms.to/assets/images/logos/logo.webp"});
 
         if (description !== null) embed.setDescription(description);
 
-        obj[method]({content: ' ', embeds: [embed]}).then(messObj => {
+        obj[method]({embeds: [embed]}).then(messObj => {
             setTimeout(() => {
                 try {
                     if (method === "reply") {
@@ -35,205 +34,162 @@ const command = {
             }, timeout);
         }, global.api.Logger.warning);
     },
-    data: {
-        name: 'archive'
-        , description: 'Create or edit Archive submissions!'
-        , options: [
-            {
-                type: 1,
-                name: "search",
-                description: "Search for a user in the Archive database",
-                options: [
-                    {
-                        type: 3,
-                        name: "query",
-                        description: "Search query. Twitch ID/Name or Discord ID/Name",
-                        required: true,
-                    }
-                ],
-            },
-            {
-                type: 1,
-                name: "create",
-                description: "Create a new Archive submission",
-                options: [
-                    {
-                        type: 3,
-                        name: "twitch-name-1",
-                        description: "Add a Twitch username to this archive submission",
-                        required: false,
-                        autocomplete: true,
-                    },
-                    {
-                        type: 3,
-                        name: "twitch-name-2",
-                        description: "Add a Twitch username to this archive submission",
-                        required: false,
-                        autocomplete: true,
-                    },
-                    {
-                        type: 3,
-                        name: "twitch-name-3",
-                        description: "Add a Twitch username to this archive submission",
-                        required: false,
-                        autocomplete: true,
-                    },
-                    {
-                        type: 3,
-                        name: "twitch-name-4",
-                        description: "Add a Twitch username to this archive submission",
-                        required: false,
-                        autocomplete: true,
-                    },
-                    {
-                        type: 3,
-                        name: "twitch-name-5",
-                        description: "Add a Twitch username to this archive submission",
-                        required: false,
-                        autocomplete: true,
-                    },
-                    {
-                        type: 3,
-                        name: "discord-id-1",
-                        description: "Add a Discord ID to this archive submission",
-                        required: false,
-                    },
-                    {
-                        type: 3,
-                        name: "discord-id-2",
-                        description: "Add a Discord ID to this archive submission",
-                        required: false,
-                    },
-                    {
-                        type: 3,
-                        name: "discord-id-3",
-                        description: "Add a Discord ID to this archive submission",
-                        required: false,
-                    },
-                    {
-                        type: 3,
-                        name: "discord-id-4",
-                        description: "Add a Discord ID to this archive submission",
-                        required: false,
-                    },
-                    {
-                        type: 3,
-                        name: "discord-id-5",
-                        description: "Add a Discord ID to this archive submission",
-                        required: false,
-                    },
-                    {
-                        type: 4,
-                        name: "identity-id-1",
-                        description: "Add an Identity ID to this archive submission",
-                        required: false,
-                    },
-                    {
-                        type: 4,
-                        name: "identity-id-2",
-                        description: "Add an Identity ID to this archive submission",
-                        required: false,
-                    },
-                    {
-                        type: 4,
-                        name: "identity-id-3",
-                        description: "Add an Identity ID to this archive submission",
-                        required: false,
-                    },
-                    {
-                        type: 4,
-                        name: "identity-id-4",
-                        description: "Add an Identity ID to this archive submission",
-                        required: false,
-                    },
-                    {
-                        type: 4,
-                        name: "identity-id-5",
-                        description: "Add an Identity ID to this archive submission",
-                        required: false,
-                    },
-                ],
-            },
-            {
-                type: 1,
-                name: "refresh",
-                description: "Refresh an Archive submission",
-                options: [
-                    {
-                        type: 3,
-                        name: "id",
-                        description: "ID of the archive entry. 8 character string",
-                        required: true,
-                    }
-                ],
-            },
-            {
-                type: 1,
-                name: "edit",
-                description: "Edit an Archive submission",
-                options: [
-                    {
-                        type: 3,
-                        name: "id",
-                        description: "ID of the archive entry. 8 character string",
-                        required: true,
-                    }
-                ],
-            },
-            {
-                type: 1,
-                name: "delete",
-                description: "Delete an Archive submission. Must be your submission",
-                options: [
-                    {
-                        type: 3,
-                        name: "id",
-                        description: "ID of the archive entry. 8 character string",
-                        required: true,
-                    }
-                ],
-            },
-            {
-                type: 1,
-                name: "setowner",
-                description: "Sets the owner of an Archive submission. Administrator only",
-                options: [
-                    {
-                        type: 3,
-                        name: "id",
-                        description: "ID of the archive entry. 8 character string",
-                        required: true,
-                    },
-                    {
-                        type: 6,
-                        name: "owner",
-                        description: "The new owner for this Archive entry",
-                        required: true,
-                    },
-                ],
-            },
-            {
-                type: 1,
-                name: "move",
-                description: "Move an Archive submission. Administrator only",
-                options: [
-                    {
-                        type: 3,
-                        name: "id",
-                        description: "ID of the archive entry. 8 character string",
-                        required: true,
-                    },
-                    {
-                        type: 3,
-                        name: "channel",
-                        description: "Channel to move the archive entry to",
-                        required: true,
-                        choices: moveChoices,
-                    }
-                ],
-            },
-        ]
-    },
+    data: new SlashCommandBuilder()
+        .setName("archive")
+        .setDescription("Create or edit Archive submissions!")
+        .addSubcommand(
+            new SlashCommandSubcommandBuilder()
+                .setName("search")
+                .setDescription("Search for a user in the Archive database")
+                .addStringOption(
+                    new SlashCommandStringOption()
+                        .setName("query")
+                        .setDescription("Search query. Twitch ID/Name or Discord ID/Name")
+                        .setRequired(true)
+                )
+        )
+        .addSubcommand(
+            new SlashCommandSubcommandBuilder()
+                .setName("create")
+                .setDescription("Create a new Archive submission")
+                .addStringOption(
+                    new SlashCommandStringOption()
+                        .setName("twitch-name-1")
+                        .setDescription("Add a Twitch username to this archive submission")
+                        .setRequired(false)
+                        .setAutocomplete(true)
+                )
+                .addStringOption(
+                    new SlashCommandStringOption()
+                        .setName("twitch-name-2")
+                        .setDescription("Add a Twitch username to this archive submission")
+                        .setRequired(false)
+                        .setAutocomplete(true)
+                )
+                .addStringOption(
+                    new SlashCommandStringOption()
+                        .setName("twitch-name-3")
+                        .setDescription("Add a Twitch username to this archive submission")
+                        .setRequired(false)
+                        .setAutocomplete(true)
+                )
+                .addStringOption(
+                    new SlashCommandStringOption()
+                        .setName("twitch-name-4")
+                        .setDescription("Add a Twitch username to this archive submission")
+                        .setRequired(false)
+                        .setAutocomplete(true)
+                )
+                .addStringOption(
+                    new SlashCommandStringOption()
+                        .setName("twitch-name-5")
+                        .setDescription("Add a Twitch username to this archive submission")
+                        .setRequired(false)
+                        .setAutocomplete(true)
+                )
+                .addStringOption(
+                    new SlashCommandStringOption()
+                        .setName("discord-id-1")
+                        .setDescription("Add a Discord ID to this archive submission")
+                        .setRequired(false)
+                )
+                .addStringOption(
+                    new SlashCommandStringOption()
+                        .setName("discord-id-2")
+                        .setDescription("Add a Discord ID to this archive submission")
+                        .setRequired(false)
+                )
+                .addStringOption(
+                    new SlashCommandStringOption()
+                        .setName("discord-id-3")
+                        .setDescription("Add a Discord ID to this archive submission")
+                        .setRequired(false)
+                )
+                .addStringOption(
+                    new SlashCommandStringOption()
+                        .setName("discord-id-4")
+                        .setDescription("Add a Discord ID to this archive submission")
+                        .setRequired(false)
+                )
+                .addStringOption(
+                    new SlashCommandStringOption()
+                        .setName("discord-id-5")
+                        .setDescription("Add a Discord ID to this archive submission")
+                        .setRequired(false)
+                )
+        )
+        .addSubcommand(
+            new SlashCommandSubcommandBuilder()
+                .setName("refresh")
+                .setDescription("Refresh an Archive submission")
+                .addStringOption(
+                    new SlashCommandStringOption()
+                        .setName("id")
+                        .setDescription("ID of the archive entry. 8 character string")
+                        .setRequired(true)
+                )
+        )
+        .addSubcommand(
+            new SlashCommandSubcommandBuilder()
+                .setName("edit")
+                .setDescription("Edit an Archive submission")
+                .addStringOption(
+                    new SlashCommandStringOption()
+                        .setName("id")
+                        .setDescription("ID of the archive entry. 8 character string")
+                        .setRequired(true)
+                )
+        )
+        .addSubcommand(
+            new SlashCommandSubcommandBuilder()
+                .setName("delete")
+                .setDescription("Delete an Archive submission. Must be your submission")
+                .addStringOption(
+                    new SlashCommandStringOption()
+                        .setName("id")
+                        .setDescription("ID of the archive entry. 8 character string")
+                        .setRequired(true)
+                )
+        )
+        .addSubcommand(
+            new SlashCommandSubcommandBuilder()
+                .setName("setowner")
+                .setDescription("Sets the owner of an Archive submission. Administrator only")
+                .addStringOption(
+                    new SlashCommandStringOption()
+                        .setName("id")
+                        .setDescription("ID of the archive entry. 8 character string")
+                        .setRequired(true)
+                )
+                .addUserOption(
+                    new SlashCommandUserOption()
+                        .setName("owner")
+                        .setDescription("The new owner for this Archive entry")
+                        .setRequired(true)
+                )
+        )
+        .addSubcommand(
+            new SlashCommandSubcommandBuilder()
+                .setName("move")
+                .setDescription("Move an Archive submission. Administrator only")
+                .addStringOption(
+                    new SlashCommandStringOption()
+                        .setName("id")
+                        .setDescription("ID of the archive entry. 8 character string")
+                        .setRequired(true)
+                )
+                .addStringOption(
+                    new SlashCommandStringOption()
+                        .setName("channel")
+                        .setDescription("Channel to move the archive entry to")
+                        .setRequired(true)
+                        .setChoices(...moveChoices)
+                )
+        ),
+    /**
+     * Execution function for this command
+     * @param {ChatInputCommandInteraction} interaction 
+     */
     async execute(interaction) {
         let subcommand = interaction.options.getSubcommand();
 
@@ -262,11 +218,11 @@ const command = {
                         channel: interaction.channel,
                     };
 
-                    let modal = new Modal()
+                    let modal = new ModalBuilder()
                         .setCustomId("archive-create")
                         .setTitle("Create an Archive Entry")
                         .addComponents(
-                            new TextInputComponent()
+                            new TextInputBuilder()
                                 .setCustomId("offense")
                                 .setLabel("Offense")
                                 .setStyle("SHORT")
@@ -274,7 +230,7 @@ const command = {
                                 .setMaxLength(256)
                                 .setPlaceholder("Write something like 'Harrassment' or 'Unsolicted Pictures' (Note: Don't put links here!)")
                                 .setRequired(true),
-                            new TextInputComponent()
+                            new TextInputBuilder()
                                 .setCustomId("description")
                                 .setLabel("Description")
                                 .setStyle("LONG")
@@ -284,10 +240,7 @@ const command = {
                                 .setRequired(true)
                         );
 
-                    showModal(modal, {
-                        client: global.client.discord,
-                        interaction: interaction,
-                    })
+                    interaction.showModal(modal).catch(api.Logger.severe);
                 } else {
                     interaction.error("Your account isn't properly linked to TMS. Contact <@267380687345025025>");
                 }
@@ -517,7 +470,7 @@ const command = {
                 } catch (e) {}
             }
 
-            const embed = new MessageEmbed()
+            const embed = new EmbedBuilder()
                 .setTitle("Archive Search Results")
                 .setColor(0x36b55c);
 
@@ -541,7 +494,7 @@ const command = {
 
                 embeds = [
                     ...embeds,
-                    new MessageEmbed()
+                    new EmbedBuilder()
                         .setTitle("Archive Entries")
                         .setDescription(entryResults)
                         .setColor(0xff4d4d),
@@ -581,13 +534,13 @@ const command = {
                 embed.setDescription(`We found \`${twitchUsers.length}\` twitch and \`${discordUsers.length}\` discord users with similar names to \`${query}\`.\n**Archive Entries:** ${entries.length} • **Twitch Bans:** ${bans.length}`)
             }
 
-            const twitchUserSelect = new MessageSelectMenu()
+            const twitchUserSelect = new StringSelectMenuBuilder()
                     .setCustomId("archive-search-twitch")
                     .setPlaceholder("View Twitch Information")
                     .setMinValues(1)
                     .setMaxValues(1);
 
-            const discordUserSelect = new MessageSelectMenu()
+            const discordUserSelect = new StringSelectMenuBuilder()
                     .setCustomId("archive-search-discord")
                     .setPlaceholder("View Discord Information")
                     .setMinValues(1)
@@ -603,16 +556,16 @@ const command = {
 
             let rows = [];
 
-            const twitchUserRow = new MessageActionRow()
+            const twitchUserRow = new ActionRowBuilder()
                 .addComponents(twitchUserSelect);
 
-            const discordUserRow = new MessageActionRow()
+            const discordUserRow = new ActionRowBuilder()
                 .addComponents(discordUserSelect);
 
             if (twitchUsers.length > 0) rows = [...rows, twitchUserRow];
             if (discordUsers.length > 0) rows = [...rows, discordUserRow];
 
-            interaction.editReply({content: ' ', embeds: embeds, components: rows});
+            interaction.editReply({embeds: embeds, components: rows});
         }
     }
 };

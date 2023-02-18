@@ -13,12 +13,12 @@ const listener = {
         if (interaction.isButton() && !interaction.component?.customId) return;
 
         const handleSuccess = message => {
-            interaction.reply({content: ' ', embeds: [new Discord.MessageEmbed().setTitle(message).setColor(0x2dad3e)], ephemeral: true})
+            interaction.reply({embeds: [new Discord.EmbedBuilder().setTitle(message).setColor(0x2dad3e)], ephemeral: true})
         }
 
         const handleError = (err, method = "reply") => {
             global.api.Logger.warning(err);
-            interaction[method]({content: ' ', embeds: [new Discord.MessageEmbed().setTitle("Uh oh!").setDescription(""+err).setColor(0x9e392f)], ephemeral: true})
+            interaction[method]({embeds: [new Discord.EmbedBuilder().setTitle("Uh oh!").setDescription(""+err).setColor(0x9e392f)], ephemeral: true})
         }
 
         if (interaction.isButton() && interaction.component.customId === "reinstate-ban") {
@@ -55,12 +55,12 @@ const listener = {
 
                 const banEmbed = await formatting.parseBanEmbed(streamer, chatter, null, timebanned);
 
-                const crossbanButton = new Discord.MessageButton()
+                const crossbanButton = new Discord.ButtonBuilder()
                         .setCustomId("cb-" + chatter.id)
                         .setLabel("Crossban")
                         .setStyle("DANGER");
         
-                const hideButton = new Discord.MessageButton()
+                const hideButton = new Discord.ButtonBuilder()
                         .setCustomId("hide-ban")
                         .setLabel("Hide Ban")
                         .setStyle("SECONDARY");
@@ -73,7 +73,7 @@ const listener = {
                 interaction.member.guild.channels.fetch(config.liveban_channel).then(banChannel => {
                     // Hide ban
                     interaction.message.delete().then(() => {
-                        banChannel.send({content: ' ', embeds: [banEmbed], components: [row]}).then(message => {
+                        banChannel.send({embeds: [banEmbed], components: [row]}).then(message => {
                             con.query("update twitch__ban set discord_message = ?, hide_reason = null where discord_message = ?;", [message.id, oldMessageId], err => {
                                 if (err) {
                                     handleError(err);

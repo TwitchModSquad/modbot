@@ -15,7 +15,7 @@ const listener = {
                         await user.discordEmbed()
                     ];
                 }
-                interaction.reply({content: ' ', ephemeral: true, embeds: embeds});
+                interaction.reply({ephemeral: true, embeds: embeds});
             } else if (interaction.component.customId === "archive-search-discord") {
                 let embeds = [];
                 for (let i = 0; i < interaction.values.length; i++) {
@@ -25,7 +25,7 @@ const listener = {
                         await user.discordEmbed()
                     ];
                 }
-                interaction.reply({content: ' ', ephemeral: true, embeds: embeds});
+                interaction.reply({ephemeral: true, embeds: embeds});
             }
         }
     }

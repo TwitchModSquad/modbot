@@ -1,4 +1,4 @@
-const {MessageEmbed} = require("discord.js");
+const {EmbedBuilder} = require("discord.js");
 const api = require("../../api/index");
 
 const config = require("../../config.json");
@@ -8,7 +8,7 @@ const discordRegex = /(?<=-d:)\d+/gi;
 const twitchRegex = /(?<=-t:)\w+/gi;
 
 const notFoundEmbed = query => {
-    return new MessageEmbed()
+    return new EmbedBuilder()
             .setTitle("User not found!")
             .setDescription("User was not found with the following query: `"+query+"`")
             .setColor(0x772ce8);
@@ -49,10 +49,10 @@ const process = async (message, regex, type) => {
         }
 
         if (embeds.length > 0)
-            message.reply({content: ' ', embeds: embeds});
+            message.reply({embeds: embeds});
 
         if (errorEmbeds.length > 0)
-            message.member.send({content: ' ', embeds: errorEmbeds}).then(() => {}, err => {});
+            message.member.send({embeds: errorEmbeds}).then(() => {}, err => {});
     }
 }
 

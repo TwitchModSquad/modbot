@@ -1,5 +1,4 @@
-const {Modal, TextInputComponent, showModal} = require("discord-modals");
-const { MessageEmbed } = require("discord.js");
+const { EmbedBuilder, ModalBuilder, TextInputBuilder, ButtonInteraction } = require("discord.js");
 const api = require("../../api/index");
 const con = require("../../database");
 
@@ -7,6 +6,10 @@ const listener = {
     name: 'archiveEditManager',
     eventName: 'interactionCreate',
     eventType: 'on',
+    /**
+     * 
+     * @param {ButtonInteraction} interaction 
+     */
     listener (interaction) {
         if (interaction.isButton()) {
             let customId = interaction.component.customId;
@@ -31,11 +34,11 @@ const listener = {
                     if (res.length > 0) {
                         api.Archive.getEntryById(res[0].archive_id).then(entry => {
                             if (customId === "edit-offense") {
-                                const modal = new Modal()
+                                const modal = new ModalBuilder()
                                     .setCustomId("edit-offense-" + entry.id)
                                     .setTitle("Edit Offense for " + entry.id)
                                     .addComponents(
-                                        new TextInputComponent()
+                                        new TextInputBuilder()
                                             .setCustomId("offense")
                                             .setLabel("Offense")
                                             .setStyle("SHORT")
@@ -45,16 +48,13 @@ const listener = {
                                             .setRequired(true)
                                             .setDefaultValue(entry.offense));
             
-                                showModal(modal, {
-                                    client: global.client.discord,
-                                    interaction: interaction,
-                                });
+                                interaction.showModal(modal);
                             } else if (customId === "edit-description") {
-                                const modal = new Modal()
+                                const modal = new ModalBuilder()
                                     .setCustomId("edit-description-" + entry.id)
                                     .setTitle("Edit Description for " + entry.id)
                                     .addComponents(
-                                        new TextInputComponent()
+                                        new TextInputBuilder()
                                             .setCustomId("description")
                                             .setLabel("Description")
                                             .setStyle("LONG")
@@ -64,16 +64,13 @@ const listener = {
                                             .setRequired(true)
                                             .setDefaultValue(entry.description));
             
-                                showModal(modal, {
-                                    client: global.client.discord,
-                                    interaction: interaction,
-                                });
+                                interaction.showModal(modal);
                             } else if (customId === "add-twitch-user") {
-                                const modal = new Modal()
+                                const modal = new ModalBuilder()
                                     .setCustomId("add-twitch-user-" + entry.id)
                                     .setTitle("Add a Twitch user to " + entry.id)
                                     .addComponents(
-                                        new TextInputComponent()
+                                        new TextInputBuilder()
                                             .setCustomId("query")
                                             .setLabel("Twitch Username")
                                             .setStyle("SHORT")
@@ -82,16 +79,13 @@ const listener = {
                                             .setPlaceholder("Give a twitch username!")
                                             .setRequired(true));
             
-                                showModal(modal, {
-                                    client: global.client.discord,
-                                    interaction: interaction,
-                                });
+                                interaction.showModal(modal);
                             } else if (customId === "add-discord-user") {
-                                const modal = new Modal()
+                                const modal = new ModalBuilder()
                                     .setCustomId("add-discord-user-" + entry.id)
                                     .setTitle("Add a Twitch user to " + entry.id)
                                     .addComponents(
-                                        new TextInputComponent()
+                                        new TextInputBuilder()
                                             .setCustomId("query")
                                             .setLabel("Discord ID")
                                             .setStyle("SHORT")
@@ -100,23 +94,20 @@ const listener = {
                                             .setPlaceholder("Give a discord ID!")
                                             .setRequired(true));
             
-                                showModal(modal, {
-                                    client: global.client.discord,
-                                    interaction: interaction,
-                                });
+                                interaction.showModal(modal);
                             } else if (customId === "add-file") {
-                                const modal = new Modal()
+                                const modal = new ModalBuilder()
                                     .setCustomId("add-file-" + entry.id)
                                     .setTitle("Add a file to " + entry.id)
                                     .addComponents(
-                                        new TextInputComponent()
+                                        new TextInputBuilder()
                                             .setCustomId("label")
                                             .setLabel("Label")
                                             .setStyle("SHORT")
                                             .setMaxLength(64)
                                             .setPlaceholder("Give it a good name!")
                                             .setRequired(false),
-                                        new TextInputComponent()
+                                        new TextInputBuilder()
                                             .setCustomId("url")
                                             .setLabel("URL to data")
                                             .setStyle("SHORT")
@@ -125,10 +116,7 @@ const listener = {
                                             .setPlaceholder("A link to the file. If we can't retrieve a file from it, we'll just add it as a link.")
                                             .setRequired(true));
             
-                                showModal(modal, {
-                                    client: global.client.discord,
-                                    interaction: interaction,
-                                });
+                                interaction.showModal(modal);
                             }
                         }, err => {
                             global.api.Logger.warning(err);
@@ -162,9 +150,9 @@ const listener = {
                                         entry.removeFile(value, user.identity);
                                     });
                                 }
-                                const embed = new MessageEmbed()
+                                const embed = new EmbedBuilder()
                                     .setTitle("Edited successfully!");
-                                interaction.reply({content: ' ', embeds: [embed], ephemeral: true});
+                                interaction.reply({embeds: [embed], ephemeral: true});
                             }, err => {
                                 global.api.Logger.warning(err);
                                 interaction.reply("We couldn't resolve this message ID to an archive entry.");
