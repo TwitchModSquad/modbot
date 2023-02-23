@@ -1,4 +1,4 @@
-const {EmbedBuilder, codeBlock, cleanCodeBlockContent} = require("discord.js");
+const {EmbedBuilder, codeBlock, cleanCodeBlockContent, AuditLogEvent} = require("discord.js");
 const {Discord} = require("../../api/index");
 
 const getKickInfo = member => {
@@ -7,7 +7,7 @@ const getKickInfo = member => {
             // Fetch a couple audit logs than just one as new entries could've been added right after this event was emitted.
             const fetchedLogs = await member.guild.fetchAuditLogs({
                 limit: 6,
-                type: 'MEMBER_KICK'
+                type: AuditLogEvent.MemberKick
             }).catch(global.api.Logger.warning);
             
             const auditEntry = fetchedLogs.entries.find(a =>

@@ -1,4 +1,4 @@
-const {EmbedBuilder, codeBlock, cleanCodeBlockContent} = require("discord.js");
+const {EmbedBuilder, codeBlock, cleanCodeBlockContent, AuditLogEvent} = require("discord.js");
 const {Discord} = require("../../api/index");
 const config = require("../../config.json");
 
@@ -8,7 +8,7 @@ const getUnbanInfo = ban => {
             // Fetch a couple audit logs than just one as new entries could've been added right after this event was emitted.
             const fetchedLogs = await ban.guild.fetchAuditLogs({
                 limit: 6,
-                type: 'GUILD_BAN_REMOVE'
+                type: AuditLogEvent.MemberBanRemove
             }).catch(global.api.Logger.warning);
 
             fetchedLogs.entries.forEach(e => global.api.Logger.info(e.extra));

@@ -1,4 +1,4 @@
-const { EmbedBuilder, codeBlock } = require("discord.js");
+const { EmbedBuilder, codeBlock, AuditLogEvent } = require("discord.js");
 const {Discord} = require("../../api/index");
 const con = require("../../database");
 
@@ -8,7 +8,7 @@ const getExecutor = member => {
             // Fetch a couple audit logs than just one as new entries could've been added right after this event was emitted.
             const fetchedLogs = await member.guild.fetchAuditLogs({
                 limit: 6,
-                type: 'MEMBER_UPDATE'
+                type: AuditLogEvent.MemberUpdate
             }).catch(global.api.Logger.warning);
             
             const auditEntry = fetchedLogs.entries.find(a =>
