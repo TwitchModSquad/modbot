@@ -1,4 +1,4 @@
-const { ChatInputCommandInteraction, ActionRowBuilder, SlashCommandBuilder, SlashCommandStringOption, SlashCommandSubcommandBuilder, EmbedBuilder, ButtonStyle } = require("discord.js");
+const { ChatInputCommandInteraction, ActionRowBuilder, SlashCommandBuilder, SlashCommandStringOption, SlashCommandSubcommandBuilder, EmbedBuilder, ButtonStyle, ButtonBuilder } = require("discord.js");
 const api = require("../../api/index");
 const con = require("../../database");
 
