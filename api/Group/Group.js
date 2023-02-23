@@ -1,4 +1,4 @@
-const { MessageEmbed, MessageButton, MessageActionRow, MessageSelectMenu, ThreadChannel, Message } = require("discord.js");
+const { EmbedBuilder, ButtonBuilder, ActionRowBuilder, StringSelectMenuBuilder, ThreadChannel, Message, ButtonStyle } = require("discord.js");
 const FullIdentity = require("../FullIdentity");
 const TwitchUser = require("../Twitch/TwitchUser");
 
@@ -134,7 +134,7 @@ class Group extends Cachable {
 
     /**
      * Generates an embed of this Group
-     * @type {Promise<MessageEmbed>}
+     * @type {Promise<EmbedBuilder>}
      */
     generateEmbed() {
         return new Promise(async (resolve, reject) => {
@@ -144,7 +144,7 @@ class Group extends Cachable {
                     hostIdentity = await global.api.getFullIdentity(this.host.identity.id);
                 }
 
-                const embed = new MessageEmbed()
+                const embed = new EmbedBuilder()
                     .setTitle(this.game + " hosted by " + this.host.display_name)
                     .setURL(config.pub_domain + "g/" + this.id)
                     .setAuthor({iconURL: this.host.profile_image_url, name: this.host.display_name})
@@ -193,55 +193,55 @@ class Group extends Cachable {
     }
 
     /**
-     * Generates the MessageActionRow for this group
-     * @type {Promise<MessageActionRow>}
+     * Generates the ActionRowBuilder for this group
+     * @type {Promise<ActionRowBuilder>}
      */
     generateComponents() {
         return new Promise((resolve, reject) => {
 
-            const setGroupCommand = new MessageButton()
+            const setGroupCommand = new ButtonBuilder()
                 .setCustomId("set-command")
                 .setLabel("Set Group Command")
-                .setStyle("PRIMARY");
+                .setStyle(ButtonStyle.Primary);
 
-            const row = new MessageActionRow();
+            const row = new ActionRowBuilder();
 
             if (!this.endtime) {
-                const editButton = new MessageButton()
+                const editButton = new ButtonBuilder()
                     .setCustomId("edit-group")
                     .setLabel("Edit")
-                    .setStyle("SECONDARY");
+                    .setStyle(ButtonStyle.Secondary);
 
                 row.addComponents(editButton)
 
                 
                 if (this.active) {
-                    const stopButton = new MessageButton()
+                    const stopButton = new ButtonBuilder()
                         .setCustomId("stop-group")
                         .setLabel("Stop Event")
-                        .setStyle("DANGER");
+                        .setStyle(ButtonStyle.Danger);
 
                     row.addComponents(stopButton);
                 } else {
-                    const startButton = new MessageButton()
+                    const startButton = new ButtonBuilder()
                         .setCustomId("start-group")
                         .setLabel("Start Event")
-                        .setStyle("SUCCESS");
+                        .setStyle(ButtonStyle.Success);
 
                     row.addComponents(startButton);
                 }
 
                 row.addComponents(setGroupCommand);
             } else {
-                const recoverGroup = new MessageButton()
+                const recoverGroup = new ButtonBuilder()
                     .setCustomId("recover-group")
                     .setLabel("Recover Event")
-                    .setStyle("SECONDARY");
+                    .setStyle(ButtonStyle.Secondary);
 
-                const copyGroup = new MessageButton()
+                const copyGroup = new ButtonBuilder()
                     .setCustomId("copy-group")
                     .setLabel("Copy Event")
-                    .setStyle("PRIMARY");
+                    .setStyle(ButtonStyle.Primary);
                 
                 row.addComponents(recoverGroup, copyGroup);
             }
@@ -254,7 +254,7 @@ class Group extends Cachable {
      * Generates the edit message for this group
      * @param {boolean} showDelete 
      * @param {FullIdentity} executor 
-     * @returns {Promise<{content:string,embeds:MessageEmbed[],components:MessageActionRow[],ephemeral:boolean}>}
+     * @returns {Promise<{content:string,embeds:EmbedBuilder[],components:ActionRowBuilder[],ephemeral:boolean}>}
      */
     generateEditMessage(showDelete = false, executor = null) {
         return new Promise((resolve, reject) => {
@@ -263,33 +263,33 @@ class Group extends Cachable {
                 if (err) global.api.Logger.severe(err);
             });
 
-            const embed = new MessageEmbed()
+            const embed = new EmbedBuilder()
                 .setTitle("Edit Group")
                 .setColor(0x772ce8)
                 .setDescription(`\`${this.game}\` hosted by [${this.host.display_name}](https://twitch.tv/${this.host.display_name.toLowerCase()})`)
                 .setFooter({text: "ID: " + this.id, iconURL: "https://tms.to/assets/images/logos/logo.webp"});
 
-            const setStartTime = new MessageButton()
+            const setStartTime = new ButtonBuilder()
                 .setLabel("Set Start Time")
-                .setStyle("LINK")
+                .setStyle(ButtonStyle.Link)
                 .setURL(`${config.pub_domain}g/${token}/settime`);
 
-            const setGame = new MessageButton()
+            const setGame = new ButtonBuilder()
                 .setCustomId("group-setgame-" + this.id)
                 .setLabel("Set Game")
-                .setStyle("SECONDARY");
+                .setStyle(ButtonStyle.Secondary);
 
-            const addParticipant = new MessageButton()
+            const addParticipant = new ButtonBuilder()
                 .setCustomId("group-addpartic-" + this.id)
                 .setLabel("Add Participant")
-                .setStyle("PRIMARY");
+                .setStyle(ButtonStyle.Primary);
 
-            const deleteButton = new MessageButton()
+            const deleteButton = new ButtonBuilder()
                 .setCustomId("group-delete-" + this.id)
                 .setLabel("Delete")
-                .setStyle("DANGER");
+                .setStyle(ButtonStyle.Danger);
 
-            const removeParticipants = new MessageSelectMenu()
+            const removeParticipants = new StringSelectMenuBuilder()
                 .setCustomId("group-rempartic-" + this.id)
                 .setMinValues(1)
                 .setMaxValues(this.participants.length)
@@ -297,15 +297,15 @@ class Group extends Cachable {
 
             removeParticipants.addOptions(this.participants.map(x => {return {value: ""+x.id, label: x.display_name}}))
 
-            const buttonRow = new MessageActionRow()
+            const buttonRow = new ActionRowBuilder()
                 .addComponents(setStartTime, setGame, addParticipant);
 
             if (showDelete) buttonRow.addComponents(deleteButton);
 
-            const removeParticipantsRow = new MessageActionRow()
+            const removeParticipantsRow = new ActionRowBuilder()
                 .addComponents(removeParticipants);
 
-            resolve({content: ' ', embeds: [embed], components: [buttonRow, removeParticipantsRow], ephemeral: true});
+            resolve({embeds: [embed], components: [buttonRow, removeParticipantsRow], ephemeral: true});
         });
     }
 
@@ -356,7 +356,7 @@ class Group extends Cachable {
 
                 if (success === "" && unmodded === "" && unknown === "" && error === "") return;
 
-                let embed = new MessageEmbed()
+                let embed = new EmbedBuilder()
                     .setTitle("Updated Group Commands")
                     .setDescription("We updated group commands in the following channels!");
 
@@ -384,7 +384,7 @@ class Group extends Cachable {
         return new Promise((resolve, reject) => {
             global.client.discord.channels.fetch(config.groups_channel).then(channel => {
                 channel.messages.fetch(this.message).then(async message => {
-                    message.edit({content: ' ', embeds: [await this.generateEmbed()], components: [await this.generateComponents()]}).then(resolve, reject);
+                    message.edit({embeds: [await this.generateEmbed()], components: [await this.generateComponents()]}).then(resolve, reject);
                 }, reject);
             }, reject)
         });
@@ -432,10 +432,10 @@ class Group extends Cachable {
 
     /**
      * Returns the base update embed for Group updates
-     * @returns {MessageEmbed}
+     * @returns {EmbedBuilder}
      */
     getUpdate() {
-        return new MessageEmbed()
+        return new EmbedBuilder()
             .setTitle("Group Update")
             .setColor(0x4d8ef7)
             .setFooter({text: "ID: " + this.id, iconURL: "https://tms.to/assets/images/logos/logo.webp"});
@@ -443,7 +443,7 @@ class Group extends Cachable {
 
     /**
      * Sends the update embed into the thread channel
-     * @param {MessageEmbed} embed
+     * @param {EmbedBuilder} embed
      * @param {FullIdentity} executor 
      * @returns {Promise<Message>}
      */
@@ -451,7 +451,7 @@ class Group extends Cachable {
         return new Promise((resolve, reject) => {
             embed.setAuthor({name: executor.name, iconURL: executor.avatar_url});
             this.getThread().then(thread => {
-                thread.send({content: ' ', embeds: [embed]}).then(resolve, reject);
+                thread.send({embeds: [embed]}).then(resolve, reject);
             }, reject);
         });
     }

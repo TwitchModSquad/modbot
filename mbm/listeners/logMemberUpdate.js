@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js");
+const { EmbedBuilder, codeBlock, AuditLogEvent } = require("discord.js");
 const {Discord} = require("../../api/index");
 const con = require("../../database");
 
@@ -8,7 +8,7 @@ const getExecutor = member => {
             // Fetch a couple audit logs than just one as new entries could've been added right after this event was emitted.
             const fetchedLogs = await member.guild.fetchAuditLogs({
                 limit: 6,
-                type: 'MEMBER_UPDATE'
+                type: AuditLogEvent.MemberUpdate
             }).catch(global.api.Logger.warning);
             
             const auditEntry = fetchedLogs.entries.find(a =>
@@ -36,18 +36,33 @@ const listener = {
                     guild.getSetting("lde-user-update-nickname", "boolean").then(updateUsernameEnabled => {
                         if (enabled && updateUsernameEnabled) {
                             guild.getSetting("lde-channel", "channel").then(async channel => {
-                                const embed = new MessageEmbed()
+                                const embed = new EmbedBuilder()
                                     .setTitle("Nickname Changed")
-                                    .addField("User", newMember.toString(), true)
+                                    .addFields({
+                                        name: "User",
+                                        value: newMember.toString(),
+                                        inline: true,
+                                    })
                                     .setColor(0x4c80d4)
                                     .setAuthor({name: newMember.user.username, iconURL: newMember.avatarURL()});
 
                                 if (executor && executor.id !== newMember.id)
-                                    embed.addField("Moderator", executor.toString(), true);
+                                    embed.addFields({
+                                        name: "Moderator",
+                                        value: executor.toString(),
+                                        inline: true,
+                                    });
                                 
-                                embed.addField("Old Nickname", "```\n" + (oldMember.nickname ? oldMember.nickname.replace(/\\`/g, "`").replace(/`/g, "\\`") : "[unset]") + "```", false)
-                                embed.addField("New Nickname", "```\n" + (newMember.nickname ? newMember.nickname.replace(/\\`/g, "`").replace(/`/g, "\\`") : "[unset]") + "```", false)
-                                channel.send({content: ' ', embeds: [embed]});
+                                embed.addFields({
+                                    name: "Old Nickname",
+                                    value: codeBlock(oldMember.nickname ? oldMember.nickname.replace(/\\`/g, "`").replace(/`/g, "\\`") : "[unset]"),
+                                    inline: false,
+                                }, {
+                                    name: "New Nickname",
+                                    value: codeBlock(newMember.nickname ? newMember.nickname.replace(/\\`/g, "`").replace(/`/g, "\\`") : "[unset]"),
+                                    inline: false,
+                                });
+                                channel.send({embeds: [embed]});
                             }).catch(global.api.Logger.warning);
                         }
                     }).catch(global.api.Logger.warning);

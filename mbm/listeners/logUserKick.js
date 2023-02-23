@@ -1,4 +1,4 @@
-const {MessageEmbed} = require("discord.js");
+const {EmbedBuilder, codeBlock, cleanCodeBlockContent, AuditLogEvent} = require("discord.js");
 const {Discord} = require("../../api/index");
 
 const getKickInfo = member => {
@@ -7,7 +7,7 @@ const getKickInfo = member => {
             // Fetch a couple audit logs than just one as new entries could've been added right after this event was emitted.
             const fetchedLogs = await member.guild.fetchAuditLogs({
                 limit: 6,
-                type: 'MEMBER_KICK'
+                type: AuditLogEvent.MemberKick
             }).catch(global.api.Logger.warning);
             
             const auditEntry = fetchedLogs.entries.find(a =>
@@ -54,21 +54,29 @@ const listener = {
 
                                 if (!((kickInfo && kickEnabled) || (!kickInfo && leaveEnabled))) return;
         
-                                let embed = new MessageEmbed()
+                                let embed = new EmbedBuilder()
                                         .setTitle("Member Left the Guild")
                                         .setDescription(`User ${member} ${kickInfo ? "was kicked from" : "has left"} the guild.`)
                                         .setColor(0xb53131)
                                         .setAuthor({name: author.username, iconURL: author.avatarURL()});
         
                                 if (kickInfo?.reason) {
-                                    embed.addField("Reason", "```" + kickInfo.reason.toString().replace(/\\`/g, "`").replace(/`/g, "\\`") + "```", true);
+                                    embed.addFields({
+                                        name: "Reason",
+                                        value: codeBlock(cleanCodeBlockContent(kickInfo.reason.toString())),
+                                        inline: true,
+                                    });
                                 }
         
                                 if (kickInfo?.executor) {
-                                    embed.addField("Moderator", kickInfo.executor.toString(), true);
+                                    embed.addFields({
+                                        name: "Moderator",
+                                        value: kickInfo.executor.toString(),
+                                        inline: true,
+                                    });
                                 }
         
-                                channel.send({content: ' ', embeds: [embed]});
+                                channel.send({embeds: [embed]});
                             }).catch(global.api.Logger.warning);
                         }).catch(global.api.Logger.warning);
                     }).catch(global.api.Logger.warning);

@@ -2,7 +2,7 @@ const con = require("../../database");
 
 require("../index");
 
-const {MessageEmbed} = require("discord.js");
+const {EmbedBuilder, codeBlock} = require("discord.js");
 
 const User = require("../User");
 const Identity = require("../Identity");
@@ -482,11 +482,11 @@ class TwitchUser extends User {
     /**
      * Generated a Discord Embed for the user.
      * 
-     * @returns {Promise<MessageEmbed>}
+     * @returns {Promise<EmbedBuilder>}
      */
     discordEmbed() {
         return new Promise(async (resolve, reject) => {
-            const embed = new MessageEmbed()
+            const embed = new EmbedBuilder()
                     .setAuthor({name: this.display_name, iconURL: this.profile_image_url, url: this.getShortlink()})
                     .setColor(0x772ce8)
                     .setThumbnail(this.profile_image_url)
@@ -494,7 +494,11 @@ class TwitchUser extends User {
                     .setFooter({text: "TMS Twitch User #" + this.id, iconURL: "https://tms.to/assets/images/logos/logo.webp"});
 
             if (this.description && this.description !== "")
-                embed.addField("Description", "```\n" + this.description + "```", false);
+                embed.addFields({
+                    name: "Description",
+                    value: codeBlock(this.description),
+                    inline: false,
+                });
 
             const streamers = await this.getStreamers();
             const mods = await this.getMods();
@@ -509,7 +513,12 @@ class TwitchUser extends User {
                 });
 
                 if (streamerStr.length <= 1024) {
-                    embed.addField("Streamers", streamerStr, true);
+                    embed.addFields({
+                        name: "Streamers",
+                        value: streamerStr,
+                        inline: true,
+                    });
+                
                 } else global.api.Logger.warning("Exceeded character count for streamers");
             }
 
@@ -521,7 +530,11 @@ class TwitchUser extends User {
                 });
 
                 if (modsStr.length <= 1024) {
-                    embed.addField("Moderators", modsStr, true);
+                    embed.addFields({
+                        name: "Moderators",
+                        value: modsStr,
+                        inline: true,
+                    });
                 } else global.api.Logger.warning("Exceeded character count for mods");
             }
 
@@ -538,7 +551,11 @@ class TwitchUser extends User {
                 let communitiesStr = global.api.stringTable(rows, 3, 5);
 
                 if (communitiesStr.length <= 1024) {
-                    embed.addField("Active Communities", "```\n" + communitiesStr + "```", false);
+                    embed.addFields({
+                        name: "Active Communities",
+                        value: codeBlock(communitiesStr),
+                        inline: false,
+                    });
                 } else global.api.Logger.warning("Exceeded character count for active communities");
             }
 
@@ -558,7 +575,11 @@ class TwitchUser extends User {
                 });
 
                 if (result.length <= 1024) {
-                    embed.addField("Bans", result, true);
+                    embed.addFields({
+                        name: "Bans",
+                        value: result,
+                        inline: true,
+                    });
                 } else global.api.Logger.warning("Exceeded character count for bans");
             }
 

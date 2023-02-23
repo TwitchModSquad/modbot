@@ -1,4 +1,4 @@
-const {MessageEmbed} = require("discord.js");
+const {EmbedBuilder} = require("discord.js");
 const resources = require("./resources.json");
 
 const command = {
@@ -8,7 +8,7 @@ const command = {
     },
     global: true,
     execute(interaction) {
-        let embed = new MessageEmbed()
+        let embed = new EmbedBuilder()
             .setTitle("National Hotlines")
             .setURL("https://victimconnect.org/resources/national-hotlines/")
             .setColor(0x2170d1);
@@ -19,10 +19,14 @@ const command = {
                 if (links !== "") links += "\n";
                 links += `[${link.name}](${link.url}) - ${link.hotline}`;
             });
-            embed.addField(resourceGroup.name, links, false);
+            embed.addFields({
+                name: resourceGroup.name,
+                value: links,
+                inline: false,
+            })
         });
 
-        interaction.reply({content: ' ', embeds: [embed], ephemeral: true})
+        interaction.reply({embeds: [embed], ephemeral: true})
     }
 };
 

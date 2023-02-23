@@ -1,9 +1,9 @@
-const {MessageEmbed} = require("discord.js");
+const {EmbedBuilder} = require("discord.js");
 const FullIdentity = require("../../api/FullIdentity");
 const DiscordGuild = require("../../api/Discord/DiscordGuild");
 
 const errorEmbed = message => {
-    return {content: ' ', embeds: [new MessageEmbed()
+    return {embeds: [new EmbedBuilder()
             .setTitle("Error:")
             .setDescription(message)
             .setColor(0xed3734)], ephemeral: true};

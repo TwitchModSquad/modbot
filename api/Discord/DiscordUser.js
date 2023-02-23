@@ -4,7 +4,7 @@ const User = require("../User");
 const Identity = require("../Identity");
 const DiscordGuild = require("./DiscordGuild");
 
-const {MessageEmbed} = require("discord.js");
+const {EmbedBuilder, codeBlock} = require("discord.js");
 
 const DISCORD_CDN = "https://cdn.discordapp.com/";
 
@@ -116,11 +116,11 @@ class DiscordUser extends User {
     /**
      * Generated a Discord Embed for the user.
      * 
-     * @returns {Promise<MessageEmbed>}
+     * @returns {Promise<EmbedBuilder>}
      */
     discordEmbed() {
         return new Promise(async (resolve, reject) => {
-            const embed = new MessageEmbed()
+            const embed = new EmbedBuilder()
                     .setAuthor({name: this.name + "#" + this.discriminator, iconURL: this.avatar_url, url: this.getShortlink()})
                     .setThumbnail(this.avatar_url)
                     .setColor(0x772ce8)
@@ -135,7 +135,12 @@ class DiscordUser extends User {
                     if (guilds !== "") guild += "\n";
                     guilds += guild.name;
                 });
-                embed.addField("Guilds", "```"+guilds+"```");
+                embed.addFields(
+                    {
+                        name: "Guilds",
+                        value: codeBlock(guilds),
+                    }
+                );
             }
 
             resolve(embed);

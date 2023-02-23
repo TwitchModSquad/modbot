@@ -1,8 +1,5 @@
-const { MessageEmbed, MessageButton, MessageActionRow } = require("discord.js");
+const { ChatInputCommandInteraction, SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandStringOption } = require("discord.js");
 const api = require("../../api/index");
-const con = require("../../database");
-
-const config = require("../../config.json");
 
 let commands = [];
 
@@ -19,60 +16,58 @@ for (const name in twitchCommands) {
 }
 
 const command = {
-    data: {
-        name: 'command'
-        , description: 'Manage TMS-hosted commands in streamer chats'
-        , options: [
-            {
-                type: 1,
-                name: "enable",
-                description: "Enable a TMS-hosted command in a streamer's channel",
-                options: [
-                    {
-                        type: 3,
-                        name: "streamer",
-                        description: "Streamer to enable the command in",
-                        required: true,
-                        autocomplete: true,
-                    },
-                    {
-                        type: 3,
-                        name: "command",
-                        description: "The command to enable",
-                        required: true,
-                        choices: commands,
-                    },
-                    {
-                        type: 3,
-                        name: "label",
-                        description: "The command label to use for this streamer, WITH a prefix. Ex: '!group'",
-                        required: true,
-                    },
-                ],
-            },
-            {
-                type: 1,
-                name: "disable",
-                description: "Disable a TMS-hosted command in a streamer's channel",
-                options: [
-                    {
-                        type: 3,
-                        name: "streamer",
-                        description: "Streamer to disable the command in",
-                        required: true,
-                        autocomplete: true,
-                    },
-                    {
-                        type: 3,
-                        name: "label",
-                        description: "The command label to disable",
-                        required: true,
-                        autocomplete: true,
-                    },
-                ],
-            },
-        ]
-    },
+    data: new SlashCommandBuilder()
+        .setName("command")
+        .setDescription("Manage TMS-hosted commands in streamer chats")
+        .addSubcommand(
+            new SlashCommandSubcommandBuilder()
+                .setName("enable")
+                .setDescription("Enable a TMS-hosted command in a streamer's channel")
+                .addStringOption(
+                    new SlashCommandStringOption()
+                        .setName("streamer")
+                        .setDescription("Streamer to enable the command in")
+                        .setRequired(true)
+                        .setAutocomplete(true)
+                )
+                .addStringOption(
+                    new SlashCommandStringOption()
+                        .setName("command")
+                        .setDescription("The command to enable")
+                        .setRequired(true)
+                        .setChoices(...commands)
+                )
+                .addStringOption(
+                    new SlashCommandStringOption()
+                        .setName("label")
+                        .setDescription("The command label to use for this streamer, WITH a prefix. Ex: '!group'")
+                        .setRequired(true)
+                        .setAutocomplete(true)
+                )
+        )
+        .addSubcommand(
+            new SlashCommandSubcommandBuilder()
+                .setName("disable")
+                .setDescription("Disable a TMS-hosted command in a streamer's channel")
+                .addStringOption(
+                    new SlashCommandStringOption()
+                        .setName("streamer")
+                        .setDescription("Streamer to disable the command in")
+                        .setRequired(true)
+                        .setAutocomplete(true)
+                )
+                .addStringOption(
+                    new SlashCommandStringOption()
+                        .setName("command")
+                        .setDescription("The command to disable")
+                        .setRequired(true)
+                        .setAutocomplete(true)
+                )
+        ),
+    /**
+     * Execution function for this command
+     * @param {ChatInputCommandInteraction} interaction 
+     */
     async execute(interaction) {
         let subcommand = interaction.options.getSubcommand(true);
 

@@ -6,7 +6,7 @@ const fs = require("fs");
 const path = require('path');
 
 const mime = require("mime-types");
-const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js');
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, Message } = require('discord.js');
 
 const DIRECTORY = "./files/";
 const TEMP_DIRECTORY = DIRECTORY + "temp/";
@@ -37,23 +37,23 @@ fs.readdir(TEMP_DIRECTORY, (err, files) => {
 const parseFileMessage = fileData => {
     const isFile = fileData.type === "file";
 
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
         .setTitle(isFile ? "File was downloaded!" : "Link was added!");
 
     if (isFile) embed.setDescription("```\nLabel: " + (fileData.label ? fileData.label : (fileData.name ? fileData.name : fileData.remote_path)) + "\nFile name/Remote Path: " + fileData.remote_path + "\nContent Type: " + fileData.content_type + "```");
     if (!isFile) embed.setDescription("```\nLabel: " + (fileData.label ? fileData.label : (fileData.name ? fileData.name : fileData.remote_path)) + "\nURL: " + fileData.remote_path +  "```");
 
-    const setLabelButton = new MessageButton()
+    const setLabelButton = new ButtonBuilder()
         .setCustomId("set-label")
-        .setStyle("PRIMARY")
+        .setStyle(ButtonStyle.Primary)
         .setLabel("Set Label");
 
-    const removeButton = new MessageButton()
+    const removeButton = new ButtonBuilder()
         .setCustomId("remove-file")
-        .setStyle("DANGER")
+        .setStyle(ButtonStyle.Danger)
         .setLabel("Remove " + (isFile ? "File" : "Link"));
 
-    const row = new MessageActionRow()
+    const row = new ActionRowBuilder()
         .addComponents(setLabelButton, removeButton);
     
     return {content: " ", embeds: [embed], components: [row]};
@@ -98,6 +98,10 @@ const listener = {
     DELETED_DIRECTORY: DELETED_DIRECTORY,
     DOWNLOADABLE_TYPES: DOWNLOADABLE_TYPES,
     parseFileMessage: parseFileMessage,
+    /**
+     * Listener for this event
+     * @param {Message} message 
+     */
     listener (message) {
         if (message.channel.isThread()) {
             api.Discord.getUserById(message.author.id).then(async user => {
@@ -127,9 +131,9 @@ const listener = {
                             } else {
                                 addFile(user.identity.id, {
                                     type: "link",
-                                    name: message.content,
+                                    name: url.toString(),
                                     content_type: type,
-                                    remote_path: message.content,
+                                    remote_path: url.toString(),
                                 });
                             }
                         } catch (err) {

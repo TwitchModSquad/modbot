@@ -1,31 +1,50 @@
-const {Modal, TextInputComponent, showModal} = require("discord-modals");
 const Discord = require("discord.js");
-const api = require("../../api/");
-const config = require("../../config.json");
-const con = require("../../database");
+const api = require("../../../api/index");
+const formatting = require("../../../twitch/Formatting");
+
+const config = require("../../../config.json");
+const con = require("../../../database");
+const { codeBlock, ButtonStyle } = require("discord.js");
 
 const listener = {
-    name: 'hideBanButton',
-    eventName: 'interactionCreate',
-    eventType: 'on',
+    name: 'hideBanModal',
+    /**
+     * Verifies a button press should be sent to this listener
+     * @param {ModalSubmitInteraction} interaction 
+     */
+    verify(interaction) {
+        return interaction.customId === "hide-ban";
+    },
+    /**
+     * Listener for a button press
+     * @param {ModalSubmitInteraction} interaction 
+     */
     async listener (interaction) {
-        if (interaction.isButton() && !interaction.component?.customId) return;
-
-        const handleError = (err, method = "reply") => {
-            interaction[method]({content: ' ', embeds: [new Discord.MessageEmbed().setTitle("Uh oh!").setDescription(err).setColor(0x9e392f)], ephemeral: true})
+        const handleSuccess = message => {
+            interaction.reply({embeds: [new Discord.EmbedBuilder().setTitle(message).setColor(0x2dad3e)], ephemeral: true})
         }
 
-        if (interaction.isButton() && interaction.component.customId === "hide-ban") {
+        const handleError = (err, method = "reply") => {
+            global.api.Logger.warning(err);
+            interaction[method]({embeds: [new Discord.EmbedBuilder().setTitle("Uh oh!").setDescription(""+err).setColor(0x9e392f)], ephemeral: true})
+        }
 
-            con.query("select streamer_id, user_id from twitch__ban where discord_message = ?;", [interaction.message.id], async (err, res) => {
+        let reason = interaction.fields.getTextInputValue("reason");
+
+        if (reason === null) reason = "";
+       
+        if (interaction.customId === "hide-ban") {
+            con.query("select streamer_id, user_id, timebanned from twitch__ban where discord_message = ?;", [interaction.message.id], async (err, res) => {
                 // Get streamer & chatter users
                 let streamer = null;
                 let chatter = null;
+                let timebanned = null;
                 if (!err) {
                     if (res.length > 0) {
                         try {
                             streamer = await api.Twitch.getUserById(res[0].streamer_id);
                             chatter = await api.Twitch.getUserById(res[0].user_id);
+                            timebanned = res[0].timebanned;
                         } catch (err) {
                             api.Logger.warning(err);
                         }
@@ -80,31 +99,39 @@ const listener = {
                     return;
                 }
 
-                // Send embed
-                let title = "Hide ban";
+                const banEmbed = await formatting.parseBanEmbed(streamer, chatter, null, timebanned);
+                const hiddenEmbed = new Discord.EmbedBuilder()
+                    .setTitle("Hidden Ban Log")
+                    .setDescription(`This record was hidden by ${interaction.member} on \`${formatting.parseDate(Date.now())}\``)
+                    .setColor(0xfa4b3e)
+                    .addFields({
+                        name: "Hide Reason",
+                        value: codeBlock(reason),
+                    });
 
-                if (streamer && chatter) title = `Hide ban: '${chatter.display_name}' in '${streamer.display_name}'`;
+                const reinstateButton = new Discord.ButtonBuilder()
+                        .setCustomId("reinstate-ban")
+                        .setLabel("Reinstate Ban")
+                        .setStyle(ButtonStyle.Primary);
+                const row = new Discord.ActionRowBuilder()
+                        .setComponents(reinstateButton);
 
-                if (title.length > 45) title = "Hide ban: " + chatter.display_name;
-
-                const modal = new Modal()
-                    .setCustomId("hide-ban")
-                    .setTitle(title)
-                    .addComponents(
-                        new TextInputComponent()
-                            .setCustomId("reason")
-                            .setLabel("Hide Reason")
-                            .setPlaceholder("Why is this ban being hidden?")
-                            .setStyle("SHORT")
-                            .setMinLength(3)
-                            .setMaxLength(64)
-                            .setRequired(true)
-                    );
-        
-                showModal(modal, {
-                    client: global.client.discord,
-                    interaction: interaction,
-                });
+                let oldMessageId = interaction.message.id;
+                // Retrieve hidden ban channel
+                interaction.member.guild.channels.fetch(config.hiddenban_channel).then(hiddenBanChannel => {
+                    // Hide ban
+                    interaction.message.delete().then(() => {
+                        hiddenBanChannel.send({embeds: [banEmbed, hiddenEmbed], components: [row]}).then(message => {
+                            con.query("update twitch__ban set discord_message = ?, hide_reason = ? where discord_message = ?;", [message.id, reason, oldMessageId], err => {
+                                if (err) {
+                                    handleError(err);
+                                } else {
+                                    handleSuccess(`Successfully hid ban: '${chatter.display_name}' from '${streamer.display_name}'`)
+                                }
+                            });
+                        }, handleError)
+                    }, handleError);
+                }, handleError)
             });
         }
     }

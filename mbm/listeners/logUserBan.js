@@ -1,4 +1,4 @@
-const {MessageEmbed} = require("discord.js");
+const {EmbedBuilder, codeBlock, cleanCodeBlockContent, AuditLogEvent} = require("discord.js");
 const {Discord} = require("../../api/index");
 const config = require("../../config.json");
 
@@ -8,7 +8,7 @@ const getBanInfo = ban => {
             // Fetch a couple audit logs than just one as new entries could've been added right after this event was emitted.
             const fetchedLogs = await ban.guild.fetchAuditLogs({
                 limit: 6,
-                type: 'GUILD_BAN_ADD'
+                type: AuditLogEvent.MemberBanAdd
             }).catch(global.api.Logger.warning);
 
             fetchedLogs.entries.forEach(e => global.api.Logger.info(e.extra));
@@ -52,39 +52,57 @@ const listener = {
                         guild.getSetting("lde-channel", "channel").then(async channel => {
                             let author = ban.user;
     
-                            let embed = new MessageEmbed()
+                            let embed = new EmbedBuilder()
                                     .setTitle("User Banned")
                                     .setDescription(`User ${ban.user} was banned from the guild`)
                                     .setColor(0xb53131)
                                     .setAuthor({name: author.username, iconURL: author.avatarURL()});
     
                             if (banInfo?.reason) {
-                                embed.addField("Reason", "```" + banInfo.reason.toString().replace(/\\`/g, "`").replace(/`/g, "\\`") + "```", true);
+                                embed.addFields({
+                                    name: "Reason",
+                                    value: codeBlock(cleanCodeBlockContent(banInfo.reason.toString())),
+                                    inline: true,
+                                })
                             }
     
                             if (banInfo?.executor) {
-                                embed.addField("Moderator", banInfo.executor.toString(), true);
+                                embed.addFields({
+                                    name: "Moderator",
+                                    value: banInfo.executor.toString(),
+                                    inline: true,
+                                });
                             }
     
-                            channel.send({content: ' ', embeds: [embed]});
+                            channel.send({embeds: [embed]});
                         }).catch(global.api.Logger.warning);
                     }
                 }).catch(global.api.Logger.warning);
             }).catch(global.api.Logger.warning);
 
             global.client.discord.channels.fetch(config.liveban_channel).then(banChannel => {
-                const embed = new MessageEmbed()
+                const embed = new EmbedBuilder()
                         .setTitle("Discord user was Banned!")
                         .setDescription(`User ${ban.user} was banned from the guild \`${ban.guild.name}\``)
                         .setURL(`https://tms.to/d/${ban.user.id}`)
                         .setColor(0xb53131)
                         .setAuthor({name: ban.guild.name, iconURL: ban.guild.iconURL()});
 
-                if (banInfo?.reason) embed.addField("Reason", "```" + banInfo.reason.toString().replace(/\\`/g, "`").replace(/`/g, "\\`") + "```", true);
+                if (banInfo?.reason)
+                    embed.addFields({
+                        name: "Reason",
+                        value: codeBlock(cleanCodeBlockContent(banInfo.reason.toString())),
+                        inline: true,
+                    });
 
-                if (banInfo?.executor) embed.addField("Moderator", banInfo.executor.toString(), true);
+                if (banInfo?.executor)
+                    embed.addFields({
+                        name: "Moderator",
+                        value: codeBlock(cleanCodeBlockContent(banInfo.executor.toString())),
+                        inline: true,
+                    });
 
-                banChannel.send({content: ' ', embeds: [embed]});
+                banChannel.send({embeds: [embed]});
             });
         }).catch(global.api.Logger.warning);
     }
