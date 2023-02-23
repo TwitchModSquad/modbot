@@ -60,6 +60,10 @@ const command = {
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
         .setDMPermission(false),
     global: false,
+    /**
+     * Called when this command is executed
+     * @param {CommandInteraction} interaction 
+     */
     async execute(interaction) {
         let streamer = interaction.options.getString("streamer", false);
         let user = interaction.options.getString("user", false);

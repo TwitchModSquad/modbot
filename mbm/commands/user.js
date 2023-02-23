@@ -26,6 +26,10 @@ const command = {
         )
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild),
     global: false,
+    /**
+     * Called when this command is executed
+     * @param {CommandInteraction} interaction 
+     */
     execute(interaction) {
         if (interaction.guildId) {
             global.api.Discord.getGuild(interaction.guildId).then(async guild => {

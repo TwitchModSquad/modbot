@@ -6,6 +6,10 @@ const command = {
         .setName("resources")
         .setDescription("View resources for suicide, sexual assault, domestic violence, and more."),
     global: true,
+    /**
+     * Called when this command is executed
+     * @param {CommandInteraction} interaction 
+     */
     execute(interaction) {
         let embed = new EmbedBuilder()
             .setTitle("National Hotlines")
