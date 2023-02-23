@@ -1,4 +1,4 @@
-const {EmbedBuilder} = require("discord.js");
+const {EmbedBuilder, SlashCommandBuilder, SlashCommandUserOption, SlashCommandStringOption} = require("discord.js");
 const FullIdentity = require("../../api/FullIdentity");
 const DiscordGuild = require("../../api/Discord/DiscordGuild");
 
@@ -10,25 +10,23 @@ const errorEmbed = message => {
 }
 
 const command = {
-    data: {
-        name: 'register'
-        , description: 'Register your Discord server to Twitch Mod Squad'
-        , options: [
-            {
-                type: 6,
-                name: "represents-discord",
-                description: "Discord mention of the channel this Discord represents",
-                required: true,
-            },
-            {
-                type: 3,
-                name: "represents-twitch",
-                description: "Twitch name of the channel this Discord represents",
-                required: true,
-            },
-        ]
-        , default_permission: false
-    },
+    data: new SlashCommandBuilder()
+        .setName("register")
+        .setDescription("Register your Discord server to Twitch Mod Squad")
+        .addUserOption(
+            new SlashCommandUserOption()
+                .setName("represents-discord")
+                .setDescription("Discord mention of the user this Discord represents")
+                .setRequired(true)
+        )
+        .addStringOption(
+            new SlashCommandStringOption()
+                .setName("represents-twitch")
+                .setDescription("Twitch name of the channel this Discord represents")
+                .setRequired(true)
+        )
+        .setDefaultMemberPermissions(8)
+        .setDMPermission(false),
     global: false,
     execute(interaction) {
         if (interaction.member?.id === interaction.guild?.ownerId
@@ -75,8 +73,6 @@ const command = {
                         ownerDiscord,
                         interaction.guild.name
                     );
-
-                    await guild.getSettings();
 
                     guild.post().then(guild => {
                         guild.addCommands(interaction.guild).then(() => {}, global.api.Logger.warning);
