@@ -63,7 +63,8 @@ const command = {
                         .setRequired(true)
                         .setAutocomplete(true)
                 )
-        ),
+        )
+        .setDMPermission(false),
     /**
      * Execution function for this command
      * @param {ChatInputCommandInteraction} interaction 

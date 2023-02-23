@@ -5,7 +5,8 @@ const con = require("../../database");
 const command = {
     data: new SlashCommandBuilder()
         .setName("invite")
-        .setDescription("Sends a link to DM to others"),
+        .setDescription("Sends a link to DM to others")
+        .setDMPermission(false),
     /**
      * Execution function for this command
      * @param {ChatInputCommandInteraction} interaction 
