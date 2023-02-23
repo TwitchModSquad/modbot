@@ -1,7 +1,14 @@
 const fs = require('fs');
 const Discord = require('discord.js');
 
-const client = new Discord.Client({ intents: [Discord.GatewayIntentBits.Guilds, Discord.GatewayIntentBits.GuildMembers, Discord.GatewayIntentBits.GuildMessages] });
+const client = new Discord.Client({
+    intents: [
+        Discord.GatewayIntentBits.Guilds,
+        Discord.GatewayIntentBits.GuildMembers,
+        Discord.GatewayIntentBits.GuildMessages,
+        Discord.GatewayIntentBits.MessageContent
+    ]
+});
 global.client.discord = client;
 
 client.commands = new Discord.Collection();
