@@ -39,13 +39,7 @@ const listener = {
                 });
             });
 
-            guild.commands.create(registerCommand.data).then(command => {
-                command.permissions.set({guild: guild.id, command: command.id, permissions: [{
-                    id: guild.ownerId,
-                    type: 'USER',
-                    permission: true,
-                }]}).then(() => {}).catch(global.api.Logger.warning);
-            }).catch(global.api.Logger.warning);
+            guild.commands.create(registerCommand.data).catch(global.api.Logger.warning);
         });
     }
 };
