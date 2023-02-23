@@ -4,7 +4,7 @@ const api = require("../../../api/index");
 const {storedCrossBanChannels} = require("../button/crossbanManager");
 
 const listener = {
-    name: 'archiveMove',
+    name: 'crossbanManager',
     /**
      * Verifies a select menu interaction should be sent to this listener
      * @param {StringSelectMenuInteraction} interaction 
