@@ -29,7 +29,7 @@ const listener = {
             const msg = {embeds: [
                 new EmbedBuilder()
                     .setTitle("Configure MBM for your server")
-                    .setDescription("Hello, <@" + guild.ownerId + "> .\n\nPlease finish setting up MBM on your server using the following commands.\n\n`/register` - Register your Discord guild. The command should include the discord user that the guild represents and the twitch username of that user.\n`/setting` - set local settings on how MBM should handle your guild")
+                    .setDescription("Hello, <@" + guild.ownerId + "> .\n\nPlease finish setting up MBM on your server using the following commands.\n\n`/register` - Register your Discord guild. The command should include the discord user that the guild represents and the twitch username of that user.")
                     .setColor(0x9403fc)
                     .setFooter({text: "Enter the above commands in any text channel in your guild.", iconURL: "https://tms.to/assets/images/logos/logo.webp"})
             ]};

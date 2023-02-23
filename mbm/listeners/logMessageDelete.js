@@ -51,51 +51,44 @@ const listener = {
                 });
 
                 if (!message.author.bot) {
-                    guild.getSetting("lde-enabled", "boolean").then(enabled => {
-                        guild.getSetting("lde-message-delete", "boolean").then(messageDeleteEnabled => {
-                            if (enabled && messageDeleteEnabled) {
-                                guild.getSetting("lde-channel", "channel").then(async channel => {
-                                    let author = message.author;
-    
-                                    if (executor) author = executor;
-    
-                                    const embed = new EmbedBuilder()
-                                            .setTitle("Message Deleted")
-                                            .addFields(
-                                                {
-                                                    name: "Channel",
-                                                    value: message.channel.toString(),
-                                                    inline: true,
-                                                },
-                                                {
-                                                    name: "Author",
-                                                    value: message.author.toString(),
-                                                    inline: true,
-                                                }
-                                            )
-                                            .setColor(0x4c80d4)
-                                            .setAuthor({name: author.username, iconURL: author.avatarURL()});
-    
-    
-                                    if (executor !== null) {
-                                        embed.addFields({
-                                            name: "Moderator",
-                                            value: executor.toString(),
-                                            inline: true,
-                                        });
-                                    }
-                                    if (message?.content && message.content.trim() !== "") {
-                                        embed.addFields({
-                                            name: "Message Content",
-                                            value: codeBlock(cleanCodeBlockContent(message.content)),
-                                            inline: false,
-                                        })
-                                    }
-                                    channel.send({embeds: [embed]});
-                                }).catch(global.api.Logger.warning);
-                            }
-                        }).catch(global.api.Logger.warning);
-                    }).catch(global.api.Logger.warning);
+                    /**TODO
+                    let author = message.author;
+
+                    if (executor) author = executor;
+
+                    const embed = new EmbedBuilder()
+                            .setTitle("Message Deleted")
+                            .addFields(
+                                {
+                                    name: "Channel",
+                                    value: message.channel.toString(),
+                                    inline: true,
+                                },
+                                {
+                                    name: "Author",
+                                    value: message.author.toString(),
+                                    inline: true,
+                                }
+                            )
+                            .setColor(0x4c80d4)
+                            .setAuthor({name: author.username, iconURL: author.avatarURL()});
+
+
+                    if (executor !== null) {
+                        embed.addFields({
+                            name: "Moderator",
+                            value: executor.toString(),
+                            inline: true,
+                        });
+                    }
+                    if (message?.content && message.content.trim() !== "") {
+                        embed.addFields({
+                            name: "Message Content",
+                            value: codeBlock(cleanCodeBlockContent(message.content)),
+                            inline: false,
+                        })
+                    }
+                    channel.send({embeds: [embed]});*/
                 }
             }).catch(global.api.Logger.warning);
         }

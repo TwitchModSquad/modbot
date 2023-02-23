@@ -37,20 +37,14 @@ const listener = {
                 guild.removeUserBan(user).then(() => {}, global.api.Logger.warning);
             }).catch(global.api.Logger.warning);
 
-            guild.getSetting("lde-enabled", "boolean").then(enabled => {
-                guild.getSetting("lde-user-unban", "boolean").then(unbanEnabled => {
-                    if (enabled && unbanEnabled) {
-                        guild.getSetting("lde-channel", "channel").then(async channel => {
-                            let author = ban.user;
-                            channel.send({embeds: [new EmbedBuilder()
-                                    .setTitle("User Unbanned")
-                                    .setDescription(`User ${ban.user} was unbanned from the guild`)
-                                    .setColor(0x595959)
-                                    .setAuthor({name: author.username, iconURL: author.avatarURL()})]});
-                        }).catch(global.api.Logger.warning);
-                    }
-                }).catch(global.api.Logger.warning);
-            }).catch(global.api.Logger.warning);
+            
+            /**TODO
+            let author = ban.user;
+            channel.send({embeds: [new EmbedBuilder()
+                    .setTitle("User Unbanned")
+                    .setDescription(`User ${ban.user} was unbanned from the guild`)
+                    .setColor(0x595959)
+                    .setAuthor({name: author.username, iconURL: author.avatarURL()})]});*/
 
             global.client.discord.channels.fetch(config.liveban_channel).then(banChannel => {
                 const embed = new EmbedBuilder()

@@ -45,44 +45,35 @@ const listener = {
                 }).catch(global.api.Logger.warning);
             }
 
-            guild.getSetting("lde-enabled", "boolean").then(enabled => {
-                if (enabled) {
-                    guild.getSetting("lde-channel", "channel").then(async channel => {
-                        guild.getSetting("lde-user-kick", "boolean").then(kickEnabled => {
-                            guild.getSetting("lde-user-leave", "boolean").then(leaveEnabled => {
-                                let author = member.user;
+            let author = member.user;
 
-                                if (!((kickInfo && kickEnabled) || (!kickInfo && leaveEnabled))) return;
-        
-                                let embed = new EmbedBuilder()
-                                        .setTitle("Member Left the Guild")
-                                        .setDescription(`User ${member} ${kickInfo ? "was kicked from" : "has left"} the guild.`)
-                                        .setColor(0xb53131)
-                                        .setAuthor({name: author.username, iconURL: author.avatarURL()});
-        
-                                if (kickInfo?.reason) {
-                                    embed.addFields({
-                                        name: "Reason",
-                                        value: codeBlock(cleanCodeBlockContent(kickInfo.reason.toString())),
-                                        inline: true,
-                                    });
-                                }
-        
-                                if (kickInfo?.executor) {
-                                    embed.addFields({
-                                        name: "Moderator",
-                                        value: kickInfo.executor.toString(),
-                                        inline: true,
-                                    });
-                                }
-        
-                                channel.send({embeds: [embed]});
-                            }).catch(global.api.Logger.warning);
-                        }).catch(global.api.Logger.warning);
-                    }).catch(global.api.Logger.warning);
-                }
-            }).catch(global.api.Logger.warning);
-        }).catch(global.api.Logger.warning);
+            /**TODO
+
+            let embed = new EmbedBuilder()
+                    .setTitle("Member Left the Guild")
+                    .setDescription(`User ${member} ${kickInfo ? "was kicked from" : "has left"} the guild.`)
+                    .setColor(0xb53131)
+                    .setAuthor({name: author.username, iconURL: author.avatarURL()});
+
+            if (kickInfo?.reason) {
+                embed.addFields({
+                    name: "Reason",
+                    value: codeBlock(cleanCodeBlockContent(kickInfo.reason.toString())),
+                    inline: true,
+                });
+            }
+
+            if (kickInfo?.executor) {
+                embed.addFields({
+                    name: "Moderator",
+                    value: kickInfo.executor.toString(),
+                    inline: true,
+                });
+            }
+
+            channel.send({embeds: [embed]});
+            */
+        }, () => {});
     }
 };
 

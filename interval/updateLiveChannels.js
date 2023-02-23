@@ -109,17 +109,7 @@ module.exports = () => {
                                 if (!err) {
                                     res.forEach(guildres => {
                                         api.Discord.getGuild(guildres.id).then(guild => {
-                                            guild.getSetting("lv-channel", "channel").then(async channel => {
-                                                if (channel) {
-                                                    let mentionEveryone = false;
-
-                                                    try {
-                                                        mentionEveryone = await guild.getSetting("lv-everyone", "boolean");
-                                                    }catch (err) {global.api.Logger.warning(err)}
-
-                                                    channel.send({content: mentionEveryone ? '@everyone' : ' ', embeds: [embed]});
-                                                }
-                                            }).catch(global.api.Logger.warning);
+                                            //TODO: Create new means of sending live messages
                                         }).catch(global.api.Logger.warning);
                                     });
                                 } else global.api.Logger.warning(err);

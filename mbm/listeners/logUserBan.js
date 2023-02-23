@@ -46,39 +46,32 @@ const listener = {
                 guild.addUserBan(user, banInfo?.reason ? banInfo.reason : null, bannedBy).then(() => {}, global.api.Logger.warning);
             }).catch(global.api.Logger.warning);
 
-            guild.getSetting("lde-enabled", "boolean").then(enabled => {
-                guild.getSetting("lde-user-ban", "boolean").then(banEnabled => {
-                    if (enabled && banEnabled) {
-                        guild.getSetting("lde-channel", "channel").then(async channel => {
-                            let author = ban.user;
-    
-                            let embed = new EmbedBuilder()
-                                    .setTitle("User Banned")
-                                    .setDescription(`User ${ban.user} was banned from the guild`)
-                                    .setColor(0xb53131)
-                                    .setAuthor({name: author.username, iconURL: author.avatarURL()});
-    
-                            if (banInfo?.reason) {
-                                embed.addFields({
-                                    name: "Reason",
-                                    value: codeBlock(cleanCodeBlockContent(banInfo.reason.toString())),
-                                    inline: true,
-                                })
-                            }
-    
-                            if (banInfo?.executor) {
-                                embed.addFields({
-                                    name: "Moderator",
-                                    value: banInfo.executor.toString(),
-                                    inline: true,
-                                });
-                            }
-    
-                            channel.send({embeds: [embed]});
-                        }).catch(global.api.Logger.warning);
-                    }
-                }).catch(global.api.Logger.warning);
-            }).catch(global.api.Logger.warning);
+            /**TODO
+            let author = ban.user;
+
+            let embed = new EmbedBuilder()
+                    .setTitle("User Banned")
+                    .setDescription(`User ${ban.user} was banned from the guild`)
+                    .setColor(0xb53131)
+                    .setAuthor({name: author.username, iconURL: author.avatarURL()});
+
+            if (banInfo?.reason) {
+                embed.addFields({
+                    name: "Reason",
+                    value: codeBlock(cleanCodeBlockContent(banInfo.reason.toString())),
+                    inline: true,
+                })
+            }
+
+            if (banInfo?.executor) {
+                embed.addFields({
+                    name: "Moderator",
+                    value: banInfo.executor.toString(),
+                    inline: true,
+                });
+            }
+
+            channel.send({embeds: [embed]});*/
 
             global.client.discord.channels.fetch(config.liveban_channel).then(banChannel => {
                 const embed = new EmbedBuilder()

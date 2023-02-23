@@ -32,41 +32,34 @@ const listener = {
         Discord.getGuild(oldMember.guild.id).then(async guild => {
             const executor = await getExecutor(oldMember);
             if (oldMember.nickname !== newMember.nickname) {
-                guild.getSetting("lde-enabled", "boolean").then(enabled => {
-                    guild.getSetting("lde-user-update-nickname", "boolean").then(updateUsernameEnabled => {
-                        if (enabled && updateUsernameEnabled) {
-                            guild.getSetting("lde-channel", "channel").then(async channel => {
-                                const embed = new EmbedBuilder()
-                                    .setTitle("Nickname Changed")
-                                    .addFields({
-                                        name: "User",
-                                        value: newMember.toString(),
-                                        inline: true,
-                                    })
-                                    .setColor(0x4c80d4)
-                                    .setAuthor({name: newMember.user.username, iconURL: newMember.avatarURL()});
+                /**TODO
+                const embed = new EmbedBuilder()
+                    .setTitle("Nickname Changed")
+                    .addFields({
+                        name: "User",
+                        value: newMember.toString(),
+                        inline: true,
+                    })
+                    .setColor(0x4c80d4)
+                    .setAuthor({name: newMember.user.username, iconURL: newMember.avatarURL()});
 
-                                if (executor && executor.id !== newMember.id)
-                                    embed.addFields({
-                                        name: "Moderator",
-                                        value: executor.toString(),
-                                        inline: true,
-                                    });
-                                
-                                embed.addFields({
-                                    name: "Old Nickname",
-                                    value: codeBlock(oldMember.nickname ? oldMember.nickname.replace(/\\`/g, "`").replace(/`/g, "\\`") : "[unset]"),
-                                    inline: false,
-                                }, {
-                                    name: "New Nickname",
-                                    value: codeBlock(newMember.nickname ? newMember.nickname.replace(/\\`/g, "`").replace(/`/g, "\\`") : "[unset]"),
-                                    inline: false,
-                                });
-                                channel.send({embeds: [embed]});
-                            }).catch(global.api.Logger.warning);
-                        }
-                    }).catch(global.api.Logger.warning);
-                }).catch(global.api.Logger.warning);
+                if (executor && executor.id !== newMember.id)
+                    embed.addFields({
+                        name: "Moderator",
+                        value: executor.toString(),
+                        inline: true,
+                    });
+                
+                embed.addFields({
+                    name: "Old Nickname",
+                    value: codeBlock(oldMember.nickname ? oldMember.nickname.replace(/\\`/g, "`").replace(/`/g, "\\`") : "[unset]"),
+                    inline: false,
+                }, {
+                    name: "New Nickname",
+                    value: codeBlock(newMember.nickname ? newMember.nickname.replace(/\\`/g, "`").replace(/`/g, "\\`") : "[unset]"),
+                    inline: false,
+                });
+                channel.send({embeds: [embed]});**/
             }
         }).catch(global.api.Logger.warning);
     }

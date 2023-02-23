@@ -26,40 +26,34 @@ const listener = {
                     global.api.Logger.warning(err);
                 });
 
-                guild.getSetting("lde-enabled", "boolean").then(enabled => {
-                    guild.getSetting("lde-message-edit", "boolean").then(messageEditEnabled => {
-                        if (enabled && messageEditEnabled) {
-                            guild.getSetting("lde-channel", "channel").then(channel => {
-                                channel.send({embeds: [new EmbedBuilder()
-                                        .setTitle("Message Edited")
-                                        .addFields(
-                                            {
-                                                name: "Channel",
-                                                value: oldMessage.channel.toString(),
-                                                inline: true,
-                                            },
-                                            {
-                                                name: "Author",
-                                                value: oldMessage.author.toString(),
-                                                inline: true,
-                                            },
-                                            {
-                                                name: "Old Message",
-                                                value: codeBlock(cleanCodeBlockContent(oldMessage.content)),
-                                                inline: false,
-                                            },
-                                            {
-                                                name: "New Message",
-                                                value: codeBlock(cleanCodeBlockContent(newMessage.content)),
-                                                inline: false,
-                                            }
-                                        )
-                                        .setColor(0x4c80d4)
-                                        .setAuthor({name: oldMessage.author.username, iconURL: oldMessage.author.avatarURL()})]});
-                            }).catch(global.api.Logger.warning);
-                        }
-                    }).catch(global.api.Logger.warning);
-                }).catch(global.api.Logger.warning);
+                /**TODO
+                channel.send({embeds: [new EmbedBuilder()
+                        .setTitle("Message Edited")
+                        .addFields(
+                            {
+                                name: "Channel",
+                                value: oldMessage.channel.toString(),
+                                inline: true,
+                            },
+                            {
+                                name: "Author",
+                                value: oldMessage.author.toString(),
+                                inline: true,
+                            },
+                            {
+                                name: "Old Message",
+                                value: codeBlock(cleanCodeBlockContent(oldMessage.content)),
+                                inline: false,
+                            },
+                            {
+                                name: "New Message",
+                                value: codeBlock(cleanCodeBlockContent(newMessage.content)),
+                                inline: false,
+                            }
+                        )
+                        .setColor(0x4c80d4)
+                        .setAuthor({name: oldMessage.author.username, iconURL: oldMessage.author.avatarURL()})]});
+                        */
             }).catch(err => {
                 global.api.Logger.warning(err);
             });

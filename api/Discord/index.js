@@ -3,7 +3,6 @@ const con = require("../../database");
 const Identity = require("../Identity");
 const DiscordUser = require("./DiscordUser");
 const DiscordGuild = require("./DiscordGuild");
-const DiscordGuildSetting = require("./DiscordGuildSetting");
 
 const Cache = require("../Cache/Cache");
 const AssumedDiscordUser = require("./AssumedDiscordUser");
@@ -199,8 +198,6 @@ class Discord {
                         await this.getUserById(row.owner_id),
                         row.name
                     );
-
-                    await guild.getSettings();
 
                     resolve(guild);
                 } else {

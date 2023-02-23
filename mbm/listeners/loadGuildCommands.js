@@ -26,22 +26,6 @@ const addCommand = (guild, commandData) => {
             permission: true,
         }];
     
-        try {
-            let dGuild = await Discord.getGuild(guild.id);
-            let adminRole = await dGuild.getSetting("rm-admin", "role");
-            
-            if (adminRole?.id) {
-                permissions = [
-                    ...permissions,
-                    {
-                        id: adminRole.id,
-                        type: 'ROLE',
-                        permission: true,
-                    },
-                ];
-            }
-        } catch (err) {}
-    
         command.permissions.set({guild: guild.id, command: command.id, permissions: permissions}).then(resolve).catch(reject);
     });
 }
