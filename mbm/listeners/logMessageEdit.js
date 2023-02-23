@@ -1,4 +1,4 @@
-const { EmbedBuilder } = require("discord.js");
+const { EmbedBuilder, codeBlock, cleanCodeBlockContent } = require("discord.js");
 const {Discord} = require("../../api/index");
 const con = require("../../database");
 
@@ -32,10 +32,28 @@ const listener = {
                             guild.getSetting("lde-channel", "channel").then(channel => {
                                 channel.send({embeds: [new EmbedBuilder()
                                         .setTitle("Message Edited")
-                                        .addField("Channel", oldMessage.channel.toString(), true)
-                                        .addField("Author", oldMessage.author.toString(), true)
-                                        .addField("Old Message", "```\n" + oldMessage.content.replace(/\\`/g, "`").replace(/`/g, "\\`") + "```", false)
-                                        .addField("New Message", "```\n" + newMessage.content.replace(/\\`/g, "`").replace(/`/g, "\\`") + "```", false)
+                                        .addFields(
+                                            {
+                                                name: "Channel",
+                                                value: oldMessage.channel.toString(),
+                                                inline: true,
+                                            },
+                                            {
+                                                name: "Author",
+                                                value: oldMessage.author.toString(),
+                                                inline: true,
+                                            },
+                                            {
+                                                name: "Old Message",
+                                                value: codeBlock(cleanCodeBlockContent(oldMessage.content)),
+                                                inline: false,
+                                            },
+                                            {
+                                                name: "New Message",
+                                                value: codeBlock(cleanCodeBlockContent(newMessage.content)),
+                                                inline: false,
+                                            }
+                                        )
                                         .setColor(0x4c80d4)
                                         .setAuthor({name: oldMessage.author.username, iconURL: oldMessage.author.avatarURL()})]});
                             }).catch(global.api.Logger.warning);

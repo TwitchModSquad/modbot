@@ -1,4 +1,4 @@
-const { EmbedBuilder } = require("discord.js");
+const { EmbedBuilder, codeBlock } = require("discord.js");
 const {Discord} = require("../../api/index");
 const con = require("../../database");
 
@@ -38,15 +38,30 @@ const listener = {
                             guild.getSetting("lde-channel", "channel").then(async channel => {
                                 const embed = new EmbedBuilder()
                                     .setTitle("Nickname Changed")
-                                    .addField("User", newMember.toString(), true)
+                                    .addFields({
+                                        name: "User",
+                                        value: newMember.toString(),
+                                        inline: true,
+                                    })
                                     .setColor(0x4c80d4)
                                     .setAuthor({name: newMember.user.username, iconURL: newMember.avatarURL()});
 
                                 if (executor && executor.id !== newMember.id)
-                                    embed.addField("Moderator", executor.toString(), true);
+                                    embed.addFields({
+                                        name: "Moderator",
+                                        value: executor.toString(),
+                                        inline: true,
+                                    });
                                 
-                                embed.addField("Old Nickname", "```\n" + (oldMember.nickname ? oldMember.nickname.replace(/\\`/g, "`").replace(/`/g, "\\`") : "[unset]") + "```", false)
-                                embed.addField("New Nickname", "```\n" + (newMember.nickname ? newMember.nickname.replace(/\\`/g, "`").replace(/`/g, "\\`") : "[unset]") + "```", false)
+                                embed.addFields({
+                                    name: "Old Nickname",
+                                    value: codeBlock(oldMember.nickname ? oldMember.nickname.replace(/\\`/g, "`").replace(/`/g, "\\`") : "[unset]"),
+                                    inline: false,
+                                }, {
+                                    name: "New Nickname",
+                                    value: codeBlock(newMember.nickname ? newMember.nickname.replace(/\\`/g, "`").replace(/`/g, "\\`") : "[unset]"),
+                                    inline: false,
+                                });
                                 channel.send({embeds: [embed]});
                             }).catch(global.api.Logger.warning);
                         }

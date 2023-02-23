@@ -1,6 +1,6 @@
 const api = require("../api/");
 const con = require("../database");
-const {EmbedBuilder} = require("discord.js");
+const {EmbedBuilder, codeBlock} = require("discord.js");
 const config = require("../config.json");
 
 module.exports = () => {
@@ -52,8 +52,18 @@ module.exports = () => {
                                 .setTitle("Twitch Name Change")
                                 .setURL(user.getShortlink())
                                 .setDescription("The following name change was detected!")
-                                .addField("Old Username", "```\n" + user.display_name + "```", true)
-                                .addField("New Username", "```\n" + helixUser.displayName + "```", true)
+                                .addFields(
+                                    {
+                                        name: "Old Username",
+                                        value: codeBlock(user.display_name),
+                                        inline: true,
+                                    },
+                                    {
+                                        name: "New Username",
+                                        value: codeBlock(helixUser.displayName),
+                                        inline: true,
+                                    }
+                                )
                                 .setColor(0x772ce8);
                             
                             user = await api.Twitch.getUserById(helixUser.id, true);
@@ -75,7 +85,10 @@ module.exports = () => {
                             }
 
                             if (archiveEntriesString !== "")
-                                embed.addField("Archive Entries", archiveEntriesString);
+                                embed.addFields({
+                                    name: "Archive Entries",
+                                    value: archiveEntriesString,
+                                });
 
                             nameChangeChannel.send({content: " ", embeds: [embed]});
                         }
@@ -118,8 +131,18 @@ module.exports = () => {
                         .setTitle("Discord Name Change")
                         .setURL(user.getShortlink())
                         .setDescription("The following name change was detected for " + retrievedUser.toString() + "!")
-                        .addField("Old Username", "```\n" + user.name + "#" + user.discriminator + "```", true)
-                        .addField("New Username", "```\n" + retrievedUser.tag + "```", true)
+                        .addFields(
+                            {
+                                name: "Old Username",
+                                value: codeBlock(user.name + "#" + user.discriminator),
+                                inline: true,
+                            },
+                            {
+                                name: "New Username",
+                                value: codeBlock(retrievedUser.tag),
+                                inline: true,
+                            }
+                        )
                         .setColor(0x772ce8);
 
                     user = await api.Discord.getUserById(id, true);
@@ -141,7 +164,10 @@ module.exports = () => {
                     }
 
                     if (archiveEntriesString !== "")
-                        embed.addField("Archive Entries", archiveEntriesString);
+                        embed.addFields({
+                            name: "Archive Entries",
+                            value: archiveEntriesString,
+                        });
                     
                     nameChangeChannel.send({content: " ", embeds: [embed]});
                 }

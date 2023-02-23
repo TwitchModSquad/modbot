@@ -88,8 +88,18 @@ module.exports = () => {
                                 .setColor(0x7d3bdc)
                                 .setURL("https://twitch.tv/" + user.display_name.toLowerCase())
                                 .setImage(stream.getThumbnailUrl(256, 144))
-                                .addField("Game", stream.gameName, true)
-                                .addField("Viewer Count", ""+stream.viewers, true)
+                                .addFields(
+                                    {
+                                        name: "Game",
+                                        value: stream.gameName,
+                                        inline: true,
+                                    },
+                                    {
+                                        name: "Viewer Count",
+                                        value: String(stream.viewers),
+                                        inline: true,
+                                    }
+                                )
                                 .setTimestamp(stream.startDate)
                                 .setFooter({text: `${user.display_name} : Live 🔴`, iconURL: user.profile_image_url});
                 

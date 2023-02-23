@@ -6,7 +6,7 @@ const fs = require("fs");
 const path = require('path');
 
 const mime = require("mime-types");
-const { EmbedBuilder, MessageActionRow, ButtonBuilder } = require('discord.js');
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 
 const DIRECTORY = "./files/";
 const TEMP_DIRECTORY = DIRECTORY + "temp/";
@@ -45,15 +45,15 @@ const parseFileMessage = fileData => {
 
     const setLabelButton = new ButtonBuilder()
         .setCustomId("set-label")
-        .setStyle("PRIMARY")
+        .setStyle(ButtonStyle.Primary)
         .setLabel("Set Label");
 
     const removeButton = new ButtonBuilder()
         .setCustomId("remove-file")
-        .setStyle("DANGER")
+        .setStyle(ButtonStyle.Danger)
         .setLabel("Remove " + (isFile ? "File" : "Link"));
 
-    const row = new MessageActionRow()
+    const row = new ActionRowBuilder()
         .addComponents(setLabelButton, removeButton);
     
     return {content: " ", embeds: [embed], components: [row]};

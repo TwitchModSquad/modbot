@@ -1,4 +1,4 @@
-const {EmbedBuilder, TextChannel, GuildMember, ButtonBuilder, MessageActionRow, MessageSelectMenu, Message} = require("discord.js");
+const {EmbedBuilder, TextChannel, GuildMember, ButtonBuilder, ActionRowBuilder, StringSelectMenuBuilder, Message, codeBlock, ButtonStyle} = require("discord.js");
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 const fs = require("fs");
 const mime = require("mime-types");
@@ -25,7 +25,7 @@ const createCrossbanButton = user => {
     const crossbanButton = new ButtonBuilder()
             .setCustomId("cb-" + user.id)
             .setLabel("Crossban " + user.display_name)
-            .setStyle("DANGER");
+            .setStyle(ButtonStyle.Danger);
 
     return crossbanButton;
 }
@@ -155,19 +155,31 @@ class Entry {
             const embed = new EmbedBuilder()
                 .setColor(0x772ce8)
                 .setTitle("Ban Entry")
-                .addField("Offense", "```" + this.offense + "```")
-                .addField("Description", "```" + this.description + "```")
+                .addFields(
+                    {
+                        name: "Offense",
+                        value: codeBlock(this.offense),
+                    },
+                    {
+                        name: "Description",
+                        value: codeBlock(this.description),
+                    }
+                )
                 .setDescription("**Submitted by " + (this.owner?.name ? this.owner.name : "Unresolvable") + "**" + (discordAccount ? " (<@" + discordAccount.id + ">)" : ""))
                 .setTimestamp(this.time_submitted)
                 .setFooter({text: "ID: " + this.id, iconURL: "https://tms.to/assets/images/logos/logo.webp"});
         
-            if (users !== "") {
-                embed.addField("User Accounts", users);
-            }
+            if (users !== "")
+                embed.addFields({
+                    name: "User Accounts",
+                    value: users,
+                });
 
-            if (files !== "") {
-                embed.addField("Files & Links", files);
-            }
+            if (files !== "")
+                embed.addFields({
+                    name: "Files",
+                    value: files,
+                });
             
     
             resolve(embed);
@@ -176,11 +188,11 @@ class Entry {
 
     /**
      * Generates a crossban button row for this entry
-     * @returns {Promise<MessageActionRow>}
+     * @returns {Promise<ActionRowBuilder>}
      */
     createCrossbanRow() {
         return new Promise(async (resolve, reject) => {
-            let row = new MessageActionRow();
+            let row = new ActionRowBuilder();
             
             for (let i = 0; i < this.users.length; i++) {
                 let user = this.users[i];
@@ -555,17 +567,17 @@ class Entry {
         const editOffense = new ButtonBuilder()
             .setCustomId("edit-offense")
             .setLabel("Edit Offense")
-            .setStyle("PRIMARY");
+            .setStyle(ButtonStyle.Primary);
 
         const editDescription = new ButtonBuilder()
             .setCustomId("edit-description")
             .setLabel("Edit Description")
-            .setStyle("SECONDARY");
+            .setStyle(ButtonStyle.Secondary);
 
-        const row1 = new MessageActionRow()
+        const row1 = new ActionRowBuilder()
             .addComponents(editOffense, editDescription);
 
-        const removeUsers = new MessageSelectMenu()
+        const removeUsers = new StringSelectMenuBuilder()
             .setCustomId("remove-users")
             .setMinValues(1)
             .setPlaceholder("Remove Users");
@@ -575,23 +587,23 @@ class Entry {
             removeUsers.addOptions({label: user.getType() + ": " + (user.user ? await user.resolveName() : user.value), value: ""+user.id});
         }
         
-        const row2 = new MessageActionRow()
+        const row2 = new ActionRowBuilder()
             .addComponents(removeUsers);
 
         const addTwitchUser = new ButtonBuilder()
             .setCustomId("add-twitch-user")
             .setLabel("Add Twitch User")
-            .setStyle("PRIMARY");
+            .setStyle(ButtonStyle.Primary);
 
         const addDiscordUser = new ButtonBuilder()
             .setCustomId("add-discord-user")
             .setLabel("Add Discord User")
-            .setStyle("SECONDARY");
+            .setStyle(ButtonStyle.Secondary);
 
-        const row3 = new MessageActionRow()
+        const row3 = new ActionRowBuilder()
             .addComponents(addTwitchUser, addDiscordUser);
 
-        const removeFiles = new MessageSelectMenu()
+        const removeFiles = new StringSelectMenuBuilder()
             .setCustomId("remove-files")
             .setMinValues(1)
             .setPlaceholder("Remove Files");
@@ -601,20 +613,20 @@ class Entry {
             removeFiles.addOptions({label: file.label ? file.label : file.remote_path, value: ""+file.id, description: file.content_type});
         }
         
-        const row4 = new MessageActionRow()
+        const row4 = new ActionRowBuilder()
             .addComponents(removeFiles);
 
         const addFile = new ButtonBuilder()
             .setCustomId("add-file")
             .setLabel("Add File")
-            .setStyle("SECONDARY");
+            .setStyle(ButtonStyle.Secondary);
 
         const cancelButton = new ButtonBuilder()
             .setCustomId("cancel-edit")
             .setLabel("Cancel")
-            .setStyle("DANGER");
+            .setStyle(ButtonStyle.Danger);
 
-        const row5 = new MessageActionRow()
+        const row5 = new ActionRowBuilder()
             .addComponents(addFile, cancelButton);
 
         let components = [row1, row2, row3];

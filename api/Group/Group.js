@@ -1,4 +1,4 @@
-const { EmbedBuilder, ButtonBuilder, MessageActionRow, MessageSelectMenu, ThreadChannel, Message } = require("discord.js");
+const { EmbedBuilder, ButtonBuilder, ActionRowBuilder, StringSelectMenuBuilder, ThreadChannel, Message, ButtonStyle } = require("discord.js");
 const FullIdentity = require("../FullIdentity");
 const TwitchUser = require("../Twitch/TwitchUser");
 
@@ -193,8 +193,8 @@ class Group extends Cachable {
     }
 
     /**
-     * Generates the MessageActionRow for this group
-     * @type {Promise<MessageActionRow>}
+     * Generates the ActionRowBuilder for this group
+     * @type {Promise<ActionRowBuilder>}
      */
     generateComponents() {
         return new Promise((resolve, reject) => {
@@ -202,15 +202,15 @@ class Group extends Cachable {
             const setGroupCommand = new ButtonBuilder()
                 .setCustomId("set-command")
                 .setLabel("Set Group Command")
-                .setStyle("PRIMARY");
+                .setStyle(ButtonStyle.Primary);
 
-            const row = new MessageActionRow();
+            const row = new ActionRowBuilder();
 
             if (!this.endtime) {
                 const editButton = new ButtonBuilder()
                     .setCustomId("edit-group")
                     .setLabel("Edit")
-                    .setStyle("SECONDARY");
+                    .setStyle(ButtonStyle.Secondary);
 
                 row.addComponents(editButton)
 
@@ -219,14 +219,14 @@ class Group extends Cachable {
                     const stopButton = new ButtonBuilder()
                         .setCustomId("stop-group")
                         .setLabel("Stop Event")
-                        .setStyle("DANGER");
+                        .setStyle(ButtonStyle.Danger);
 
                     row.addComponents(stopButton);
                 } else {
                     const startButton = new ButtonBuilder()
                         .setCustomId("start-group")
                         .setLabel("Start Event")
-                        .setStyle("SUCCESS");
+                        .setStyle(ButtonStyle.Success);
 
                     row.addComponents(startButton);
                 }
@@ -236,12 +236,12 @@ class Group extends Cachable {
                 const recoverGroup = new ButtonBuilder()
                     .setCustomId("recover-group")
                     .setLabel("Recover Event")
-                    .setStyle("SECONDARY");
+                    .setStyle(ButtonStyle.Secondary);
 
                 const copyGroup = new ButtonBuilder()
                     .setCustomId("copy-group")
                     .setLabel("Copy Event")
-                    .setStyle("PRIMARY");
+                    .setStyle(ButtonStyle.Primary);
                 
                 row.addComponents(recoverGroup, copyGroup);
             }
@@ -254,7 +254,7 @@ class Group extends Cachable {
      * Generates the edit message for this group
      * @param {boolean} showDelete 
      * @param {FullIdentity} executor 
-     * @returns {Promise<{content:string,embeds:EmbedBuilder[],components:MessageActionRow[],ephemeral:boolean}>}
+     * @returns {Promise<{content:string,embeds:EmbedBuilder[],components:ActionRowBuilder[],ephemeral:boolean}>}
      */
     generateEditMessage(showDelete = false, executor = null) {
         return new Promise((resolve, reject) => {
@@ -271,25 +271,25 @@ class Group extends Cachable {
 
             const setStartTime = new ButtonBuilder()
                 .setLabel("Set Start Time")
-                .setStyle("LINK")
+                .setStyle(ButtonStyle.Link)
                 .setURL(`${config.pub_domain}g/${token}/settime`);
 
             const setGame = new ButtonBuilder()
                 .setCustomId("group-setgame-" + this.id)
                 .setLabel("Set Game")
-                .setStyle("SECONDARY");
+                .setStyle(ButtonStyle.Secondary);
 
             const addParticipant = new ButtonBuilder()
                 .setCustomId("group-addpartic-" + this.id)
                 .setLabel("Add Participant")
-                .setStyle("PRIMARY");
+                .setStyle(ButtonStyle.Primary);
 
             const deleteButton = new ButtonBuilder()
                 .setCustomId("group-delete-" + this.id)
                 .setLabel("Delete")
-                .setStyle("DANGER");
+                .setStyle(ButtonStyle.Danger);
 
-            const removeParticipants = new MessageSelectMenu()
+            const removeParticipants = new StringSelectMenuBuilder()
                 .setCustomId("group-rempartic-" + this.id)
                 .setMinValues(1)
                 .setMaxValues(this.participants.length)
@@ -297,12 +297,12 @@ class Group extends Cachable {
 
             removeParticipants.addOptions(this.participants.map(x => {return {value: ""+x.id, label: x.display_name}}))
 
-            const buttonRow = new MessageActionRow()
+            const buttonRow = new ActionRowBuilder()
                 .addComponents(setStartTime, setGame, addParticipant);
 
             if (showDelete) buttonRow.addComponents(deleteButton);
 
-            const removeParticipantsRow = new MessageActionRow()
+            const removeParticipantsRow = new ActionRowBuilder()
                 .addComponents(removeParticipants);
 
             resolve({embeds: [embed], components: [buttonRow, removeParticipantsRow], ephemeral: true});

@@ -4,7 +4,7 @@ const User = require("../User");
 const Identity = require("../Identity");
 const DiscordGuild = require("./DiscordGuild");
 
-const {EmbedBuilder} = require("discord.js");
+const {EmbedBuilder, codeBlock} = require("discord.js");
 
 const DISCORD_CDN = "https://cdn.discordapp.com/";
 
@@ -135,7 +135,12 @@ class DiscordUser extends User {
                     if (guilds !== "") guild += "\n";
                     guilds += guild.name;
                 });
-                embed.addField("Guilds", "```"+guilds+"```");
+                embed.addFields(
+                    {
+                        name: "Guilds",
+                        value: codeBlock(guilds),
+                    }
+                );
             }
 
             resolve(embed);

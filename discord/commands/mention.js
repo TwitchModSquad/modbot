@@ -124,11 +124,17 @@ const command = {
 
         streamers.forEach((streamer, index) => {
             let modString = "";
+            
             allMods[index].forEach(mod => {
                 if (modString !== "") modString += "\n";
                 modString += `<@${mod.id}>`;
             });
-            embed.addField(streamer.display_name, modString, true);
+
+            embed.addFields({
+                name: streamer.display_name,
+                value: modString,
+                inline: true,
+            });
         });
 
         interaction.reply({content: mentionString, embeds: [embed]});

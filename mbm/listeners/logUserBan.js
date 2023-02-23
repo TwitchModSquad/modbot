@@ -1,4 +1,4 @@
-const {EmbedBuilder} = require("discord.js");
+const {EmbedBuilder, codeBlock, cleanCodeBlockContent} = require("discord.js");
 const {Discord} = require("../../api/index");
 const config = require("../../config.json");
 
@@ -59,11 +59,19 @@ const listener = {
                                     .setAuthor({name: author.username, iconURL: author.avatarURL()});
     
                             if (banInfo?.reason) {
-                                embed.addField("Reason", "```" + banInfo.reason.toString().replace(/\\`/g, "`").replace(/`/g, "\\`") + "```", true);
+                                embed.addFields({
+                                    name: "Reason",
+                                    value: codeBlock(cleanCodeBlockContent(banInfo.reason.toString())),
+                                    inline: true,
+                                })
                             }
     
                             if (banInfo?.executor) {
-                                embed.addField("Moderator", banInfo.executor.toString(), true);
+                                embed.addFields({
+                                    name: "Moderator",
+                                    value: banInfo.executor.toString(),
+                                    inline: true,
+                                });
                             }
     
                             channel.send({embeds: [embed]});
@@ -80,9 +88,19 @@ const listener = {
                         .setColor(0xb53131)
                         .setAuthor({name: ban.guild.name, iconURL: ban.guild.iconURL()});
 
-                if (banInfo?.reason) embed.addField("Reason", "```" + banInfo.reason.toString().replace(/\\`/g, "`").replace(/`/g, "\\`") + "```", true);
+                if (banInfo?.reason)
+                    embed.addFields({
+                        name: "Reason",
+                        value: codeBlock(cleanCodeBlockContent(banInfo.reason.toString())),
+                        inline: true,
+                    });
 
-                if (banInfo?.executor) embed.addField("Moderator", banInfo.executor.toString(), true);
+                if (banInfo?.executor)
+                    embed.addFields({
+                        name: "Moderator",
+                        value: codeBlock(cleanCodeBlockContent(banInfo.executor.toString())),
+                        inline: true,
+                    });
 
                 banChannel.send({embeds: [embed]});
             });

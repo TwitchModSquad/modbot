@@ -1,4 +1,4 @@
-const { EmbedBuilder } = require("discord.js");
+const { EmbedBuilder, codeBlock, cleanCodeBlockContent } = require("discord.js");
 const {Discord} = require("../../api/index");
 const con = require("../../database");
 
@@ -61,17 +61,35 @@ const listener = {
     
                                     const embed = new EmbedBuilder()
                                             .setTitle("Message Deleted")
-                                            .addField("Channel", message.channel.toString(), true)
-                                            .addField("Author", message.author.toString(), true)
+                                            .addFields(
+                                                {
+                                                    name: "Channel",
+                                                    value: message.channel.toString(),
+                                                    inline: true,
+                                                },
+                                                {
+                                                    name: "Author",
+                                                    value: message.author.toString(),
+                                                    inline: true,
+                                                }
+                                            )
                                             .setColor(0x4c80d4)
                                             .setAuthor({name: author.username, iconURL: author.avatarURL()});
     
     
                                     if (executor !== null) {
-                                        embed.addField("Moderator", executor.toString(), true);
+                                        embed.addFields({
+                                            name: "Moderator",
+                                            value: executor.toString(),
+                                            inline: true,
+                                        });
                                     }
                                     if (message?.content && message.content.trim() !== "") {
-                                        embed.addField("Message Content", "```\n" + message.content.replace(/`/g, "/`") + "```", false);
+                                        embed.addFields({
+                                            name: "Message Content",
+                                            value: codeBlock(cleanCodeBlockContent(message.content)),
+                                            inline: false,
+                                        })
                                     }
                                     channel.send({embeds: [embed]});
                                 }).catch(global.api.Logger.warning);

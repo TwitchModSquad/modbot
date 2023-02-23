@@ -5,6 +5,7 @@ const config = require("../../config.json");
 const formatting = require("../Formatting");
 
 const Discord = require("discord.js");
+const { ButtonStyle } = require("discord.js");
 
 const BPM_ANNOUNCE_MAXIMUM = 5;
 
@@ -23,14 +24,14 @@ const listener = {
                         const crossbanButton = new Discord.ButtonBuilder()
                                 .setCustomId("cb-" + chatter.id)
                                 .setLabel("Crossban")
-                                .setStyle("DANGER");
+                                .setStyle(ButtonStyle.Danger);
                 
                         const hideButton = new Discord.ButtonBuilder()
                                 .setCustomId("hide-ban")
                                 .setLabel("Hide Ban")
-                                .setStyle("SECONDARY");
+                                .setStyle(ButtonStyle.Secondary);
                         
-                        const row = new Discord.MessageActionRow()
+                        const row = new Discord.ActionRowBuilder()
                                 .addComponents(crossbanButton, hideButton);
 
                         dchnl.send({embeds: [embed], components: [row]}).then(message => {

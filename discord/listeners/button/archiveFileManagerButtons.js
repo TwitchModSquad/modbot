@@ -1,28 +1,40 @@
-const { ModalBuilder, TextInputBuilder } = require("discord.js");
+const { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder } = require("discord.js");
 
-const {cache} = require("../commands/archive");
-const api = require("../../api/index");
+const {cache} = require("../../commands/archive");
+const api = require("../../../api/index");
 
 const fs = require("fs");
 
 const listener = {
     name: 'archiveFileManagerButtons',
-    eventName: 'interactionCreate',
-    eventType: 'on',
+    /**
+     * Verifies a button press should be sent to this listener
+     * @param {ButtonInteraction} interaction 
+     */
+    verify(interaction) {
+        return interaction.component.customId === "set-label"
+            || interaction.component.customId === "remove-file";
+    },
+    /**
+     * Listener for a button press
+     * @param {ButtonInteraction} interaction 
+     */
     listener (interaction) {
         if (interaction.isButton()) {
             if (interaction.component.customId === "set-label") {
+                const label = new TextInputBuilder()
+                    .setCustomId("label")
+                    .setLabel("Label")
+                    .setStyle(TextInputStyle.Short)
+                    .setMinLength(3)
+                    .setMaxLength(64)
+                    .setRequired(true);
+
                 const modal = new ModalBuilder()
                     .setCustomId("set-label-" + interaction.message.id)
                     .setTitle("Set File Label")
                     .addComponents(
-                        new TextInputBuilder()
-                            .setCustomId("label")
-                            .setLabel("Label")
-                            .setStyle("SHORT")
-                            .setMinLength(3)
-                            .setMaxLength(64)
-                            .setRequired(true)
+                        new ActionRowBuilder().addComponents(label)
                     );
                 
                 interaction.showModal(modal);

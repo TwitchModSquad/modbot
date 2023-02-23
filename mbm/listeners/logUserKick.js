@@ -1,4 +1,4 @@
-const {EmbedBuilder} = require("discord.js");
+const {EmbedBuilder, codeBlock, cleanCodeBlockContent} = require("discord.js");
 const {Discord} = require("../../api/index");
 
 const getKickInfo = member => {
@@ -61,11 +61,19 @@ const listener = {
                                         .setAuthor({name: author.username, iconURL: author.avatarURL()});
         
                                 if (kickInfo?.reason) {
-                                    embed.addField("Reason", "```" + kickInfo.reason.toString().replace(/\\`/g, "`").replace(/`/g, "\\`") + "```", true);
+                                    embed.addFields({
+                                        name: "Reason",
+                                        value: codeBlock(cleanCodeBlockContent(kickInfo.reason.toString())),
+                                        inline: true,
+                                    });
                                 }
         
                                 if (kickInfo?.executor) {
-                                    embed.addField("Moderator", kickInfo.executor.toString(), true);
+                                    embed.addFields({
+                                        name: "Moderator",
+                                        value: kickInfo.executor.toString(),
+                                        inline: true,
+                                    });
                                 }
         
                                 channel.send({embeds: [embed]});

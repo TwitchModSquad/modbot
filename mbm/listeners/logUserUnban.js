@@ -1,4 +1,4 @@
-const {EmbedBuilder} = require("discord.js");
+const {EmbedBuilder, codeBlock, cleanCodeBlockContent} = require("discord.js");
 const {Discord} = require("../../api/index");
 const config = require("../../config.json");
 
@@ -60,9 +60,19 @@ const listener = {
                         .setColor(0xb53131)
                         .setAuthor({name: ban.guild.name, iconURL: ban.guild.iconURL()});
 
-                if (unbanInfo?.reason) embed.addField("Reason", "```" + unbanInfo.reason.toString().replace(/\\`/g, "`").replace(/`/g, "\\`") + "```", true);
+                if (unbanInfo?.reason)
+                    embed.addFields({
+                        name: "Reason",
+                        value: codeBlock(cleanCodeBlockContent(unbanInfo.reason.toString())),
+                        inline: true,
+                    });
 
-                if (unbanInfo?.executor) embed.addField("Moderator", unbanInfo.executor.toString(), true);
+                if (unbanInfo?.executor)
+                    embed.addFields({
+                        name: "Moderator",
+                        value: unbanInfo.executor.toString(),
+                        inline: true,
+                    });
 
                 banChannel.send({embeds: [embed]});
             });

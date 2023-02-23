@@ -1,4 +1,4 @@
-const {EmbedBuilder, StringSelectMenuBuilder, ActionRowBuilder, ChatInputCommandInteraction, SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandStringOption, SlashCommandUserOption, ModalBuilder, TextInputBuilder} = require("discord.js");
+const {EmbedBuilder, StringSelectMenuBuilder, ActionRowBuilder, ChatInputCommandInteraction, SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandStringOption, SlashCommandUserOption, ModalBuilder, TextInputBuilder, TextInputStyle} = require("discord.js");
 const api = require("../../api/index");
 const con = require("../../database");
 
@@ -218,26 +218,30 @@ const command = {
                         channel: interaction.channel,
                     };
 
-                    let modal = new ModalBuilder()
+                    const offense = new TextInputBuilder()
+                        .setCustomId("offense")
+                        .setLabel("Offense")
+                        .setStyle(TextInputStyle.Short)
+                        .setMinLength(3)
+                        .setMaxLength(256)
+                        .setPlaceholder("Write something like 'Harrassment' or 'Unsolicted Pictures' (Note: Don't put links here!)")
+                        .setRequired(true);
+                    
+                    const description = new TextInputBuilder()
+                        .setCustomId("description")
+                        .setLabel("Description")
+                        .setStyle(TextInputStyle.Paragraph)
+                        .setMinLength(32)
+                        .setMaxLength(2048)
+                        .setPlaceholder("Go into more detail!")
+                        .setRequired(true);
+
+                    const modal = new ModalBuilder()
                         .setCustomId("archive-create")
                         .setTitle("Create an Archive Entry")
                         .addComponents(
-                            new TextInputBuilder()
-                                .setCustomId("offense")
-                                .setLabel("Offense")
-                                .setStyle("SHORT")
-                                .setMinLength(3)
-                                .setMaxLength(256)
-                                .setPlaceholder("Write something like 'Harrassment' or 'Unsolicted Pictures' (Note: Don't put links here!)")
-                                .setRequired(true),
-                            new TextInputBuilder()
-                                .setCustomId("description")
-                                .setLabel("Description")
-                                .setStyle("LONG")
-                                .setMinLength(32)
-                                .setMaxLength(2048)
-                                .setPlaceholder("Go into more detail!")
-                                .setRequired(true)
+                            new ActionRowBuilder().addComponents(offense),
+                            new ActionRowBuilder().addComponents(description)
                         );
 
                     interaction.showModal(modal).catch(api.Logger.severe);
@@ -505,7 +509,11 @@ const command = {
                 let banStr = "";
 
                 const addField = () => {
-                    embed.addField("Bans", banStr, true);
+                    embed.addFields({
+                        name: "Bans",
+                        value: banStr,
+                        inline: true,
+                    });
                     banStr = "";
                 }
 

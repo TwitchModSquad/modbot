@@ -19,7 +19,11 @@ const command = {
                 if (links !== "") links += "\n";
                 links += `[${link.name}](${link.url}) - ${link.hotline}`;
             });
-            embed.addField(resourceGroup.name, links, false);
+            embed.addFields({
+                name: resourceGroup.name,
+                value: links,
+                inline: false,
+            })
         });
 
         interaction.reply({embeds: [embed], ephemeral: true})

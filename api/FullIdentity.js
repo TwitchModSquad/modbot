@@ -126,7 +126,7 @@ class FullIdentity extends Identity {
             });
 
             if (moderatorInStr !== "") {
-                identityEmbed.addField("Moderates For", moderatorInStr, false);
+                identityEmbed.addFields({name: "Moderates For", value: moderatorInStr, inline: false});
             }
 
             for (let di = 0; di < this.discordAccounts.length; di ++) {

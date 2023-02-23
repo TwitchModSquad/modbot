@@ -1,4 +1,4 @@
-const { ChatInputCommandInteraction, ActionRowBuilder, SlashCommandBuilder, SlashCommandStringOption, SlashCommandSubcommandBuilder, EmbedBuilder } = require("discord.js");
+const { ChatInputCommandInteraction, ActionRowBuilder, SlashCommandBuilder, SlashCommandStringOption, SlashCommandSubcommandBuilder, EmbedBuilder, ButtonStyle } = require("discord.js");
 const api = require("../../api/index");
 const con = require("../../database");
 
@@ -152,17 +152,17 @@ const command = {
                     const editButton = new ButtonBuilder()
                         .setCustomId("edit-group")
                         .setLabel("Edit")
-                        .setStyle("SECONDARY");
+                        .setStyle(ButtonStyle.Secondary);
 
                     const startButton = new ButtonBuilder()
                         .setCustomId("start-group")
                         .setLabel("Start Event")
-                        .setStyle("SUCCESS");
+                        .setStyle(ButtonStyle.Success);
 
                     const setGroupCommand = new ButtonBuilder()
                         .setCustomId("set-command")
                         .setLabel("Set Group Command")
-                        .setStyle("PRIMARY");
+                        .setStyle(ButtonStyle.Primary);
 
                     const row = new ActionRowBuilder()
                         .addComponents(editButton, startButton, setGroupCommand);
