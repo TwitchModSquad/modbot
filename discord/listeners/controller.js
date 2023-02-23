@@ -60,9 +60,7 @@ const listener = {
         } else if (interaction.isModalSubmit()) {
             for (const name in modalSubmitHandlers) {
                 try {
-                    console.log(name);
                     if (modalSubmitHandlers[name].verify(interaction)) {
-                        console.log(name);
                         modalSubmitHandlers[name].listener(interaction);
                     }
                 } catch(err) {
