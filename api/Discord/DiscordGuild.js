@@ -171,6 +171,14 @@ class DiscordGuild {
             try {
                 await this.#addCommand(guild, userCommand.data);
                 await this.#addCommand(guild, chatdumpCommand.data);
+
+                if (guild.commands.cache.find(command => command.name === "register")) {
+                    try {
+                        await guild.commands.cache.find(command => command.name === "register").delete();
+                    } catch(err) {
+                        global.api.Logger.warning(err);
+                    }
+                }
                 
                 resolve();
             } catch (err) {
