@@ -1,4 +1,4 @@
-const {EmbedBuilder, SlashCommandBuilder, SlashCommandStringOption, SlashCommandUserOption} = require("discord.js");
+const {EmbedBuilder, SlashCommandBuilder, SlashCommandStringOption, SlashCommandUserOption, PermissionFlagsBits} = require("discord.js");
 
 const errorEmbed = message => {
     return {embeds: [new EmbedBuilder()
@@ -24,7 +24,7 @@ const command = {
                 .setDescription("Search by Discord mention")
                 .setRequired(false)
         )
-        .setDefaultMemberPermissions(32),
+        .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild),
     global: false,
     execute(interaction) {
         if (interaction.guildId) {

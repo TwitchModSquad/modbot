@@ -1,4 +1,4 @@
-const {MessageEmbed, AttachmentBuilder, SlashCommandBuilder, SlashCommandStringOption, SlashCommandIntegerOption, SlashCommandNumberOption, SlashCommandBooleanOption} = require("discord.js");
+const {MessageEmbed, AttachmentBuilder, SlashCommandBuilder, SlashCommandStringOption, SlashCommandIntegerOption, SlashCommandNumberOption, SlashCommandBooleanOption, PermissionFlagsBits} = require("discord.js");
 
 const con = require("../../database");
 
@@ -57,7 +57,7 @@ const command = {
                 .setDescription("'True' if you only want the dump to be viewable by you. Default: True")
                 .setRequired(false)
         )
-        .setDefaultMemberPermissions(8)
+        .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
         .setDMPermission(false),
     global: false,
     async execute(interaction) {

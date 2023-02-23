@@ -1,4 +1,4 @@
-const {EmbedBuilder, SlashCommandBuilder, SlashCommandUserOption, SlashCommandStringOption} = require("discord.js");
+const {EmbedBuilder, SlashCommandBuilder, SlashCommandUserOption, SlashCommandStringOption, PermissionFlagsBits} = require("discord.js");
 const FullIdentity = require("../../api/FullIdentity");
 const DiscordGuild = require("../../api/Discord/DiscordGuild");
 
@@ -25,7 +25,7 @@ const command = {
                 .setDescription("Twitch name of the channel this Discord represents")
                 .setRequired(true)
         )
-        .setDefaultMemberPermissions(8)
+        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .setDMPermission(false),
     global: false,
     execute(interaction) {
