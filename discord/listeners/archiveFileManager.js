@@ -6,7 +6,7 @@ const fs = require("fs");
 const path = require('path');
 
 const mime = require("mime-types");
-const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, Message } = require('discord.js');
 
 const DIRECTORY = "./files/";
 const TEMP_DIRECTORY = DIRECTORY + "temp/";
@@ -98,6 +98,10 @@ const listener = {
     DELETED_DIRECTORY: DELETED_DIRECTORY,
     DOWNLOADABLE_TYPES: DOWNLOADABLE_TYPES,
     parseFileMessage: parseFileMessage,
+    /**
+     * Listener for this event
+     * @param {Message} message 
+     */
     listener (message) {
         if (message.channel.isThread()) {
             api.Discord.getUserById(message.author.id).then(async user => {
@@ -127,9 +131,9 @@ const listener = {
                             } else {
                                 addFile(user.identity.id, {
                                     type: "link",
-                                    name: message.content,
+                                    name: url.toString(),
                                     content_type: type,
-                                    remote_path: message.content,
+                                    remote_path: url.toString(),
                                 });
                             }
                         } catch (err) {
