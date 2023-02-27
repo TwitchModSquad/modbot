@@ -176,9 +176,22 @@ const command = {
                         .setRequired(true)
                 )
         )
+        .addSubcommand(
+            new SlashCommandSubcommandBuilder()
+                .setName("delete")
+                .setDescription("Delete a listener in the current channel")
+                .addStringOption(
+                    new SlashCommandStringOption()
+                        .setName("listener")
+                        .setDescription("The listener to remove")
+                        .setRequired(true)
+                        .setAutocomplete(true)
+                )
+        )
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
         .setDMPermission(false),
     global: false,
+    listeners: listeners,
     /**
      * Called when this command is executed
      * @param {ChatInputCommandInteraction} interaction 
@@ -201,10 +214,21 @@ const command = {
                 } else {
                     interaction.error(`Listener was not found with name \`${listener}\`!`);
                 }
-            } else if (subcommand === "edit") {
-    
             } else if (subcommand === "delete") {
-    
+                let id = Number(interaction.options.getString("listener", true));
+
+                let listener = guild.listeners.find(x => x.id === id)
+
+                if (listener) {
+                    guild.removeListener(listener).then(() => {
+                        interaction.success(`The listener of type \`${listeners[listener.event].name}\` was deleted (ID #${listener.id})`)
+                    }, err => {
+                        console.error(err);
+                        interaction.error("An error occurred!");
+                    });
+                } else {
+                    interaction.error("Could not resolve listener by ID");
+                }
             }
         }, err => {
             global.api.Logger.warning(err);
