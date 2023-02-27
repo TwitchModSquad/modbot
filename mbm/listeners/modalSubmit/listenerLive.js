@@ -30,7 +30,7 @@ const listener = {
                     }
                 });
             }
-            if (users.length > 0) {console.log(users.map(x => x.id).join(","));
+            if (users.length > 0) {
                 guild.addListener(interaction.channel, "live", users.map(x => x.id).join(",")).then(listener => {
                     interaction.success("The listener was added!");
                 }, err => {
