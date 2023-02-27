@@ -5,6 +5,7 @@ const DiscordListener = require("./DiscordListener");
 const chatdumpCommand = require("../../mbm/commands/chatdump");
 const listenerCommand = require("../../mbm/commands/listener");
 const userCommand = require("../../mbm/commands/user");
+const userContextCommand = require("../../mbm/commands/userContext");
 
 const config = require("../../config.json");
 const { TextChannel } = require("discord.js");
@@ -182,6 +183,7 @@ class DiscordGuild {
                 await this.#addCommand(guild, chatdumpCommand.data);
                 await this.#addCommand(guild, listenerCommand.data);
                 await this.#addCommand(guild, userCommand.data);
+                await this.#addCommand(guild, userContextCommand.data);
 
                 if (guild.commands.cache.find(command => command.name === "register")) {
                     try {
@@ -245,6 +247,25 @@ class DiscordGuild {
                 } else {
                     reject(err);
                 }
+            });
+        });
+    }
+
+    /**
+     * Removes a listener from the guild
+     * @param {DiscordListener} listener
+     * @returns {Promise<void>} 
+     */
+    removeListener(listener) {
+        return new Promise((resolve, reject) => {
+            con.query("delete from discord__listener where id = ?;", [listener.id], err => {
+                if (!err) {
+                    this.listeners = this.listeners.filter(x => x.id !== listener.id);
+                    global.api.Discord.listeners = global.api.Discord.listeners.filter(x => x.id !== listener.id);
+
+                    resolve();
+                } else
+                    reject(err);
             });
         });
     }
