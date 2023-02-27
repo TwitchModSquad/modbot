@@ -42,6 +42,21 @@ const listener = {
                                 chatter.id,
                             ]);
                         }).catch(api.Logger.warning);
+
+                        embed.setFooter({
+                            text: "Retrieved from Twitch Mod Squad",
+                            iconURL: "https://tms.to/assets/images/logo.webp",
+                        });
+
+                        let listeners = api.Discord.listeners.filter(
+                                x => x.event === "twitchBan"
+                                && x.data.split(",").includes(String(streamer.id))
+                            );
+
+                        listeners.forEach(listener => {
+                            listener.channel.send({embeds: [embed]})
+                                .catch(api.Logger.warning);
+                        });
                     } catch (err) {
                         api.Logger.severe(err);
                     }
