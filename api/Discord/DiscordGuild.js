@@ -1,10 +1,13 @@
 const con = require("../../database");
 const DiscordUser = require("./DiscordUser");
+const DiscordListener = require("./DiscordListener");
 
-const userCommand = require("../../mbm/commands/user");
 const chatdumpCommand = require("../../mbm/commands/chatdump");
+const listenerCommand = require("../../mbm/commands/listener");
+const userCommand = require("../../mbm/commands/user");
 
 const config = require("../../config.json");
+const { TextChannel } = require("discord.js");
 
 class DiscordGuild {
     /**
@@ -34,6 +37,13 @@ class DiscordGuild {
      * @type {string}
      */
     name;
+
+    /**
+     * Represents listeners in this guild
+     * 
+     * @type {DiscordListener[]}
+     */
+    listeners;
 
     /**
      * Add a punishment for a user
@@ -144,7 +154,7 @@ class DiscordGuild {
             const commands = guild.commands.cache;
             let command = commands.find(x => commandData.name === x.name);
 
-            if (config.force_command_push) {
+            if (command && config.force_command_push) {
                 await command.delete();
                 command = null;
             }
@@ -169,8 +179,9 @@ class DiscordGuild {
     addCommands(guild) {
         return new Promise(async (resolve, reject) => {
             try {
-                await this.#addCommand(guild, userCommand.data);
                 await this.#addCommand(guild, chatdumpCommand.data);
+                await this.#addCommand(guild, listenerCommand.data);
+                await this.#addCommand(guild, userCommand.data);
 
                 if (guild.commands.cache.find(command => command.name === "register")) {
                     try {
@@ -188,17 +199,70 @@ class DiscordGuild {
     }
 
     /**
+     * Adds a Listener to this guild
+     * @param {TextChannel} channel 
+     * @param {string} event 
+     * @param {string?} data 
+     * @returns {Promise<DiscordListener>}
+     */
+    addListener(channel, event, data) {
+        return new Promise((resolve, reject) => {
+            if (channel.guild?.id !== this.id) {
+                reject("Channel guild does not match the guild that the listener was added to");
+                return;
+            }
+
+            con.query("insert into discord__listener (guild, channel, event, data) values (?, ?, ?, ?);", [
+                this.id,
+                channel.id,
+                event,
+                data
+            ], err => {
+                if (!err) {
+                    con.query("select id from discord__listener where guild = ? and channel = ? and event = ?;", [this.id, channel.id, event], (err, res) => {
+                        if (!err) {
+                            if (res.length > 0) {
+                                let listener = new DiscordListener(res[0].id, channel.guild, channel, event, data);
+                                
+                                this.listeners = [
+                                    ...this.listeners,
+                                    listener,
+                                ]
+
+                                global.api.Discord.listeners = [
+                                    ...global.api.Discord.listeners,
+                                    listener,
+                                ];
+            
+                                resolve(listener);
+                            } else {
+                                reject("Unable to find listener");
+                            }
+                        } else {
+                            reject(err);
+                        }
+                    })
+                } else {
+                    reject(err);
+                }
+            });
+        });
+    }
+
+    /**
      * Constructor for a DiscordGuild
      * @param {number} id 
      * @param {FullIdentity} represents 
      * @param {DiscordUser} owner 
      * @param {string} name 
+     * @param {DiscordListener} listeners
      */
-    constructor(id, represents, owner, name) {
+    constructor(id, represents, owner, name, listeners) {
         this.id = id;
         this.represents = represents;
         this.owner = owner;
         this.name = name;
+        this.listeners = listeners;
     }
 
     /**

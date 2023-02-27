@@ -26,8 +26,11 @@ const listener = {
                     global.api.Logger.warning(err);
                 });
 
-                /**TODO
-                channel.send({embeds: [new EmbedBuilder()
+                let listeners = guild.listeners.filter(x => x.event === "messageEdit");
+
+                if (listeners.length > 0) {
+
+                    const embed = new EmbedBuilder()
                         .setTitle("Message Edited")
                         .addFields(
                             {
@@ -52,8 +55,14 @@ const listener = {
                             }
                         )
                         .setColor(0x4c80d4)
-                        .setAuthor({name: oldMessage.author.username, iconURL: oldMessage.author.avatarURL()})]});
-                        */
+                        .setAuthor({name: oldMessage.author.username, iconURL: oldMessage.author.displayAvatarURL()});
+
+                    listeners.forEach(listener => {
+                        listener.channel.send({embeds: [embed]})
+                            .catch(api.Logger.warning);
+                    });
+
+                }
             }).catch(err => {
                 global.api.Logger.warning(err);
             });

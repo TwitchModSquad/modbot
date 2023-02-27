@@ -47,32 +47,37 @@ const listener = {
 
             let author = member.user;
 
-            /**TODO
+            let listeners = guild.listeners.filter(x => x.event === "userKick" || x.event === "userLeave");
 
-            let embed = new EmbedBuilder()
-                    .setTitle("Member Left the Guild")
-                    .setDescription(`User ${member} ${kickInfo ? "was kicked from" : "has left"} the guild.`)
-                    .setColor(0xb53131)
-                    .setAuthor({name: author.username, iconURL: author.avatarURL()});
+            if (listeners.length > 0) {
+                let embed = new EmbedBuilder()
+                        .setTitle("Member Left the Guild")
+                        .setDescription(`User ${member} ${kickInfo ? "was kicked from" : "has left"} the guild.`)
+                        .setColor(0xb53131)
+                        .setAuthor({name: author.username, iconURL: author.displayAvatarURL()});
 
-            if (kickInfo?.reason) {
-                embed.addFields({
-                    name: "Reason",
-                    value: codeBlock(cleanCodeBlockContent(kickInfo.reason.toString())),
-                    inline: true,
+                if (kickInfo?.reason) {
+                    embed.addFields({
+                        name: "Reason",
+                        value: codeBlock(cleanCodeBlockContent(kickInfo.reason.toString())),
+                        inline: true,
+                    });
+                }
+
+                if (kickInfo?.executor) {
+                    embed.addFields({
+                        name: "Moderator",
+                        value: kickInfo.executor.toString(),
+                        inline: true,
+                    });
+                }
+
+                listeners.forEach(listener => {
+                    if ((kickInfo && listener.event === "userKick") || (!kickInfo && listener.event === "userLeave"))
+                        listener.channel.send({embeds: [embed]})
+                            .catch(api.Logger.warning);
                 });
             }
-
-            if (kickInfo?.executor) {
-                embed.addFields({
-                    name: "Moderator",
-                    value: kickInfo.executor.toString(),
-                    inline: true,
-                });
-            }
-
-            channel.send({embeds: [embed]});
-            */
         }, () => {});
     }
 };

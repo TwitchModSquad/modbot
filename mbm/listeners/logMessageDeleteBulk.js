@@ -52,44 +52,51 @@ const listener = {
                     });
     
                     if (!message.author.bot) {
-                        /**TODO
-                        let author = message.author;
+                        let listeners = guild.listeners.filter(x => x.event === "messageDelete");
+    
+                        if (listeners.length > 0) {
+                            let author = message.author;
 
-                        if (executor) author = executor;
+                            if (executor) author = executor;
 
-                        const embed = new EmbedBuilder()
-                                .setTitle("Message Deleted")
-                                .addFields(
-                                    {
-                                        name: "Channel",
-                                        value: message.channel.toString(),
-                                        inline: true,
-                                    },
-                                    {
-                                        name: "Author",
-                                        value: message.author.toString(),
-                                        inline: true,
-                                    }
-                                )
-                                .setColor(0x4c80d4)
-                                .setAuthor({name: author.username, iconURL: author.avatarURL()});
+                            const embed = new EmbedBuilder()
+                                    .setTitle("Message Deleted")
+                                    .addFields(
+                                        {
+                                            name: "Channel",
+                                            value: message.channel.toString(),
+                                            inline: true,
+                                        },
+                                        {
+                                            name: "Author",
+                                            value: message.author.toString(),
+                                            inline: true,
+                                        }
+                                    )
+                                    .setColor(0x4c80d4)
+                                    .setAuthor({name: author.username, iconURL: author.displayAvatarURL()});
 
 
-                        if (executor !== null) {
-                            embed.addFields({
-                                name: "Moderator",
-                                value: executor.toString(),
-                                inline: true,
+                            if (executor !== null) {
+                                embed.addFields({
+                                    name: "Moderator",
+                                    value: executor.toString(),
+                                    inline: true,
+                                });
+                            }
+                            if (message?.content && message.content.trim() !== "") {
+                                embed.addFields({
+                                    name: "Message Content",
+                                    value: codeBlock(cleanCodeBlockContent(message.content)),
+                                    inline: false,
+                                });
+                            }
+                            
+                            listeners.forEach(listener => {
+                                listener.channel.send({embeds: [embed]})
+                                    .catch(api.Logger.warning);
                             });
                         }
-                        if (message?.content && message.content.trim() !== "") {
-                            embed.addFields({
-                                name: "Message Content",
-                                value: codeBlock(cleanCodeBlockContent(message.content)),
-                                inline: false,
-                            });
-                        }
-                        channel.send({embeds: [embed]});*/
                     }
                 });
             }).catch(global.api.Logger.warning);
