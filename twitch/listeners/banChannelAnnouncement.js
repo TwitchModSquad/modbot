@@ -17,7 +17,7 @@ const listener = {
             if (config.hasOwnProperty("liveban_channel")) {
                 let dchnl = global.modSquadGuild.channels.cache.find(dchnl => dchnl.id == config.liveban_channel);
     
-                if (dchnl.isText()) {
+                if (dchnl.type === Discord.ChannelType.GuildText) {
                     try {
                         const embed = await formatting.parseBanEmbed(streamer, chatter, bpm, timebanned);
 
