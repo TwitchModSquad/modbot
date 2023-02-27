@@ -40,14 +40,10 @@ const command = {
                         try {
                             let users = await global.api.Twitch.getUserByName(interaction.options.getString("twitch"));
                             for (let i = 0; i < users.length; i++) {
-                                if (users[i].identity?.id) {
-                                    await loadIdentity(users[i].identity.id);
-                                } else {
-                                    embeds = [
-                                        ...embeds,
-                                        await users[i].discordEmbed()
-                                    ];
-                                }
+                                embeds = [
+                                    ...embeds,
+                                    await users[i].discordEmbed()
+                                ];
                             }
                         } catch (err) {}
                     }
@@ -55,14 +51,10 @@ const command = {
                         try {
                             let user = await global.api.Discord.getUserById(interaction.options.getUser("discord").id);
 
-                            if (user.identity?.id) {
-                                await loadIdentity(user.identity.id);
-                            } else if (user) {
-                                embeds = [
-                                    ...embeds,
-                                    await user.discordEmbed()
-                                ];
-                            }
+                            embeds = [
+                                ...embeds,
+                                await user.discordEmbed()
+                            ];
                         } catch (err) {}
                     }
 
