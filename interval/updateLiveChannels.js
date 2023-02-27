@@ -107,13 +107,10 @@ module.exports = () => {
                 
                             channel.send({embeds: [embed]});
 
-                            console.log(api.Discord.listeners);
                             api.Discord.listeners.filter(x => x.event === "live").forEach(listener => {
                                 if (!listener.data) return;
 
                                 let streamers = listener.data.split(",");
-                                console.log(streamers);
-                                console.log(user.id);
                                 if (streamers.includes(String(user.id))) {
                                     listener.channel.send({embeds: [embed]}).catch(api.Logger.warning);
                                 }
