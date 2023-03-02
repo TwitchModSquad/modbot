@@ -9,7 +9,7 @@ const addCommand = (guild, commandData) => {
         const commands = guild.commands.cache;
         let command = commands.find(x => commandData.name === x.name);
 
-        if (config.force_command_push) {
+        if (config.force_command_push && command) {
             try {
                 await guild.commands.delete(command.id);
             } catch(err) {
