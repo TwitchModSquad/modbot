@@ -109,7 +109,10 @@ class ListenClient {
             channel,
         ]
         if (this.client)
-            this.client.join(channel).catch(api.Logger.warning);
+            this.client.join(channel).catch(err => {
+                api.Logger.warning("Error occurred while joining #" + channel + ":");
+                api.Logger.warning(err);
+            });
     }
     
     /**
