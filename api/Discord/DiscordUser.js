@@ -124,12 +124,11 @@ class DiscordUser extends User {
                     .setFooter({text: "TMS Discord User #" + this.id, iconURL: "https://tms.to/assets/images/logos/logo.webp"});
 
             const mutualGuilds = await this.getGuilds();
-            console.log(mutualGuilds)
             
             if (mutualGuilds.length > 0) {
                 let guilds = "";
                 mutualGuilds.forEach(guild => {
-                    if (guilds !== "") guild += "\n";
+                    if (guilds !== "") guilds += "\n";
                     guilds += guild.name;
                 });
                 embed.addFields(
