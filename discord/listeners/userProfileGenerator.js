@@ -23,6 +23,8 @@ const listener = {
      * @param {Message} message 
      */
     async listener (message) {
+        if (!message?.content || message.content.length === 0) return;
+
         const content = message.content.toLowerCase();
         if (!(content.includes("-i:") || content.includes("-d:") || content.includes("-t:"))) return;
 
