@@ -74,11 +74,7 @@ class DiscordUser extends User {
      * @returns {string}
      */
     getShortlink() {
-        if (this.identity?.id) {
-            return "https://tms.to/i/" + this.identity.id;
-        } else {
-            return "https://tms.to/d/" + this.id;
-        }
+        return `https://tms.to/panel/user/${this.id}`;
     }
 
     /**
@@ -131,7 +127,7 @@ class DiscordUser extends User {
             if (mutualGuilds.length > 0) {
                 let guilds = "";
                 mutualGuilds.forEach(guild => {
-                    if (guilds !== "") guild += "\n";
+                    if (guilds !== "") guilds += "\n";
                     guilds += guild.name;
                 });
                 embed.addFields(

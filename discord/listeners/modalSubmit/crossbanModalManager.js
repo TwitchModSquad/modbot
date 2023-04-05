@@ -1,6 +1,6 @@
 const Discord = require("discord.js");
 const api = require("../../../api/index");
-const {storedCrossBanChannels, storedCrossBanUser} = require("../selectMenu/crossbanManager");
+const {storedCrossBanChannels, storedCrossBanUser} = require("../button/crossbanManager");
 
 const config = require("../../../config.json");
 const con = require("../../../database");

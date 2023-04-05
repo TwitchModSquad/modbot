@@ -472,11 +472,7 @@ class TwitchUser extends User {
      * @returns {string}
      */
     getShortlink() {
-        if (this.identity?.id) {
-            return "https://tms.to/i/" + this.identity.id;
-        } else {
-            return "https://tms.to/t/" + this.id;
-        }
+        return `https://tms.to/panel/user/${this.id}`;
     }
 
     /**

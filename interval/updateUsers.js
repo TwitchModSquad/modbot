@@ -70,14 +70,15 @@ module.exports = () => {
             try {
                 let followers = await api.Twitch.Direct.helix.users.getFollows({followedUser: userId});
 
-                if (followers.total >= GET_MODS_THRESHOLD) {
+                con.query("update twitch__user set follower_count = ? where id = ?;", [followers.total, userId]);
+
+                /*if (followers.total >= GET_MODS_THRESHOLD) {
                     let user = await api.Twitch.getUserById(userId);
                     await user.refreshMods(false);
-                }
-
-                con.query("update twitch__user set follower_count = ? where id = ?;", [followers.total, userId]);
+                }*/
             } catch (err) {
-                global.api.Logger.warning(err);
+                api.Logger.warning("An error occurred while updating follower counts & moderators:");
+                api.Logger.warning(err);
             }
         });
     });
