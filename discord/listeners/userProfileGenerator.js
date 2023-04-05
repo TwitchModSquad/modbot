@@ -14,8 +14,8 @@ const notFoundEmbed = query => {
             .setColor(0x772ce8);
 }
 
-const process = async (message, regex, type) => {
-    let match = message.content.match(regex);
+const process = async (content, regex, type) => {
+    let match = content.match(regex);
     
     if (match.length > 0) {
         let embeds = [];
@@ -48,12 +48,16 @@ const process = async (message, regex, type) => {
             }
         }
 
-        if (embeds.length > 0)
-            message.reply({embeds: embeds});
-
-        if (errorEmbeds.length > 0)
-            message.member.send({embeds: errorEmbeds}).then(() => {}, err => {});
+        return {
+            embeds: embeds,
+            errorEmbeds: errorEmbeds
+        };
     }
+
+    return {
+        embeds: [],
+        errorEmbeds: []
+    };
 }
 
 const listener = {
@@ -64,17 +68,52 @@ const listener = {
      * Function for this listener
      * @param {Message} message 
      */
-    listener (message) {
+    async listener (message) {
         const content = message.content.toLowerCase();
         if (!(content.includes("-i:") || content.includes("-d:") || content.includes("-t:"))) return;
 
+        let embeds = [];
+        let errorEmbeds = [];
+
         if (content.indexOf("-i:") !== -1) {
-            process(message, identityRegex, "identity");
-        } else if (content.indexOf("-d:") !== -1) {
-            process(message, discordRegex, "discord");
-        } else if (content.indexOf("-t:") !== -1) {
-            process(message, twitchRegex, "twitch");
+            const result = await process(content, identityRegex, "identity");
+            embeds = [
+                ...embeds,
+                ...result.embeds,
+            ];
+            errorEmbeds = [
+                ...errorEmbeds,
+                ...result.errorEmbeds,
+            ];
         }
+        if (content.indexOf("-d:") !== -1) {
+            const result = await process(content, discordRegex, "discord");
+            embeds = [
+                ...embeds,
+                ...result.embeds,
+            ];
+            errorEmbeds = [
+                ...errorEmbeds,
+                ...result.errorEmbeds,
+            ];
+        }
+        if (content.indexOf("-t:") !== -1) {
+            const result = await process(content, twitchRegex, "twitch");
+            embeds = [
+                ...embeds,
+                ...result.embeds,
+            ];
+            errorEmbeds = [
+                ...errorEmbeds,
+                ...result.errorEmbeds,
+            ];
+        }
+
+        if (embeds.length > 0)
+            message.reply({embeds: embeds});
+
+        if (errorEmbeds.length > 0)
+            message.member.send({embeds: errorEmbeds}).then(() => {}, err => {});
     }
 };
 
