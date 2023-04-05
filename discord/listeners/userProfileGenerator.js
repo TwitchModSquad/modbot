@@ -1,4 +1,4 @@
-const {EmbedBuilder} = require("discord.js");
+const {EmbedBuilder, Message} = require("discord.js");
 const api = require("../../api/index");
 
 const config = require("../../config.json");
@@ -60,15 +60,19 @@ const listener = {
     name: 'userProfileGenerator',
     eventName: 'messageCreate',
     eventType: 'on',
+    /**
+     * Function for this listener
+     * @param {Message} message 
+     */
     listener (message) {
-        if (message.guild.id !== config.modsquad_discord) return;
+        const content = message.content.toLowerCase();
+        if (!(content.includes("-i:") || content.includes("-d:") || content.includes("-t:"))) return;
 
-
-        if (message.content.toLowerCase().indexOf("-i:") !== -1) {
+        if (content.indexOf("-i:") !== -1) {
             process(message, identityRegex, "identity");
-        } else if (message.content.toLowerCase().indexOf("-d:") !== -1) {
+        } else if (content.indexOf("-d:") !== -1) {
             process(message, discordRegex, "discord");
-        } else if (message.content.toLowerCase().indexOf("-t:") !== -1) {
+        } else if (content.indexOf("-t:") !== -1) {
             process(message, twitchRegex, "twitch");
         }
     }
