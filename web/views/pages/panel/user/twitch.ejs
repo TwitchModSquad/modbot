@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+login<!DOCTYPE html>
 <html lang="en">
 <head>
     <title>TMS Panel - Twitch User <%= user.display_name %></title>
@@ -27,7 +27,7 @@
                             <h3><%= user.display_name %><% if (user.affiliation === "partner") { %><img src="/assets/images/badges/twitch/partner.png" alt="partner" title="Twitch Partner" /><% } %><% if (user.identity?.admin) { %><img src="/assets/images/badges/tms/admin.png" alt="tms administrator" title="TMS Administrator" /><% } %><% if (user.identity?.mod) { %><img src="/assets/images/badges/tms/mod.png" alt="tms moderator" title="TMS Moderator" /><% } %> <span class="id"><%= user.id %></span></h3>
                             <div class="follower-count"><strong>Follower Count:</strong> <%= comma(user.follower_count) %></div>
                             <div class="view-count"><strong>View Count:</strong> <%= comma(user.view_count) %></div>
-                            <div class="twitch-account"><strong>Twitch Account:</strong> <a target="__blank" href="https://twitch.tv/<%= user.display_name.toLowerCase() %>">https://twitch.tv/<%= user.display_name.toLowerCase() %></a></div>
+                            <div class="twitch-account"><strong>Twitch Account:</strong> <a target="__blank" href="https://twitch.tv/<%= user.login %>">https://twitch.tv/<%= user.login %></a></div>
                             <div class="chat-logs"><strong>User Chat Logs:</strong> <a href="/panel/chat-history?chatter=<%= user.id %>">Click to view</a></div>
                         </div>
                     </div>
