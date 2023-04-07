@@ -151,7 +151,7 @@ class Group extends Cachable {
                     .setColor(0x772ce8)
                     .setFooter({text: "ID: " + this.id, iconURL: "https://tms.to/assets/images/logos/logo.webp"})
                     .addFields([
-                        {name: "Host", value: "[" + this.host.display_name + "](https://twitch.tv/" + this.host.display_name.toLowerCase() + ")" + (hostIdentity === null || hostIdentity.discordAccounts.length === 0 ? "" : " [<@" + hostIdentity.discordAccounts[0].id + ">]"), inline: true},
+                        {name: "Host", value: "[" + this.host.display_name + "](https://twitch.tv/" + this.host.login + ")" + (hostIdentity === null || hostIdentity.discordAccounts.length === 0 ? "" : " [<@" + hostIdentity.discordAccounts[0].id + ">]"), inline: true},
                         {name: "Posted By", value: `<@${this.created_by.discordAccounts[0].id}>`, inline: true},
                     ]);
 
@@ -162,7 +162,7 @@ class Group extends Cachable {
 
                     if (participantList !== "") participantList += "\n";
 
-                    participantList += "**" + (i + 1) + "** - [" + participant.display_name + "](https://twitch.tv/" + participant.display_name.toLowerCase() + ")";
+                    participantList += "**" + (i + 1) + "** - [" + participant.display_name + "](https://twitch.tv/" + participant.login + ")";
 
                     if (participant.identity?.id) {
                         let identity = await api.getFullIdentity(participant.identity.id);
@@ -266,7 +266,7 @@ class Group extends Cachable {
             const embed = new EmbedBuilder()
                 .setTitle("Edit Group")
                 .setColor(0x772ce8)
-                .setDescription(`\`${this.game}\` hosted by [${this.host.display_name}](https://twitch.tv/${this.host.display_name.toLowerCase()})`)
+                .setDescription(`\`${this.game}\` hosted by [${this.host.display_name}](https://twitch.tv/${this.host.login})`)
                 .setFooter({text: "ID: " + this.id, iconURL: "https://tms.to/assets/images/logos/logo.webp"});
 
             const setStartTime = new ButtonBuilder()
@@ -337,7 +337,7 @@ class Group extends Cachable {
 
                     
                     try {
-                        await global.client.listen.client.say(streamer.display_name.toLowerCase(), command);
+                        await global.client.listen.client.say(streamer.login, command);
 
                         let isMod = global.client.listen.isMod(streamer);
 
@@ -543,8 +543,8 @@ class Group extends Cachable {
                 } else {
                     if (executor) this.sendUpdate(this.getUpdate()
                         .addFields([
-                            {name: "Old Host", value: `[${this.host.display_name}](https://twitch.tv/${this.host.display_name.toLowerCase()})`, inline: true},
-                            {name: "New Host", value: `[${user.display_name}](https://twitch.tv/${user.display_name.toLowerCase()})`, inline: true},
+                            {name: "Old Host", value: `[${this.host.display_name}](https://twitch.tv/${this.host.login})`, inline: true},
+                            {name: "New Host", value: `[${user.display_name}](https://twitch.tv/${user.login})`, inline: true},
                         ]), executor).catch(global.api.Logger.warning);
                     this.host = user;
                     this.participants = this.participants.filter(x => x.id !== user.id);
@@ -569,7 +569,7 @@ class Group extends Cachable {
                     } else {
                         if (executor) this.sendUpdate(this.getUpdate()
                             .addFields([
-                                {name: "New Participant", value: `[${participant.display_name}](https://twitch.tv/${participant.display_name.toLowerCase()})`, inline: true},
+                                {name: "New Participant", value: `[${participant.display_name}](https://twitch.tv/${participant.login})`, inline: true},
                             ]), executor).catch(global.api.Logger.warning);
                         this.participants = [
                             ...this.participants,
@@ -600,7 +600,7 @@ class Group extends Cachable {
                     let participant = participants[i];
                     if (participant.id !== this.host.id) {
                         if (participantString !== "") participantString += "\n";
-                        participantString += `[${participant.display_name}](https://twitch.tv/${participant.display_name.toLowerCase()})`;
+                        participantString += `[${participant.display_name}](https://twitch.tv/${participant.login})`;
                         await con.pquery("delete from group__user where group_id = ? and user_id = ? and host = false;", [this.id, participant.id]);
                         this.participants = this.participants.filter(x => x.id !== participant.id);
                     }
@@ -759,7 +759,7 @@ class Group extends Cachable {
         let groupString = host;
 
         this.participants.forEach((participant, i) => {
-            groupString += "/" + encodeURI(participant.display_name.toLowerCase());
+            groupString += "/" + encodeURI(participant.login);
         });
 
         return groupString;

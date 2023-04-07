@@ -153,7 +153,7 @@ const command = {
                 let log = res[i];
                 let streamer = await global.api.Twitch.getUserById(log.streamer_id);
                 let user = await global.api.Twitch.getUserById(log.user_id);
-                str += formatDate(new Date(log.timesent)) + " [#" + streamer.display_name.toLowerCase() + "] " + user.display_name + ": " + log.message + "\n";
+                str += formatDate(new Date(log.timesent)) + " [#" + streamer.login + "] " + user.display_name + ": " + log.message + "\n";
             }
             
             const attachment = new AttachmentBuilder(Buffer.from(str, 'utf-8'), {name: "dump-" + Date.now() + ".txt", description: "Chat history!", content_type: "text/plain"});

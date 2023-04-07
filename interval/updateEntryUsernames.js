@@ -43,7 +43,7 @@ module.exports = () => {
                     try {
                         let user = await api.Twitch.getUserById(helixUser.id, true);
         
-                        if (helixUser.displayName.toLowerCase() !== user.display_name.toLowerCase()) {
+                        if (helixUser.displayName.toLowerCase() !== user.login) {
                             await con.pquery("update twitch__username set last_seen = now() where id = ? and display_name = ?;", [user.id, user.display_name]);
                             await con.pquery("insert into twitch__username (id, display_name) values (?, ?) on duplicate key update display_name = ?;", [user.id, helixUser.displayName, helixUser.displayName]);
                             await con.pquery("update twitch__user set display_name = ? where id = ?;", [helixUser.displayName, user.id]);

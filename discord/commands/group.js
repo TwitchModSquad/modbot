@@ -128,7 +128,7 @@ const command = {
                         .setAuthor({iconURL: host.profile_image_url, name: host.display_name})
                         .setColor(0x772ce8)
                         .addFields([
-                            {name: "Host", value: "[" + host.display_name + "](https://twitch.tv/" + host.display_name.toLowerCase() + ")" + (hostIdentity === null || hostIdentity.discordAccounts.length === 0 ? "" : " [<@" + hostIdentity.discordAccounts[0].id + ">]"), inline: true},
+                            {name: "Host", value: "[" + host.display_name + "](https://twitch.tv/" + host.login + ")" + (hostIdentity === null || hostIdentity.discordAccounts.length === 0 ? "" : " [<@" + hostIdentity.discordAccounts[0].id + ">]"), inline: true},
                             {name: "Posted By", value: interaction.member.toString(), inline: true},
                         ]);
 
@@ -139,7 +139,7 @@ const command = {
 
                         if (participantList !== "") participantList += "\n";
 
-                        participantList += "**" + (i + 1) + "** - [" + user.display_name + "](https://twitch.tv/" + user.display_name.toLowerCase() + ")";
+                        participantList += "**" + (i + 1) + "** - [" + user.display_name + "](https://twitch.tv/" + user.login + ")";
 
                         if (user.identity?.id) {
                             let identity = await api.getFullIdentity(user.identity.id);

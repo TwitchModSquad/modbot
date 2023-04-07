@@ -6,12 +6,12 @@ module.exports = {
     description: "Stops any active groups for this streamer if the streamer is the host of the event",
     async execute(streamer, chatter, tags, alias, args, message) {
         const handleError = err => {
-            global.client.ban.say(streamer.display_name.toLowerCase(), chatter.display_name + ", an error occurred while processing this command!");
+            global.client.ban.say(streamer.login, chatter.display_name + ", an error occurred while processing this command!");
             api.Logger.severe(err);
         }
 
         const handleExpectedError = err => {
-            global.client.ban.say(streamer.display_name.toLowerCase(), chatter.display_name + ", " + err);
+            global.client.ban.say(streamer.login, chatter.display_name + ", " + err);
         }
 
         const badges = tags.badges || {};
@@ -37,9 +37,9 @@ module.exports = {
                             }
 
                             if (stopped > 0) {
-                                global.client.ban.say(streamer.display_name.toLowerCase(), `${chatter.display_name}, stopped ${stopped} group${stopped === 1 ? "" : "s"}!`);
+                                global.client.ban.say(streamer.login, `${chatter.display_name}, stopped ${stopped} group${stopped === 1 ? "" : "s"}!`);
                             } else
-                                global.client.ban.say(streamer.display_name.toLowerCase(), `${chatter.display_name}, there were no events to stop!`);
+                                global.client.ban.say(streamer.login, `${chatter.display_name}, there were no events to stop!`);
                         } catch(err2) {
                             handleError(err2);
                         }

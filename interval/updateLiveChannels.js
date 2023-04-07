@@ -86,7 +86,7 @@ module.exports = () => {
                                 .setAuthor({name: `🔴 ${user.display_name} is now live!`})
                                 .setTitle(stream.title)
                                 .setColor(0x7d3bdc)
-                                .setURL("https://twitch.tv/" + user.display_name.toLowerCase())
+                                .setURL("https://twitch.tv/" + user.login)
                                 .setImage(stream.getThumbnailUrl(256, 144))
                                 .addFields(
                                     {
@@ -145,7 +145,7 @@ module.exports = () => {
                     const embed = new EmbedBuilder()
                         .setTitle(`${user.display_name} has gone offline!`)
                         .setColor(0x451b7f)
-                        .setURL("https://twitch.tv/" + user.display_name.toLowerCase())
+                        .setURL("https://twitch.tv/" + user.login)
                         .setTimestamp(new Date())
                         .setFooter({text: `${user.display_name} : Offline`, iconURL: user.profile_image_url});
         

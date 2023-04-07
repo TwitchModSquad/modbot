@@ -86,7 +86,7 @@ class Formatting {
                 const embed = new Discord.EmbedBuilder()
                         .setTitle(`User was Banned!`)
                         .setURL(chatter.getShortlink())
-                        .setAuthor({name: streamer.display_name, iconURL: streamer.profile_image_url, url: "https://twitch.tv/" + streamer.display_name.toLowerCase()})
+                        .setAuthor({name: streamer.display_name, iconURL: streamer.profile_image_url, url: "https://twitch.tv/" + streamer.login})
                         .setDescription(`User \`${chatter.display_name}\` was banned from channel \`${streamer.display_name}\``)
                         .setColor(0xe83b3b);
 
@@ -204,7 +204,7 @@ class Formatting {
 
                 // Assemble active channels
                 lares.forEach(xchnl => {
-                    activeChannels += "\n" + xchnl.channel + (' '.repeat(Math.max(1, longestChannelName + ACTIVE_CHANNEL_PADDING - xchnl.channel.length))) + this.parseDate(parseInt(xchnl.lastactive)) + (bannedChannels.includes(xchnl.channel) || xchnl.channel.toLowerCase() === streamer.display_name.toLowerCase() ? ' [❌ banned]' : '');
+                    activeChannels += "\n" + xchnl.channel + (' '.repeat(Math.max(1, longestChannelName + ACTIVE_CHANNEL_PADDING - xchnl.channel.length))) + this.parseDate(parseInt(xchnl.lastactive)) + (bannedChannels.includes(xchnl.channel) || xchnl.channel.toLowerCase() === streamer.login ? ' [❌ banned]' : '');
 
                     bannedChannels.splice(bannedChannels.indexOf(xchnl.channel), 1);
                 });

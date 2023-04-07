@@ -30,7 +30,7 @@
 
             <div class="streamers">
                 <% featuredStreamers.forEach((streamer, i) => { %>
-                    <a class="streamer<%= (i === 0 || i === 4) ? " small" : "" %><%= (i === 2) ? " big" : "" %>" href="https://twitch.tv/<%= streamer.display_name.toLowerCase() %>" target="__blank">
+                    <a class="streamer<%= (i === 0 || i === 4) ? " small" : "" %><%= (i === 2) ? " big" : "" %>" href="https://twitch.tv/<%= streamer.login %>" target="__blank">
                         <img src="<%= streamer.profile_image_url %>" alt="Twitch profile picture for <%= streamer.display_name %>">
                         <div class="streamer-info">
                             <h3><%= streamer.display_name %><% if (streamer.affiliation === "partner") { %> <img src="/assets/images/badges/twitch/partner.png" alt="twitch partner" class="partner-badge"><% } %></h3>
@@ -62,7 +62,7 @@
 
             <div class="streamers">
                 <% participatingStreamers.forEach((streamer, i) => { %>
-                    <a class="streamer<%= (i === 0 || i === 4) ? " small" : "" %><%= (i === 2) ? " big" : "" %>" href="https://twitch.tv/<%= streamer.display_name.toLowerCase() %>" target="__blank">
+                    <a class="streamer<%= (i === 0 || i === 4) ? " small" : "" %><%= (i === 2) ? " big" : "" %>" href="https://twitch.tv/<%= streamer.login %>" target="__blank">
                         <img src="<%= streamer.profile_image_url %>" alt="Twitch profile picture for <%= streamer.display_name %>">
                         <div class="streamer-info">
                             <h3><%= streamer.display_name %><% if (streamer.affiliation === "partner") { %> <img src="/assets/images/badges/twitch/partner.png" alt="twitch partner" class="partner-badge"><% } %></h3>

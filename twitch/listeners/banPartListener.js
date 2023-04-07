@@ -27,10 +27,10 @@ const listener = {
             }
 
             api.Logger.warning(`Parting from channel ${streamer.display_name} for exceeding BPM threshold of ${PART_THRESHOLD}`);
-            global.partFromChannel(streamer.display_name.toLowerCase());
+            global.partFromChannel(streamer.login);
 
             setTimeout(() => {
-                global.listenOnChannel(streamer.display_name.toLowerCase());
+                global.listenOnChannel(streamer.login);
             }, PART_TIME * 60 * 1000);
         }
     }

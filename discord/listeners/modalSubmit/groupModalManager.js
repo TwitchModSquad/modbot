@@ -98,7 +98,7 @@ const listener = {
                     delete cache[interaction.user.id];
 
                     if (method === "sendcmd") {
-                        global.client.listen.client.say(streamer.display_name.toLowerCase(), command).then(() => {
+                        global.client.listen.client.say(streamer.login, command).then(() => {
                             let isMod = global.client.listen.isMod(streamer);
     
                             let embed = new EmbedBuilder()
@@ -156,7 +156,7 @@ const listener = {
                             },
                             {
                                 name: "Host",
-                                value: `[${host.display_name}](https://twitch.tv/${host.display_name.toLowerCase()})`,
+                                value: `[${host.display_name}](https://twitch.tv/${host.login})`,
                                 inline: true,
                             },
                             {
@@ -188,7 +188,7 @@ const listener = {
                         let participant = copyCache[interaction.user.id].participants[i];
                         if (participantString !== "") participantString += "\n";
 
-                        participantString += `${i+1} - [${participant.display_name}](https://twitch.tv/${participant.display_name.toLowerCase()})`;
+                        participantString += `${i+1} - [${participant.display_name}](https://twitch.tv/${participant.login})`;
                     }
 
                     embed.addFields([

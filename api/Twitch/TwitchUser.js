@@ -172,7 +172,7 @@ class TwitchUser extends User {
 
             https.request({
                 host: "modlookup.3v.fi",
-                path: "/api/user-v3/" + this.display_name.toLowerCase() + "?limit=100&cursor="
+                path: "/api/user-v3/" + this.login + "?limit=100&cursor="
             }, response => {
                 let str = "";
     
@@ -220,7 +220,7 @@ class TwitchUser extends User {
                                         let active = user.follower_count >= FOLLOWER_REQUIREMENT || user.affiliation === "partner";
 
                                         if (active && global.listenOnChannel) {
-                                            global.listenOnChannel(user.display_name.toLowerCase());
+                                            global.listenOnChannel(user.login);
                                         }
 
                                         con.query("insert into identity__moderator (identity_id, modfor_id, active) values (?, ?, ?) on duplicate key update active = ?;", [thisUser.identity.id, identity.id, active, active]);
@@ -486,7 +486,7 @@ class TwitchUser extends User {
                     .setAuthor({name: this.display_name, iconURL: this.profile_image_url, url: this.getShortlink()})
                     .setColor(0x772ce8)
                     .setThumbnail(this.profile_image_url)
-                    .setDescription(`\`\`\`${this.id}\`\`\`**Name: **${this.display_name}\n**Followers: **${comma(this.follower_count)}\n**Views: **${comma(this.view_count)}\n[Profile](https://twitch.tv/${this.display_name.toLowerCase()})`)
+                    .setDescription(`\`\`\`${this.id}\`\`\`**Name: **${this.display_name}\n**Followers: **${comma(this.follower_count)}\n**Views: **${comma(this.view_count)}\n[Profile](https://twitch.tv/${this.login})`)
                     .setFooter({text: "TMS Twitch User #" + this.id, iconURL: "https://tms.to/assets/images/logos/logo.webp"});
 
             if (this.description && this.description !== "")
@@ -505,7 +505,7 @@ class TwitchUser extends User {
                 let streamerStr = "";
                 streamers.forEach(streamer => {
                     if (streamerStr !== "") streamerStr += "\n";
-                    streamerStr += `**${streamer.display_name}** : [Profile](https://twitch.tv/${streamer.display_name.toLowerCase()})`;
+                    streamerStr += `**${streamer.display_name}** : [Profile](https://twitch.tv/${streamer.login})`;
                 });
 
                 if (streamerStr.length <= 1024) {
@@ -522,7 +522,7 @@ class TwitchUser extends User {
                 let modsStr = "";
                 mods.forEach(mod => {
                     if (modsStr !== "") modsStr += "\n";
-                    modsStr += `**${mod.display_name}** : [Profile](https://twitch.tv/${mod.display_name.toLowerCase()})`;
+                    modsStr += `**${mod.display_name}** : [Profile](https://twitch.tv/${mod.login})`;
                 });
 
                 if (modsStr.length <= 1024) {

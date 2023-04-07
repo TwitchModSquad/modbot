@@ -72,7 +72,7 @@ const listener = {
                 },
                 {
                     name: "Host",
-                    value: `[${cache.host.display_name}](https://twitch.tv/${cache.host.display_name.toLowerCase()})`,
+                    value: `[${cache.host.display_name}](https://twitch.tv/${cache.host.login})`,
                     inline: true,
                 },
                 {
@@ -115,7 +115,7 @@ const listener = {
             let participant = cache.participants[i];
             if (participantString !== "") participantString += "\n";
 
-            participantString += `${i+1} - [${participant.display_name}](https://twitch.tv/${participant.display_name.toLowerCase()})`;
+            participantString += `${i+1} - [${participant.display_name}](https://twitch.tv/${participant.login})`;
         }
 
         embed.addFields([
@@ -555,7 +555,7 @@ const listener = {
                                     .setAuthor({iconURL: cache.host.profile_image_url, name: cache.host.display_name})
                                     .setColor(0x772ce8)
                                     .addFields([
-                                        {name: "Host", value: "[" + cache.host.display_name + "](https://twitch.tv/" + cache.host.display_name.toLowerCase() + ")" + (hostIdentity === null || hostIdentity.discordAccounts.length === 0 ? "" : " [<@" + hostIdentity.discordAccounts[0].id + ">]"), inline: true},
+                                        {name: "Host", value: "[" + cache.host.display_name + "](https://twitch.tv/" + cache.host.login + ")" + (hostIdentity === null || hostIdentity.discordAccounts.length === 0 ? "" : " [<@" + hostIdentity.discordAccounts[0].id + ">]"), inline: true},
                                         {name: "Posted By", value: interaction.member.toString(), inline: true},
                                     ]);
 
@@ -566,7 +566,7 @@ const listener = {
 
                                     if (participantList !== "") participantList += "\n";
 
-                                    participantList += "**" + (i + 1) + "** - [" + user.display_name + "](https://twitch.tv/" + user.display_name.toLowerCase() + ")";
+                                    participantList += "**" + (i + 1) + "** - [" + user.display_name + "](https://twitch.tv/" + user.login + ")";
 
                                     if (user.identity?.id) {
                                         let identity = await api.getFullIdentity(user.identity.id);

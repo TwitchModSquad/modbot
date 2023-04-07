@@ -119,7 +119,7 @@ class FullIdentity extends Identity {
                 moderatorInStr += "**"+modLink.modForIdentity.name+"**";
 
                 if (modLink.modForIdentity.twitchAccounts.length > 0)
-                    moderatorInStr += " - [Profile](https://twitch.tv/" + modLink.modForIdentity.twitchAccounts[0].display_name.toLowerCase() + ")";
+                    moderatorInStr += " - [Profile](https://twitch.tv/" + modLink.modForIdentity.twitchAccounts[0].login + ")";
 
                 if (modLink.modForIdentity.discordAccounts.length > 0)
                     moderatorInStr += ` - <@${modLink.modForIdentity.discordAccounts[0].id}>`;

@@ -182,7 +182,7 @@ class ListenClient {
      * @return {boolean|null}
      */
     isMod(streamer) {
-        const botState = this.client.userstate["#" + streamer.display_name.toLowerCase()];
+        const botState = this.client.userstate["#" + streamer.login];
         if (botState !== undefined) {
             return botState.mod;
         } else {
