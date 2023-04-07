@@ -21,6 +21,11 @@ const listener = {
                     try {
                         const embed = await formatting.parseBanEmbed(streamer, chatter, bpm, timebanned);
 
+                        const commentButton = new Discord.ButtonBuilder()
+                                .setCustomId("comment-" + chatter.id)
+                                .setLabel("Add Comment")
+                                .setStyle(ButtonStyle.Primary);
+
                         const crossbanButton = new Discord.ButtonBuilder()
                                 .setCustomId("cb-" + chatter.id)
                                 .setLabel("Crossban")
@@ -32,7 +37,7 @@ const listener = {
                                 .setStyle(ButtonStyle.Secondary);
                         
                         const row = new Discord.ActionRowBuilder()
-                                .addComponents(crossbanButton, hideButton);
+                                .addComponents(commentButton, crossbanButton, hideButton);
 
                         dchnl.send({embeds: [embed], components: [row]}).then(message => {
                             con.query("update twitch__ban set discord_message = ? where timebanned = ? and streamer_id = ? and user_id = ?;", [

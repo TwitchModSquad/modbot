@@ -10,39 +10,12 @@ const addCommand = (guild, commandData) => {
         if (!command) {
             try {
                 command = await guild.commands.create(commandData);
+                resolve();
             } catch (err) {
                 reject(err);
                 return;
             }
         }
-        
-        let permissions = [{
-            id: guild.ownerId,
-            type: 'USER',
-            permission: true,
-        }, {
-            id: "267380687345025025", // Override to allow @Twijn#8888 to access commands for debug purposes.
-            type: 'USER',
-            permission: true,
-        }];
-    
-        try {
-            let dGuild = await Discord.getGuild(guild.id);
-            let adminRole = await dGuild.getSetting("rm-admin", "role");
-            
-            if (adminRole?.id) {
-                permissions = [
-                    ...permissions,
-                    {
-                        id: adminRole.id,
-                        type: 'ROLE',
-                        permission: true,
-                    },
-                ];
-            }
-        } catch (err) {}
-    
-        command.permissions.set({guild: guild.id, command: command.id, permissions: permissions}).then(resolve).catch(reject);
     });
 }
 

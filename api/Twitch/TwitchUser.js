@@ -24,6 +24,7 @@ const authProvider = new ClientCredentialsAuthProvider(config.twitch.client_id, 
 const api = new ApiClient({ authProvider });
 
 const tmi = require('tmi.js');
+const ModComment = require("./ModComment");
 
 const modClient = new tmi.Client({
     options: { debug: false },
@@ -114,6 +115,13 @@ class TwitchUser extends User {
      * @type {?string}
      */
     affiliation;
+
+    /**
+     * ModComments attached to this user
+     * This by default is null - if you are attempting to retrieve comments, use TwitchUser.getComments()
+     * @type {ModComment[]?}
+     */
+    comments = null;
 
     /**
      * Constructs a TwitchUser object
@@ -463,6 +471,92 @@ class TwitchUser extends User {
                     ]
                 }
                 resolve(users);
+            });
+        });
+    }
+
+    /**
+     * Returns mod comments on this user
+     * @returns {Promise<ModComment[]>}
+     */
+    getComments() {
+        return new Promise((resolve, reject) => {
+            con.query("select id, comment, posted_by, deleted_by from twitch__comment where user = ?;", [this.id], async (err, res) => {
+                if (!err) {
+                    let comments = [];
+
+                    for (let i = 0; i < res.length; i++) {
+                        const comment = res[i];
+                        comments = [
+                            ...comments,
+                            new ModComment(
+                                comment.id,
+                                this,
+                                comment.comment,
+                                comment.posted_by ?
+                                    await global.api.getFullIdentity(comment.posted_by) : null,
+                                comment.deleted_by ?
+                                    await global.api.getFullIdentity(comment.deleted_by) : null,
+                            ),
+                        ]
+                    }
+
+                    this.comments = comments;
+
+                    resolve(comments);
+                } else {
+                    reject(err);
+                }
+            });
+        });
+    }
+    
+    /**
+     * Adds a mod comment to the user
+     * @param {string} comment 
+     * @param {FullIdentity?} postedBy 
+     * @returns {Promise<ModComment>}
+     */
+    addComment(comment, postedBy = null) {
+        return new Promise((resolve, reject) => {
+            con.query("insert into twitch__comment (user, posted_by, comment) values (?, ?, ?);", [
+                this.id,
+                postedBy?.id,
+                comment,
+            ], err => {
+                if (!err) {
+                    con.query("select id, comment from twitch__comment where user = ? and comment = ? order by id desc limit 1;", [
+                        this.id,
+                        comment,
+                    ], (err, res) => {
+                        if (!err) {
+                            if (res.length > 0) {
+                                const comment = new ModComment(
+                                        res[0].id,
+                                        this,
+                                        res[0].comment,
+                                        postedBy
+                                    );
+                                    
+                                if (this.comments) {
+                                    this.comments = [
+                                        ...this.comments,
+                                        comment,
+                                    ]
+                                }
+
+                                resolve(comment);
+                            } else {
+                                reject("Unable to get created record");
+                            }
+                        } else {
+                            global.api.Logger.severe(err);
+                            reject("Failed to retrieve created record - may have been created");
+                        }
+                    });
+                } else {
+                    reject(err);
+                }
             });
         });
     }
