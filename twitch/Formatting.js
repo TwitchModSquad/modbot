@@ -142,6 +142,22 @@ class Formatting {
                         api.Logger.warning(err);
                     }
                 }
+
+                const comments = await chatter.getComments(false);
+
+                if (comments.length > 0) {
+                    let commentStr = "";
+                    console.log(comments);
+                    comments.forEach(comment => {
+                        commentStr += `\n"${comment.comment.emoji ? comment.comment.emoji + " " : ""}${comment.comment.comment}" - By ${comment.postedBy.name}`;
+                    });
+
+                    embed.addFields({
+                        name: "Mod Comments",
+                        value: codeBlock(commentStr),
+                        inline: false,
+                    });
+                }
                 
                 // If the query returns results, parse the results and add them to the embed.
                 if (typeof(res) === "object") {

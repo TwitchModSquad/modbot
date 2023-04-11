@@ -1,10 +1,21 @@
-const { EmbedBuilder, StringSelectMenuBuilder, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } = require("discord.js");
+const { EmbedBuilder, StringSelectMenuBuilder, ActionRowBuilder } = require("discord.js");
 const api = require("../../../api/index");
-const config = require("../../../config.json");
 const con = require("../../../database");
+
+const getComments = async () => {
+    const comments = (await con.pquery("select id, comment, emoji from comment order by comment asc;")).map(x => {
+        return {
+            label: x.comment,
+            value: String(x.id),
+            emoji: x.emoji,
+        };
+    });
+    return comments;
+}
 
 const listener = {
     name: 'commentManager',
+    getComments: getComments,
     /**
      * Verifies a button press should be sent to this listener
      * @param {ButtonInteraction} interaction 
@@ -16,11 +27,7 @@ const listener = {
      * Listener for a button press
      * @param {ButtonInteraction} interaction 
      */
-    async listener (interaction) {
-        const handleSuccess = message => {
-            interaction.reply({embeds: [new EmbedBuilder().setTitle(message).setColor(0x2dad3e)], ephemeral: true})
-        }
-
+    listener (interaction) {
         const handleError = (err, method = "reply") => {
             global.api.Logger.warning(err);
             interaction[method]({embeds: [new EmbedBuilder().setTitle("Uh oh!").setDescription(err).setColor(0x9e392f)], ephemeral: true})
@@ -31,21 +38,35 @@ const listener = {
                 api.getFullIdentity(user.identity.id).then(async identity => {
                     const twitchUser = await api.Twitch.getUserById(interaction.component.customId.replace("comment-",""));
 
-                    const modal = new ModalBuilder()
-                        .setCustomId(interaction.component.customId)
-                        .setTitle("Add Comment : " + twitchUser.display_name)
-                        .addComponents(
-                            new TextInputBuilder()
-                                .setCustomId("comment")
-                                .setLabel("Comment")
-                                .setMinLength(6)
-                                .setMaxLength(512)
-                                .setStyle(TextInputStyle.Paragraph)
-                                .setRequired(true)
-                                .setPlaceholder("Known Troublemaker")
-                        );
+                    const comments = [
+                        {
+                            label: "Write a Comment",
+                            value: "custom",
+                            emoji: "📝",
+                        },
+                        ...(await getComments()),
+                    ]
 
-                    interaction.showModal(modal);
+                    const embed = new EmbedBuilder()
+                        .setTitle("Add a Mod Comment")
+                        .setDescription(`Use the select menu below to add a pre-defined comment for \`${twitchUser.display_name}\`, or write your own!`)
+                        .setColor(0x772ce8);
+
+                    const selectMenu = new StringSelectMenuBuilder()
+                        .setCustomId(interaction.component.customId)
+                        .setMinValues(1)
+                        .setMaxValues(1)
+                        .setPlaceholder("Select a comment, or write your own!")
+                        .setOptions(comments);
+
+                    interaction.reply({
+                        ephemeral: true,
+                        embeds: [embed],
+                        components: [
+                            new ActionRowBuilder()
+                                .addComponents(selectMenu)
+                        ]
+                    });
                 }).catch(err => handleError(err + ""));
             } else {
                 handleError("You must link your account with TMS before you can use Crossban functions!\nAsk a user for an invite link.");

@@ -1,3 +1,4 @@
+const Comment = require("./Comment");
 const FullIdentity = require("../FullIdentity");
 const TwitchUser = require("./TwitchUser");
 
@@ -30,7 +31,7 @@ class ModComment {
 
     /**
      * The comment placed
-     * @type {string}
+     * @type {Comment}
      */
     comment;
 
@@ -38,7 +39,7 @@ class ModComment {
      * Constructor for a ModComment
      * @param {number} id
      * @param {TwitchUser} user 
-     * @param {string} comment 
+     * @param {Comment} comment 
      * @param {FullIdentity?} postedBy 
      * @param {FullIdentity?} deletedBy 
      */

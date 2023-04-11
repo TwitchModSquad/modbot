@@ -2,7 +2,7 @@ const con = require("../../database");
 
 require("../index");
 
-const {EmbedBuilder, codeBlock} = require("discord.js");
+const {EmbedBuilder, codeBlock, ButtonBuilder, ActionRowBuilder, ButtonStyle} = require("discord.js");
 
 const User = require("../User");
 const Identity = require("../Identity");
@@ -24,7 +24,10 @@ const authProvider = new ClientCredentialsAuthProvider(config.twitch.client_id, 
 const api = new ApiClient({ authProvider });
 
 const tmi = require('tmi.js');
+const Comment = require("./Comment");
 const ModComment = require("./ModComment");
+
+const Formatting = require("../../twitch/Formatting");
 
 const modClient = new tmi.Client({
     options: { debug: false },
@@ -477,11 +480,12 @@ class TwitchUser extends User {
 
     /**
      * Returns mod comments on this user
+     * @param {boolean} includeDeleted
      * @returns {Promise<ModComment[]>}
      */
-    getComments() {
+    getComments(includeDeleted = false) {
         return new Promise((resolve, reject) => {
-            con.query("select id, comment, posted_by, deleted_by from twitch__comment where user = ?;", [this.id], async (err, res) => {
+            con.query(`select twitch__comment.id, comment_id, comment.comment as predef_comment, comment.emoji, twitch__comment.comment, posted_by, deleted_by from twitch__comment left join comment on comment.id = comment_id where user = ?${includeDeleted ? "" : " and deleted_by is null"} order by posted_time desc;`, [this.id], async (err, res) => {
                 if (!err) {
                     let comments = [];
 
@@ -492,7 +496,9 @@ class TwitchUser extends User {
                             new ModComment(
                                 comment.id,
                                 this,
-                                comment.comment,
+                                comment.predef_comment ?
+                                    new Comment(comment.comment_id, comment.predef_comment, comment.emoji) :
+                                    new Comment(null, comment.comment),
                                 comment.posted_by ?
                                     await global.api.getFullIdentity(comment.posted_by) : null,
                                 comment.deleted_by ?
@@ -510,6 +516,117 @@ class TwitchUser extends User {
             });
         });
     }
+
+    /**
+     * Refreshes the user's ban entries in the #bans channel
+     * @returns {Promise<void>}
+     */
+    #refreshBanLogs() {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const bans = await this.getBans();
+                const channel = await global.client.discord.channels.fetch(config.liveban_channel);
+    
+                for (let i = 0; i < bans.length; i++) {
+                    const ban = bans[i];
+                    if (!ban.discord_message) return;
+
+                    try {
+                        const message = await channel.messages.fetch(ban.discord_message);
+                        const embed = await Formatting.parseBanEmbed(ban.channel, ban.user, null, ban.time);
+
+                        const commentButton = new ButtonBuilder()
+                                .setCustomId("comment-" + ban.user.id)
+                                .setLabel("Add Comment")
+                                .setStyle(ButtonStyle.Primary);
+
+                        const crossbanButton = new ButtonBuilder()
+                                .setCustomId("cb-" + ban.user.id)
+                                .setLabel("Crossban")
+                                .setStyle(ButtonStyle.Danger);
+                
+                        const hideButton = new ButtonBuilder()
+                                .setCustomId("hide-ban")
+                                .setLabel("Hide Ban")
+                                .setStyle(ButtonStyle.Secondary);
+                        
+                        const row = new ActionRowBuilder()
+                                .addComponents(commentButton, crossbanButton, hideButton);
+                            
+                        message.edit({embeds: [embed], components: [row]});
+                    } catch(err2) {
+                        global.api.Logger.warning(err2);
+                    }
+                }
+
+                resolve();
+            } catch(err) {
+                reject(err);
+            }
+        });
+    }
+    
+    /**
+     * Adds a mod comment to the user
+     * @param {number} commentId 
+     * @param {FullIdentity?} postedBy 
+     * @returns {Promise<ModComment>}
+     */
+    addComment(commentId, postedBy = null) {
+        return new Promise((resolve, reject) => {
+            con.query("select id from twitch__comment where user = ? and comment_id = ?;", [this.id, commentId], (chkerr, chkres) => {
+                if (!chkerr) {
+                    if (chkres.length > 0) {
+                        reject("This comment already exists under this user!");
+                        return;
+                    }
+
+                    con.query("insert into twitch__comment (user, posted_by, comment_id) values (?, ?, ?);", [
+                        this.id,
+                        postedBy?.id,
+                        commentId,
+                    ], err => {
+                        if (!err) {
+                            con.query("select twitch__comment.id, comment.id as comment_id, comment.comment from twitch__comment join comment on comment.id = comment_id where user = ? order by id desc limit 1;", [
+                                this.id,
+                            ], (err, res) => {
+                                if (!err) {
+                                    if (res.length > 0) {
+                                        const comment = new ModComment(
+                                                res[0].id,
+                                                this,
+                                                new Comment(res[0].comment_id, res[0].comment),
+                                                postedBy
+                                            );
+                                            
+                                        if (this.comments) {
+                                            this.comments = [
+                                                ...this.comments,
+                                                comment,
+                                            ]
+                                        }
+
+                                        this.#refreshBanLogs().then(() => {}, global.api.Logger.warning)
+        
+                                        resolve(comment);
+                                    } else {
+                                        reject("Unable to get created record");
+                                    }
+                                } else {
+                                    global.api.Logger.severe(err);
+                                    reject("Failed to retrieve created record - may have been created");
+                                }
+                            });
+                        } else {
+                            reject(err);
+                        }
+                    });
+                } else {
+                    reject(chkerr);
+                }
+            });
+        });
+    }
     
     /**
      * Adds a mod comment to the user
@@ -517,7 +634,7 @@ class TwitchUser extends User {
      * @param {FullIdentity?} postedBy 
      * @returns {Promise<ModComment>}
      */
-    addComment(comment, postedBy = null) {
+    addCustomComment(comment, postedBy = null) {
         return new Promise((resolve, reject) => {
             con.query("insert into twitch__comment (user, posted_by, comment) values (?, ?, ?);", [
                 this.id,
@@ -525,16 +642,15 @@ class TwitchUser extends User {
                 comment,
             ], err => {
                 if (!err) {
-                    con.query("select id, comment from twitch__comment where user = ? and comment = ? order by id desc limit 1;", [
+                    con.query("select id, comment from twitch__comment where user = ? order by id desc limit 1;", [
                         this.id,
-                        comment,
-                    ], (err, res) => {
+                    ], async (err, res) => {
                         if (!err) {
                             if (res.length > 0) {
                                 const comment = new ModComment(
                                         res[0].id,
                                         this,
-                                        res[0].comment,
+                                        new Comment(null, res[0].comment),
                                         postedBy
                                     );
                                     
@@ -542,8 +658,10 @@ class TwitchUser extends User {
                                     this.comments = [
                                         ...this.comments,
                                         comment,
-                                    ]
+                                    ];
                                 }
+
+                                this.#refreshBanLogs().then(() => {}, global.api.Logger.warning)
 
                                 resolve(comment);
                             } else {
@@ -559,6 +677,14 @@ class TwitchUser extends User {
                 }
             });
         });
+    }
+
+    /**
+     * 
+     * @param {*} id 
+     */
+    deleteComment(id) {
+
     }
 
     /**
