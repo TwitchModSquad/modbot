@@ -194,9 +194,10 @@ router.get("/", async (req, res) => {
 
             if (user.identity?.admin) {
                 addBadge(TMS_BADGES_URL + "admin.png", "tms admin", "TMS Administrator");
-            }
-            if (user.identity?.mod) {
+            } else if (user.identity?.mod) {
                 addBadge(TMS_BADGES_URL + "mod.png", "tms mod", "TMS Moderator");
+            } else if (user.identity?.authenticated) {
+                addBadge(TMS_BADGES_URL + "tms.png", "tms member", "TMS Member");
             }
 
             data.chat = [
