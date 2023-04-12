@@ -472,7 +472,7 @@ class TwitchUser extends User {
      * @returns {string}
      */
     getShortlink() {
-        return `https://tms.to/panel/user/${this.id}`;
+        return `${config.pub_domain}panel/user/${this.id}`;
     }
 
     /**

@@ -1,4 +1,5 @@
 const con = require("../../database");
+const config = require("../../config.json");
 
 const User = require("../User");
 const Identity = require("../Identity");
@@ -74,7 +75,7 @@ class DiscordUser extends User {
      * @returns {string}
      */
     getShortlink() {
-        return `https://tms.to/panel/user/${this.id}`;
+        return `${config.pub_domain}panel/user/${this.id}`;
     }
 
     /**

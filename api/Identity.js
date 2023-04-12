@@ -1,4 +1,5 @@
 const con = require("../database");
+const config = require("../config.json");
 
 const {EmbedBuilder} = require("discord.js");
 
@@ -81,7 +82,7 @@ class Identity {
      * @returns {string}
      */
     getShortlink() {
-        return "https://tms.to/i/" + this.id;
+        return `${config.pub_domain}i/${this.id}`;
     }
 
     /**
