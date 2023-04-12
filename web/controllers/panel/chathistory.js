@@ -3,12 +3,15 @@ const router = express.Router();
 
 const con = require("../../../database");
 const api = require("../../../api/");
+const config = require("../../../config.json");
 
 const EMOTE_URL = "https://static-cdn.jtvnw.net/emoticons/v1/{{id}}/1.0";
 
 const BADGES_URL = "/assets/images/badges/";
 const TWITCH_BADGES_URL = BADGES_URL + "twitch/";
 const TMS_BADGES_URL = BADGES_URL + "tms/";
+
+const TWITCH_USER_REGEX = /@(\w{4,})/g;
 
 let cachedChatters = [];
 let cachedStreamers = [];
@@ -145,7 +148,7 @@ router.get("/", async (req, res) => {
                 .replace("&", "&amp;")
                 .replace("<", "&lt;")
                 .replace(">", "&gt;")
-                .replace("&lt;3", "<3"); // hack to reverse <3 to &lt;3
+                .replace("&lt;3", "<3"); // hack to reverse <3 from &lt;3
 
             if (chatLog.emotes) {
                 let replacements = [];
@@ -166,6 +169,9 @@ router.get("/", async (req, res) => {
                     chatLog.message = chatLog.message.split(replacement.emoteString).join(replacement.html);
                 })
             }
+
+            chatLog.message = chatLog.message
+                .replace(TWITCH_USER_REGEX, `<a href="${config.pub_domain}panel/user/$1" target="__blank">$&</a>`);
 
             let badges = "";
 
