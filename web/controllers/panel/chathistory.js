@@ -12,7 +12,7 @@ const TWITCH_BADGES_URL = BADGES_URL + "twitch/";
 const TMS_BADGES_URL = BADGES_URL + "tms/";
 
 const TWITCH_USER_REGEX = /@(\w{4,})/g;
-const URL_REGEX = /(https?:\/\/)?(\w+(\.\w+)+\/?[0-9A-Za-z-_~:/#\[\]@!$&?'()*+,;%=]*)/g;
+const URL_REGEX = /(https?:\/\/)?(\w+(\.[a-zA-Z]\w+)+\/?[0-9A-Za-z-_~:/#\[\]@!$&?'()*+,;%=]*)/g;
 
 let cachedChatters = [];
 let cachedStreamers = [];
