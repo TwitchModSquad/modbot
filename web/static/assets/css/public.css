@@ -18,13 +18,13 @@ body {
 
 header {
     background-color: var(--primary-background-color);
-    height: 5.5rem;
+    height: 4.5rem;
     box-shadow: var(--heavy-shadow);
 }
 
 header img {
-    width: 4em;
-    height: 4em;
+    width: 3em;
+    height: 3em;
     border-radius: 1em;
     margin: .75em;
 }
@@ -41,8 +41,8 @@ nav a {
     display: inline-block;
     color: var(--primary-text-color);
     text-decoration: none;
-    font-size: 1.2rem;
-    padding: .25em;
+    font-size: 1rem;
+    padding: .35em;
     margin: 0 .4em;
 }
 
@@ -80,9 +80,9 @@ section.landing {
     position: relative;
     color: var(--primary-background-color);
     text-shadow: var(--heavy-shadow);
-    font-size: 1.5em;
+    font-size: 1.2em;
     text-align: center;
-    height: calc(100vh - 5.5rem);
+    height: calc(100vh - 4.5rem);
 }
 
 section.landing .wrapper {
@@ -112,7 +112,7 @@ section.transparent .wrapper::after {
 
 section.landing h1 {
     color: var(--primary-tms-color);
-    font-size: 2.7em;
+    font-size: 2.3em;
     font-weight: 300;
 }
 
