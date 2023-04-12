@@ -12,6 +12,7 @@ const TWITCH_BADGES_URL = BADGES_URL + "twitch/";
 const TMS_BADGES_URL = BADGES_URL + "tms/";
 
 const TWITCH_USER_REGEX = /@(\w{4,})/g;
+const URL_REGEX = /(https?:\/\/)?(\w+(\.\w+)+\/?[0-9A-Za-z-_~:/#\[\]@!$&?'()*+,;%=]*)/g;
 
 let cachedChatters = [];
 let cachedStreamers = [];
@@ -148,7 +149,8 @@ router.get("/", async (req, res) => {
                 .replace("&", "&amp;")
                 .replace("<", "&lt;")
                 .replace(">", "&gt;")
-                .replace("&lt;3", "<3"); // hack to reverse <3 from &lt;3
+                .replace("&lt;3", "<3")
+                .replace(URL_REGEX, `<a href="https://$2" target="__blank" onclick="return confirm('This is an external link and can\\'t be protected by TMS. Are you sure you want to continue?');">$&</a>`); // hack to reverse <3 from &lt;3
 
             if (chatLog.emotes) {
                 let replacements = [];
