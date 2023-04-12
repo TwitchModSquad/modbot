@@ -546,10 +546,10 @@ class TwitchUser extends User {
 
                 let communitiesStr = global.api.stringTable(rows, 3, 5);
 
-                if (communitiesStr.length <= 1024) {
+                if (communitiesStr.length <= 950) {
                     embed.addFields({
                         name: "Active Communities",
-                        value: codeBlock(communitiesStr),
+                        value: `[View online at tms.to](${this.getShortlink()})\n` + codeBlock(communitiesStr),
                         inline: false,
                     });
                 } else global.api.Logger.warning("Exceeded character count for active communities");
