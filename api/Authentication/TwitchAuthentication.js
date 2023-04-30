@@ -13,13 +13,18 @@ class TwitchAuthentication {
     TWITCH_STREAMER_URL = `https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=${config.twitch.client_id}&redirect_uri=${encodeURIComponent(config.api_domain + "auth/twitch")}&scope=${encodeURIComponent(STREAMER_SCOPES)}`;
     TWITCH_ADDMOD_URL = `https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=${config.twitch.client_id}&redirect_uri=${encodeURIComponent(config.api_domain + "auth/twitch")}&scope=${encodeURIComponent(ADD_MODERATOR_SCOPES)}`;
     TWITCH_REDIRECT = config.api_domain + "auth/twitch";
+
+    
+    CONNECT_TWITCH_URL = `https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=${config.twitch.client_id}&redirect_uri=${encodeURIComponent(config.api_domain + "connect")}&scope=${encodeURIComponent(NORMAL_SCOPES)}`;
+    CONNECT_REDIRECT = config.api_domain + "connect";
     
     /**
      * Given an oauth code from the redirected Twitch request, requests a refresh token and client token from Twitch
      * @param {string} code 
+     * @param {boolean} connect
      * @returns {Promise<{access_token: string, expires_in: number, refresh_token: string, scope: object, token_type: string}>}
      */
-    async getToken(code) {
+    async getToken(code, connect = false) {
         const oauthResult = await fetch("https://id.twitch.tv/oauth2/token", {
             method: 'POST',
             body: new URLSearchParams({
@@ -27,7 +32,7 @@ class TwitchAuthentication {
                 client_secret: config.twitch.client_secret,
                 code: code,
                 grant_type: "authorization_code",
-                redirect_uri: this.TWITCH_REDIRECT,
+                redirect_uri: connect ? this.CONNECT_REDIRECT : this.TWITCH_REDIRECT,
             }),
         });
 
