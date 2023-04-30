@@ -7,8 +7,11 @@ class DiscordAuthentication {
 
     DISCORD_URL = `https://discord.com/api/oauth2/authorize?client_id=${config.discord_auth.client_id}&redirect_uri=${encodeURIComponent(config.api_domain + "auth/discord")}&response_type=code&scope=${encodeURIComponent(SCOPES)}`;
     DISCORD_REDIRECT = config.api_domain + "auth/discord";
+    
+    CONNECT_DISCORD_URL = `https://discord.com/api/oauth2/authorize?client_id=${config.discord_auth.client_id}&redirect_uri=${encodeURIComponent(config.api_domain + "connect/discord")}&response_type=code&scope=${encodeURIComponent(SCOPES)}`;
+    CONNECT_REDIRECT = config.api_domain + "connect/discord";
 
-    async getToken(code) {
+    async getToken(code, connect = false) {
         const oauthResult = await fetch('https://discord.com/api/oauth2/token', {
             method: 'POST',
             body: new URLSearchParams({
@@ -16,7 +19,7 @@ class DiscordAuthentication {
                 client_secret: config.discord_auth.secret_id,
                 code,
                 grant_type: 'authorization_code',
-                redirect_uri: this.DISCORD_REDIRECT,
+                redirect_uri: connect ? this.CONNECT_REDIRECT : this.DISCORD_REDIRECT,
                 scope: 'identify',
             }),
             headers: {
