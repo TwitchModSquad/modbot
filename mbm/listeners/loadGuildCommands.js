@@ -55,9 +55,6 @@ const listener = {
                 }, global.api.Logger.warning);
     
                 await guild.commands.fetch();
-                guild.commands.cache.forEach(x => {
-                    guild.commands.delete(x).catch(console.error);
-                })
     
                 Discord.getGuild(guild.id).then(dGuild => {
                     guild.members.cache.forEach(member => {
