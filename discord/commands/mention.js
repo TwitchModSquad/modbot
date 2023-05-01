@@ -41,7 +41,8 @@ const command = {
                 .setName("streamer-5")
                 .setDescription("Streamer's twitch name to mention")
                 .setAutocomplete(true)
-        ),
+        )
+        .setDMPermission(false),
     /**
      * Execution function for this command
      * @param {ChatInputCommandInteraction} interaction 

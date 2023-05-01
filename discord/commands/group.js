@@ -59,7 +59,8 @@ const cmdData = new SlashCommandBuilder()
                     .setName("nickname")
                     .setDescription("New nickname for this streamer. Omit this option to unset the nickname")
             )
-    );
+    )
+    .setDMPermission(false);
 
 const command = {
     data: cmdData,

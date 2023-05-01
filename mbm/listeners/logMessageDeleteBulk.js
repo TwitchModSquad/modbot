@@ -52,51 +52,51 @@ const listener = {
                     });
     
                     if (!message.author.bot) {
-                        guild.getSetting("lde-enabled", "boolean").then(enabled => {
-                            guild.getSetting("lde-message-delete", "boolean").then(messageDeleteEnabled => {
-                                if (enabled && messageDeleteEnabled) {
-                                    guild.getSetting("lde-channel", "channel").then(async channel => {
-                                        let author = message.author;
-        
-                                        if (executor) author = executor;
-        
-                                        const embed = new EmbedBuilder()
-                                                .setTitle("Message Deleted")
-                                                .addFields(
-                                                    {
-                                                        name: "Channel",
-                                                        value: message.channel.toString(),
-                                                        inline: true,
-                                                    },
-                                                    {
-                                                        name: "Author",
-                                                        value: message.author.toString(),
-                                                        inline: true,
-                                                    }
-                                                )
-                                                .setColor(0x4c80d4)
-                                                .setAuthor({name: author.username, iconURL: author.avatarURL()});
-        
-        
-                                        if (executor !== null) {
-                                            embed.addFields({
-                                                name: "Moderator",
-                                                value: executor.toString(),
-                                                inline: true,
-                                            });
+                        let listeners = guild.listeners.filter(x => x.event === "messageDelete");
+    
+                        if (listeners.length > 0) {
+                            let author = message.author;
+
+                            if (executor) author = executor;
+
+                            const embed = new EmbedBuilder()
+                                    .setTitle("Message Deleted")
+                                    .addFields(
+                                        {
+                                            name: "Channel",
+                                            value: message.channel.toString(),
+                                            inline: true,
+                                        },
+                                        {
+                                            name: "Author",
+                                            value: message.author.toString(),
+                                            inline: true,
                                         }
-                                        if (message?.content && message.content.trim() !== "") {
-                                            embed.addFields({
-                                                name: "Message Content",
-                                                value: codeBlock(cleanCodeBlockContent(message.content)),
-                                                inline: false,
-                                            });
-                                        }
-                                        channel.send({embeds: [embed]});
-                                    }).catch(global.api.Logger.warning);
-                                }
-                            }).catch(global.api.Logger.warning);
-                        }).catch(global.api.Logger.warning);
+                                    )
+                                    .setColor(0x4c80d4)
+                                    .setAuthor({name: author.username, iconURL: author.displayAvatarURL()});
+
+
+                            if (executor !== null) {
+                                embed.addFields({
+                                    name: "Moderator",
+                                    value: executor.toString(),
+                                    inline: true,
+                                });
+                            }
+                            if (message?.content && message.content.trim() !== "") {
+                                embed.addFields({
+                                    name: "Message Content",
+                                    value: codeBlock(cleanCodeBlockContent(message.content)),
+                                    inline: false,
+                                });
+                            }
+                            
+                            listeners.forEach(listener => {
+                                listener.channel.send({embeds: [embed]})
+                                    .catch(api.Logger.warning);
+                            });
+                        }
                     }
                 });
             }).catch(global.api.Logger.warning);

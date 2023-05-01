@@ -5,6 +5,8 @@ const {EmbedBuilder} = require("discord.js");
 
 const api = require("../api/index");
 
+const client = require("../discord/discord");
+
 const getLiveChannel = () => {
     return new Promise((resolve, reject) => {
         global.client.discord.guilds.fetch(config.modsquad_discord).then(guild => {
@@ -105,24 +107,13 @@ module.exports = () => {
                 
                             channel.send({embeds: [embed]});
 
-                            con.query("select id from discord__guild where represents_id = ?;", [identity.id], (err, res) => {
-                                if (!err) {
-                                    res.forEach(guildres => {
-                                        api.Discord.getGuild(guildres.id).then(guild => {
-                                            guild.getSetting("lv-channel", "channel").then(async channel => {
-                                                if (channel) {
-                                                    let mentionEveryone = false;
+                            api.Discord.listeners.filter(x => x.event === "live").forEach(listener => {
+                                if (!listener.data) return;
 
-                                                    try {
-                                                        mentionEveryone = await guild.getSetting("lv-everyone", "boolean");
-                                                    }catch (err) {global.api.Logger.warning(err)}
-
-                                                    channel.send({content: mentionEveryone ? '@everyone' : ' ', embeds: [embed]});
-                                                }
-                                            }).catch(global.api.Logger.warning);
-                                        }).catch(global.api.Logger.warning);
-                                    });
-                                } else global.api.Logger.warning(err);
+                                let streamers = listener.data.split(",");
+                                if (streamers.includes(String(user.id))) {
+                                    listener.channel.send({embeds: [embed]}).catch(api.Logger.warning);
+                                }
                             });
                         });
                     } else {
@@ -136,7 +127,7 @@ module.exports = () => {
 
                 con.query("update live set end_time = now() where identity_id = ?;", [identity.id], err => {
                     if (err) {
-                        global.api.Logger.warning();
+                        global.api.Logger.warning(err);
                         return;
                     }
 

@@ -2,10 +2,21 @@ const {Discord} = require("../../api/index");
 const client = global.client.mbm;
 const registerCommand = require("../commands/register");
 
+const config = require("../../config.json");
+
 const addCommand = (guild, commandData) => {
     return new Promise(async (resolve, reject) => {
         const commands = guild.commands.cache;
         let command = commands.find(x => commandData.name === x.name);
+
+        if (config.force_command_push && command) {
+            try {
+                await guild.commands.delete(command.id);
+            } catch(err) {
+                reject(err);
+                return;
+            }
+        }
     
         if (!command) {
             try {
@@ -15,34 +26,8 @@ const addCommand = (guild, commandData) => {
                 return;
             }
         }
-        
-        let permissions = [{
-            id: guild.ownerId,
-            type: 'USER',
-            permission: true,
-        }, {
-            id: "267380687345025025", // Override to allow @Twijn#8888 to access commands for debug purposes.
-            type: 'USER',
-            permission: true,
-        }];
-    
-        try {
-            let dGuild = await Discord.getGuild(guild.id);
-            let adminRole = await dGuild.getSetting("rm-admin", "role");
-            
-            if (adminRole?.id) {
-                permissions = [
-                    ...permissions,
-                    {
-                        id: adminRole.id,
-                        type: 'ROLE',
-                        permission: true,
-                    },
-                ];
-            }
-        } catch (err) {}
-    
-        command.permissions.set({guild: guild.id, command: command.id, permissions: permissions}).then(resolve).catch(reject);
+
+        resolve();
     });
 }
 

@@ -98,7 +98,6 @@ class DiscordUser extends User {
                             await global.api.Discord.getUserById(res[i].owner_id),
                             res[i].name
                         );
-                    await guild.getSettings();
                     
                     guilds = [
                         ...guilds,

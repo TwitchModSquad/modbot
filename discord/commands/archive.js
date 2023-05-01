@@ -185,7 +185,8 @@ const command = {
                         .setRequired(true)
                         .setChoices(...moveChoices)
                 )
-        ),
+        )
+        .setDMPermission(false),
     /**
      * Execution function for this command
      * @param {ChatInputCommandInteraction} interaction 

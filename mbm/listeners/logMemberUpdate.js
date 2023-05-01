@@ -1,6 +1,5 @@
-const { EmbedBuilder, codeBlock, AuditLogEvent } = require("discord.js");
-const {Discord} = require("../../api/index");
-const con = require("../../database");
+const { EmbedBuilder, codeBlock, AuditLogEvent, GuildMember } = require("discord.js");
+const api = require("../../api/index");
 
 const getExecutor = member => {
     return new Promise((resolve, reject) => {
@@ -28,47 +27,55 @@ const listener = {
     name: 'logMemberUpdate',
     eventName: 'guildMemberUpdate',
     eventType: 'on',
+    /**
+     * Listener for this update event
+     * @param {GuildMember} oldMember 
+     * @param {GuildMember} newMember 
+     */
     listener (oldMember, newMember) {
-        Discord.getGuild(oldMember.guild.id).then(async guild => {
-            const executor = await getExecutor(oldMember);
+        api.Discord.getGuild(oldMember.guild.id).then(async guild => {
             if (oldMember.nickname !== newMember.nickname) {
-                guild.getSetting("lde-enabled", "boolean").then(enabled => {
-                    guild.getSetting("lde-user-update-nickname", "boolean").then(updateUsernameEnabled => {
-                        if (enabled && updateUsernameEnabled) {
-                            guild.getSetting("lde-channel", "channel").then(async channel => {
-                                const embed = new EmbedBuilder()
-                                    .setTitle("Nickname Changed")
-                                    .addFields({
-                                        name: "User",
-                                        value: newMember.toString(),
-                                        inline: true,
-                                    })
-                                    .setColor(0x4c80d4)
-                                    .setAuthor({name: newMember.user.username, iconURL: newMember.avatarURL()});
 
-                                if (executor && executor.id !== newMember.id)
-                                    embed.addFields({
-                                        name: "Moderator",
-                                        value: executor.toString(),
-                                        inline: true,
-                                    });
-                                
-                                embed.addFields({
-                                    name: "Old Nickname",
-                                    value: codeBlock(oldMember.nickname ? oldMember.nickname.replace(/\\`/g, "`").replace(/`/g, "\\`") : "[unset]"),
-                                    inline: false,
-                                }, {
-                                    name: "New Nickname",
-                                    value: codeBlock(newMember.nickname ? newMember.nickname.replace(/\\`/g, "`").replace(/`/g, "\\`") : "[unset]"),
-                                    inline: false,
-                                });
-                                channel.send({embeds: [embed]});
-                            }).catch(global.api.Logger.warning);
-                        }
-                    }).catch(global.api.Logger.warning);
-                }).catch(global.api.Logger.warning);
+                let listeners = guild.listeners.filter(x => x.event === "memberUpdate");
+
+                if (listeners.length > 0) {
+                    const executor = await getExecutor(oldMember);
+
+                    const embed = new EmbedBuilder()
+                        .setTitle("Nickname Changed")
+                        .addFields({
+                            name: "User",
+                            value: newMember.toString(),
+                            inline: true,
+                        })
+                        .setColor(0x4c80d4)
+                        .setAuthor({name: newMember.user.username, iconURL: newMember.displayAvatarURL()});
+    
+                    if (executor && executor.id !== newMember.id)
+                        embed.addFields({
+                            name: "Moderator",
+                            value: executor.toString(),
+                            inline: true,
+                        });
+                    
+                    embed.addFields({
+                        name: "Old Nickname",
+                        value: codeBlock(oldMember.nickname ? oldMember.nickname.replace(/\\`/g, "`").replace(/`/g, "\\`") : "[unset]"),
+                        inline: false,
+                    }, {
+                        name: "New Nickname",
+                        value: codeBlock(newMember.nickname ? newMember.nickname.replace(/\\`/g, "`").replace(/`/g, "\\`") : "[unset]"),
+                        inline: false,
+                    });
+
+                    listeners.forEach(listener => {
+                        listener.channel.send({embeds: [embed]})
+                            .catch(api.Logger.warning);
+                    });
+                }
+
             }
-        }).catch(global.api.Logger.warning);
+        }).catch(api.Logger.warning);
     }
 };
 

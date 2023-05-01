@@ -2,7 +2,7 @@ const fs = require('fs');
 const Discord = require('discord.js');
 
 // Create a new Discord client using discord.js
-const client = new Discord.Client({ intents: [Discord.GatewayIntentBits.Guilds, Discord.GatewayIntentBits.GuildMembers, Discord.GatewayIntentBits.GuildMessages, Discord.GatewayIntentBits.GuildModeration] });
+const client = new Discord.Client({ intents: [Discord.GatewayIntentBits.Guilds, Discord.GatewayIntentBits.GuildMembers, Discord.GatewayIntentBits.GuildMessages, Discord.GatewayIntentBits.MessageContent, Discord.GatewayIntentBits.GuildModeration] });
 global.client.mbm = client;
 
 // Client scope command and listener caches

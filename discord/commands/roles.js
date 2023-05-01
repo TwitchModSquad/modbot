@@ -4,7 +4,8 @@ const games = require("../games");
 const command = {
     data: new SlashCommandBuilder()
         .setName("roles")
-        .setDescription("Allows you to select Game roles!"),
+        .setDescription("Allows you to select Game roles!")
+        .setDMPermission(false),
     /**
      * Execution function for this command
      * @param {ChatInputCommandInteraction} interaction 
