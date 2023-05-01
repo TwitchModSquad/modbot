@@ -574,7 +574,7 @@ class TwitchUser extends User {
                     embed.addFields({
                         name: "Bans",
                         value: result,
-                        inline: true,
+                        inline: false,
                     });
                 } else global.api.Logger.warning("Exceeded character count for bans");
             }

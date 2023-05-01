@@ -1,4 +1,4 @@
-const { ButtonInteraction, AnySelectMenuInteraction, ModalSubmitInteraction } = require('discord.js');
+const { ButtonInteraction, AnySelectMenuInteraction, ModalSubmitInteraction, EmbedBuilder } = require('discord.js');
 
 const fs = require('fs');
 const api = require("../../api");
@@ -47,6 +47,27 @@ const listener = {
      * @param {ButtonInteraction|ModalSubmitInteraction|AnySelectMenuInteraction} interaction 
      */
     listener (interaction) {
+        const success = message => {
+            const embed = new EmbedBuilder()
+                .setTitle("Success!")
+                .setDescription(message)
+                .setColor(0x772ce8);
+
+            interaction.reply({embeds: [embed], ephemeral: true})
+        }
+
+        const error = message => {
+            const embed = new EmbedBuilder()
+                .setTitle("Error!")
+                .setDescription(message)
+                .setColor(0xe83b3b);
+
+            interaction.reply({embeds: [embed], ephemeral: true})
+        }
+
+        interaction.success = success;
+        interaction.error = error;
+        
         if (interaction.isButton()) {
             for (const name in buttonHandlers) {
                 try {
