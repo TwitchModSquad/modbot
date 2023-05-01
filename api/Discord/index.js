@@ -53,16 +53,14 @@ class Discord {
             if (!err) { 
                 for (let i = 0; i < res.length; i++) {
                     let listener = res[i];
-                    this.listeners = [
-                        ...this.listeners,
-                        new DiscordListener(
+                    this.listeners.push(new DiscordListener(
                             listener.id,
                             await global.client.mbm.guilds.fetch(listener.guild),
                             await global.client.mbm.channels.fetch(listener.channel),
                             listener.event,
                             listener.data
                         )
-                    ];
+                    );
                 }
                 this.listenersInitialized = true;
                 global.api.Logger.info("Loaded " + this.listeners.length + " listener(s)");
