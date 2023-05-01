@@ -49,7 +49,9 @@ class Discord {
      * Init discord guild listeners
      */
     init() {
+        console.log("init");
         con.query("select * from discord__listener;", async (err, res) => {
+            console.log("init got");
             if (!err) { 
                 for (let i = 0; i < res.length; i++) {
                     let listener = res[i];
