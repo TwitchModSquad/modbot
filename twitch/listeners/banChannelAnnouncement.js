@@ -5,6 +5,7 @@ const config = require("../../config.json");
 const formatting = require("../Formatting");
 
 const Discord = require("discord.js");
+const { ButtonStyle } = require("discord.js");
 
 const BPM_ANNOUNCE_MAXIMUM = 5;
 
@@ -16,24 +17,24 @@ const listener = {
             if (config.hasOwnProperty("liveban_channel")) {
                 let dchnl = global.modSquadGuild.channels.cache.find(dchnl => dchnl.id == config.liveban_channel);
     
-                if (dchnl.isText()) {
+                if (dchnl.type === Discord.ChannelType.GuildText) {
                     try {
                         const embed = await formatting.parseBanEmbed(streamer, chatter, bpm, timebanned);
 
-                        const crossbanButton = new Discord.MessageButton()
+                        const crossbanButton = new Discord.ButtonBuilder()
                                 .setCustomId("cb-" + chatter.id)
                                 .setLabel("Crossban")
-                                .setStyle("DANGER");
+                                .setStyle(ButtonStyle.Danger);
                 
-                        const hideButton = new Discord.MessageButton()
+                        const hideButton = new Discord.ButtonBuilder()
                                 .setCustomId("hide-ban")
                                 .setLabel("Hide Ban")
-                                .setStyle("SECONDARY");
+                                .setStyle(ButtonStyle.Secondary);
                         
-                        const row = new Discord.MessageActionRow()
+                        const row = new Discord.ActionRowBuilder()
                                 .addComponents(crossbanButton, hideButton);
 
-                        dchnl.send({content: ' ', embeds: [embed], components: [row]}).then(message => {
+                        dchnl.send({embeds: [embed], components: [row]}).then(message => {
                             con.query("update twitch__ban set discord_message = ? where timebanned = ? and streamer_id = ? and user_id = ?;", [
                                 message.id,
                                 timebanned,
@@ -41,6 +42,21 @@ const listener = {
                                 chatter.id,
                             ]);
                         }).catch(api.Logger.warning);
+
+                        embed.setFooter({
+                            text: "Retrieved from Twitch Mod Squad",
+                            iconURL: "https://tms.to/assets/images/logo.webp",
+                        });
+
+                        let listeners = api.Discord.listeners.filter(
+                                x => x.event === "twitchBan"
+                                && x.data.split(",").includes(String(streamer.id))
+                            );
+
+                        listeners.forEach(listener => {
+                            listener.channel.send({embeds: [embed]})
+                                .catch(api.Logger.warning);
+                        });
                     } catch (err) {
                         api.Logger.severe(err);
                     }

@@ -2,10 +2,21 @@ const {Discord} = require("../../api/index");
 const client = global.client.mbm;
 const registerCommand = require("../commands/register");
 
+const config = require("../../config.json");
+
 const addCommand = (guild, commandData) => {
     return new Promise(async (resolve, reject) => {
         const commands = guild.commands.cache;
         let command = commands.find(x => commandData.name === x.name);
+
+        if (config.force_command_push && command) {
+            try {
+                await guild.commands.delete(command.id);
+            } catch(err) {
+                reject(err);
+                return;
+            }
+        }
     
         if (!command) {
             try {
@@ -15,34 +26,8 @@ const addCommand = (guild, commandData) => {
                 return;
             }
         }
-        
-        let permissions = [{
-            id: guild.ownerId,
-            type: 'USER',
-            permission: true,
-        }, {
-            id: "267380687345025025", // Override to allow @Twijn#8888 to access commands for debug purposes.
-            type: 'USER',
-            permission: true,
-        }];
-    
-        try {
-            let dGuild = await Discord.getGuild(guild.id);
-            let adminRole = await dGuild.getSetting("rm-admin", "role");
-            
-            if (adminRole?.id) {
-                permissions = [
-                    ...permissions,
-                    {
-                        id: adminRole.id,
-                        type: 'ROLE',
-                        permission: true,
-                    },
-                ];
-            }
-        } catch (err) {}
-    
-        command.permissions.set({guild: guild.id, command: command.id, permissions: permissions}).then(resolve).catch(reject);
+
+        resolve();
     });
 }
 
@@ -52,35 +37,37 @@ const listener = {
     eventType: 'once',
     async listener () {
         await client.guilds.fetch();
-        client.guilds.cache.forEach(async guild => {
-            const members = await guild.members.fetch();
-            global.api.Logger.info(`Fetched members for ${guild.name}: ${members.size} members`)
-
-            guild.channels.fetch().then(channels => {
-                channels.forEach(channel => {
-                    try {
-                        if (channel.type === "GUILD_TEXT") {
-                            channel.messages.fetch().then(() => {}, () => {}); // By default will just fetch 50 messages.
+        setTimeout(async () => {
+            client.guilds.cache.forEach(async guild => {
+                const members = await guild.members.fetch();
+                global.api.Logger.info(`Fetched members for ${guild.name}: ${members.size} members`)
+    
+                guild.channels.fetch().then(channels => {
+                    channels.forEach(channel => {
+                        try {
+                            if (channel.type === "GUILD_TEXT") {
+                                channel.messages.fetch().then(() => {}, () => {}); // By default will just fetch 50 messages.
+                            }
+                        } catch(err) {
+                            global.api.Logger.warning(err);
                         }
-                    } catch(err) {
-                        global.api.Logger.warning(err);
-                    }
+                    });
+                }, global.api.Logger.warning);
+    
+                await guild.commands.fetch();
+    
+                Discord.getGuild(guild.id).then(dGuild => {
+                    guild.members.cache.forEach(member => {
+                        Discord.getUserById(member.id, false, true).then(dUser => {
+                            dGuild.addUser(dUser).then(() => {}, global.api.Logger.warning);
+                        }, global.api.Logger.warning);
+                    });
+                    dGuild.addCommands(guild);
+                }).catch(async err => {
+                    addCommand(guild, registerCommand.data).then(() => {}, global.api.Logger.warning);
                 });
-            }, global.api.Logger.warning);
-
-            await guild.commands.fetch();
-
-            Discord.getGuild(guild.id).then(dGuild => {
-                guild.members.cache.forEach(member => {
-                    Discord.getUserById(member.id, false, true).then(dUser => {
-                        dGuild.addUser(dUser).then(() => {}, global.api.Logger.warning);
-                    }, global.api.Logger.warning);
-                });
-                dGuild.addCommands(guild);
-            }).catch(async err => {
-                addCommand(guild, registerCommand.data).then(() => {}, global.api.Logger.warning);
             });
-        });
+        }, 10000);
     }
 };
 

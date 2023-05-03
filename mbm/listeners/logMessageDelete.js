@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js");
+const { EmbedBuilder, codeBlock, cleanCodeBlockContent, AuditLogEvent } = require("discord.js");
 const {Discord} = require("../../api/index");
 const con = require("../../database");
 
@@ -8,7 +8,7 @@ const getExecutor = message => {
             // Fetch a couple audit logs than just one as new entries could've been added right after this event was emitted.
             const fetchedLogs = await message.guild.fetchAuditLogs({
                 limit: 6,
-                type: 'MESSAGE_DELETE'
+                type: AuditLogEvent.MessageDelete
             }).catch(global.api.Logger.warning);
             
             const auditEntry = fetchedLogs.entries.find(a =>
@@ -51,33 +51,51 @@ const listener = {
                 });
 
                 if (!message.author.bot) {
-                    guild.getSetting("lde-enabled", "boolean").then(enabled => {
-                        guild.getSetting("lde-message-delete", "boolean").then(messageDeleteEnabled => {
-                            if (enabled && messageDeleteEnabled) {
-                                guild.getSetting("lde-channel", "channel").then(async channel => {
-                                    let author = message.author;
+                    let listeners = guild.listeners.filter(x => x.event === "messageDelete");
+
+                    if (listeners.length > 0) {
+                        let author = message.author;
     
-                                    if (executor) author = executor;
+                        if (executor) author = executor;
     
-                                    const embed = new MessageEmbed()
-                                            .setTitle("Message Deleted")
-                                            .addField("Channel", message.channel.toString(), true)
-                                            .addField("Author", message.author.toString(), true)
-                                            .setColor(0x4c80d4)
-                                            .setAuthor({name: author.username, iconURL: author.avatarURL()});
-    
-    
-                                    if (executor !== null) {
-                                        embed.addField("Moderator", executor.toString(), true);
+                        const embed = new EmbedBuilder()
+                                .setTitle("Message Deleted")
+                                .addFields(
+                                    {
+                                        name: "Channel",
+                                        value: message.channel.toString(),
+                                        inline: true,
+                                    },
+                                    {
+                                        name: "Author",
+                                        value: message.author.toString(),
+                                        inline: true,
                                     }
-                                    if (message?.content && message.content.trim() !== "") {
-                                        embed.addField("Message Content", "```\n" + message.content.replace(/`/g, "/`") + "```", false);
-                                    }
-                                    channel.send({content: ' ', embeds: [embed]});
-                                }).catch(global.api.Logger.warning);
-                            }
-                        }).catch(global.api.Logger.warning);
-                    }).catch(global.api.Logger.warning);
+                                )
+                                .setColor(0x4c80d4)
+                                .setAuthor({name: author.username, iconURL: author.displayAvatarURL()});
+    
+    
+                        if (executor !== null) {
+                            embed.addFields({
+                                name: "Moderator",
+                                value: executor.toString(),
+                                inline: true,
+                            });
+                        }
+                        if (message?.content && message.content.trim() !== "") {
+                            embed.addFields({
+                                name: "Message Content",
+                                value: codeBlock(cleanCodeBlockContent(message.content)),
+                                inline: false,
+                            })
+                        }
+                        
+                        listeners.forEach(listener => {
+                            listener.channel.send({embeds: [embed]})
+                                .catch(api.Logger.warning);
+                        });
+                    }
                 }
             }).catch(global.api.Logger.warning);
         }

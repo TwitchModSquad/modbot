@@ -1,35 +1,48 @@
-const { MessageEmbed, MessageSelectMenu, MessageActionRow, MessageButton } = require("discord.js");
-const api = require("../../api/index");
-const con = require("../../database");
+const { EmbedBuilder, StringSelectMenuBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
+const api = require("../../../api/index");
+const con = require("../../../database");
 
-const {cache, copyCache, updateCopyMessage} = require("./groupManager");
+const {cache, copyCache, updateCopyMessage} = require("../groupManager");
 
 const listener = {
-    name: 'archiveEditModalManager',
-    eventName: 'modalSubmit',
-    eventType: 'on',
-    async listener (modal) {
+    name: 'groupModalManager',
+    /**
+     * Verifies a button press should be sent to this listener
+     * @param {ModalSubmitInteraction} interaction 
+     */
+    verify(interaction) {
+        return interaction.customId.startsWith("group-addpartic-")
+            || interaction.customId.startsWith("group-setgame-")
+            || interaction.customId === "group-cmd"
+            || interaction.customId.startsWith("group-copy-")
+            || interaction.customId === "copy-participant-add";
+    },
+    /**
+     * Listener for a button press
+     * @param {ModalSubmitInteraction} interaction 
+     */
+    async listener (interaction) {
         const handleSuccess = message => {
-            modal.reply({content: ' ', embeds: [new MessageEmbed().setTitle(message).setColor(0x2dad3e)], ephemeral: true})
+            interaction.reply({embeds: [new EmbedBuilder().setTitle(message).setColor(0x2dad3e)], ephemeral: true})
         }
 
         const handleError = (err) => {
             global.api.Logger.warning(err);
-            modal.reply({content: ' ', embeds: [new MessageEmbed().setTitle("Uh oh!").setDescription(err).setColor(0x9e392f)], ephemeral: true})
+            interaction.reply({embeds: [new EmbedBuilder().setTitle("Uh oh!").setDescription(err).setColor(0x9e392f)], ephemeral: true})
         }
 
-        if (modal.customId.startsWith("group-addpartic-")) {
-            let id = modal.customId.replace("group-addpartic-", "");
+        if (interaction.customId.startsWith("group-addpartic-")) {
+            let id = interaction.customId.replace("group-addpartic-", "");
             let participant;
 
             try {
-                participant = (await api.Twitch.getUserByName(modal.getTextInputValue("participant"), true))[0];
+                participant = (await api.Twitch.getUserByName(interaction.fields.getTextInputValue("participant"), true))[0];
             } catch (err) {
                 handleError(err);
                 return;
             }
 
-            api.Discord.getUserById(modal.user.id).then(async discordUser => {
+            api.Discord.getUserById(interaction.user.id).then(async discordUser => {
                 if (discordUser.identity?.id) {
                     let identity = await api.getFullIdentity(discordUser.identity.id);
                     
@@ -45,11 +58,11 @@ const listener = {
                 api.Logger.warning(err);
                 handleError("Unable to find linked Twitch user");
             });
-        } else if (modal.customId.startsWith("group-setgame-")) {
-            let id = modal.customId.replace("group-setgame-", "");
-            let game = modal.getTextInputValue("game");
+        } else if (interaction.customId.startsWith("group-setgame-")) {
+            let id = interaction.customId.replace("group-setgame-", "");
+            let game = interaction.fields.getTextInputValue("game");
 
-            api.Discord.getUserById(modal.user.id).then(async discordUser => {
+            api.Discord.getUserById(interaction.user.id).then(async discordUser => {
                 if (discordUser.identity?.id) {
                     let identity = await api.getFullIdentity(discordUser.identity.id);
                     
@@ -65,13 +78,13 @@ const listener = {
                 api.Logger.warning(err);
                 handleError("Unable to find linked Twitch user");
             });
-        } else if (modal.customId === "group-cmd") {
-            if (cache.hasOwnProperty(modal.user.id)) {
-                const group = cache[modal.user.id].group;
-                const method = cache[modal.user.id].method;
-                const streamer = cache[modal.user.id].streamer;
+        } else if (interaction.customId === "group-cmd") {
+            if (cache.hasOwnProperty(interaction.user.id)) {
+                const group = cache[interaction.user.id].group;
+                const method = cache[interaction.user.id].method;
+                const streamer = cache[interaction.user.id].streamer;
 
-                const layout = modal.getTextInputValue("layout");
+                const layout = interaction.fields.getTextInputValue("layout");
 
                 if (layout.indexOf("{{group}}") !== -1) {
                     const command = await group.generateGroupCommand(streamer, layout);
@@ -82,13 +95,13 @@ const listener = {
                         if (err) api.Logger.severe(err);
                     });
 
-                    delete cache[modal.user.id];
+                    delete cache[interaction.user.id];
 
                     if (method === "sendcmd") {
-                        global.client.listen.client.say(streamer.display_name.toLowerCase(), command).then(() => {
+                        global.client.listen.client.say(streamer.login, command).then(() => {
                             let isMod = global.client.listen.isMod(streamer);
     
-                            let embed = new MessageEmbed()
+                            let embed = new EmbedBuilder()
                                 .setTitle("Message Sent!")
                                 .setDescription(`Sent set command message to \`${streamer.display_name}\`!\nWe will automatically send update commands if participants are added or removed from this group.`);
     
@@ -104,10 +117,10 @@ const listener = {
                                 }]);
                             }
     
-                            modal.reply({content: command, embeds: [embed], ephemeral: true});
+                            interaction.reply({content: command, embeds: [embed], ephemeral: true});
                         }, handleError)
                     } else {
-                        modal.reply({content: command, ephemeral: true})
+                        interaction.reply({content: command, ephemeral: true})
                     }
                 } else {
                     handleError("Layout must contain `{{group}}`, which is used for substituting group information.")
@@ -115,24 +128,24 @@ const listener = {
             } else {
                 handleError("Command generator information was not saved in cache. Try again");
             }
-        } else if (modal.customId.startsWith("group-copy-")) {
-            let id = modal.customId.replace("group-copy-", "");
-            let game = modal.getTextInputValue("game");
-            let host = modal.getTextInputValue("host");
+        } else if (interaction.customId.startsWith("group-copy-")) {
+            let id = interaction.customId.replace("group-copy-", "");
+            let game = interaction.fields.getTextInputValue("game");
+            let host = interaction.fields.getTextInputValue("host");
 
             api.Group.getGroupById(id).then(async group => {
                 try {
                     host = (await api.Twitch.getUserByName(host))[0];
     
-                    copyCache[modal.user.id] = {
+                    copyCache[interaction.user.id] = {
                         game: game,
                         oldGroup: group,
                         host: host,
                         participants: group.participants,
-                        modal: modal,
+                        modal: interaction,
                     };
 
-                    const embed = new MessageEmbed()
+                    const embed = new EmbedBuilder()
                         .setTitle("Copy Event")
                         .setDescription("**Copying event** - " + group.game + " hosted by " + group.host.display_name + " *[old data]*")
                         .addFields([
@@ -143,7 +156,7 @@ const listener = {
                             },
                             {
                                 name: "Host",
-                                value: `[${host.display_name}](https://twitch.tv/${host.display_name.toLowerCase()})`,
+                                value: `[${host.display_name}](https://twitch.tv/${host.login})`,
                                 inline: true,
                             },
                             {
@@ -153,11 +166,11 @@ const listener = {
                         ]);
                     
                     if (host.id !== group.host.id) { // new host is NOT the old host
-                        copyCache[modal.user.id].participants = copyCache[modal.user.id].participants
+                        copyCache[interaction.user.id].participants = copyCache[interaction.user.id].participants
                             .filter(x => x.id !== host.id && x.id !== group.host.id); // removes old host and new host from participants if present
                         
-                        copyCache[modal.user.id].participants = [
-                            ...copyCache[modal.user.id].participants,
+                        copyCache[interaction.user.id].participants = [
+                            ...copyCache[interaction.user.id].participants,
                             group.host,   // adds old host to participants
                         ];
 
@@ -171,11 +184,11 @@ const listener = {
 
                     let participantString = "";
 
-                    for (let i = 0; i < copyCache[modal.user.id].participants.length; i++) {
-                        let participant = copyCache[modal.user.id].participants[i];
+                    for (let i = 0; i < copyCache[interaction.user.id].participants.length; i++) {
+                        let participant = copyCache[interaction.user.id].participants[i];
                         if (participantString !== "") participantString += "\n";
 
-                        participantString += `${i+1} - [${participant.display_name}](https://twitch.tv/${participant.display_name.toLowerCase()})`;
+                        participantString += `${i+1} - [${participant.display_name}](https://twitch.tv/${participant.login})`;
                     }
 
                     embed.addFields([
@@ -185,26 +198,26 @@ const listener = {
                         }
                     ])
 
-                    const addParticipantsButton = new MessageButton()
+                    const addParticipantsButton = new ButtonBuilder()
                         .setCustomId("copy-participant-add")
                         .setLabel("Add Participant")
-                        .setStyle("PRIMARY");
+                        .setStyle(ButtonStyle.Primary);
 
-                    const createButton = new MessageButton()
+                    const createButton = new ButtonBuilder()
                         .setCustomId("copy-create")
                         .setLabel("Create Group")
-                        .setStyle("SUCCESS");
+                        .setStyle(ButtonStyle.Success);
 
-                    const removeParticipantsSelect = new MessageSelectMenu()
+                    const removeParticipantsSelect = new StringSelectMenuBuilder()
                         .setCustomId("copy-participant-remove")
                         .setPlaceholder("Remove Participants")
                         .setMinValues(1)
-                        .setMaxValues(Math.max(1, copyCache[modal.user.id].participants.length - 1));
+                        .setMaxValues(Math.max(1, copyCache[interaction.user.id].participants.length - 1));
             
-                    if (copyCache[modal.user.id].participants.length === 1)
+                    if (copyCache[interaction.user.id].participants.length === 1)
                         removeParticipantsSelect.setDisabled(true);
 
-                    removeParticipantsSelect.addOptions(copyCache[modal.user.id].participants.map(
+                    removeParticipantsSelect.addOptions(copyCache[interaction.user.id].participants.map(
                         x => {
                             return {
                                 label: x.display_name,
@@ -213,43 +226,43 @@ const listener = {
                         }
                     ));
 
-                    const row = new MessageActionRow()
+                    const row = new ActionRowBuilder()
                         .addComponents(addParticipantsButton, createButton);
 
-                    const removeParticipantsRow = new MessageActionRow()
+                    const removeParticipantsRow = new ActionRowBuilder()
                         .addComponents(removeParticipantsSelect);
 
-                    modal.reply({content: ' ', embeds: [embed], components: [row, removeParticipantsRow], ephemeral: true});
+                    interaction.reply({embeds: [embed], components: [row, removeParticipantsRow], ephemeral: true});
                 } catch (err) {
                     handleError(err);
                 }
             }, handleError);
-        } else if (modal.customId === "copy-participant-add") {
-            if (copyCache.hasOwnProperty(modal.user.id)) {
+        } else if (interaction.customId === "copy-participant-add") {
+            if (copyCache.hasOwnProperty(interaction.user.id)) {
                 let participant;
     
                 try {
-                    participant = (await api.Twitch.getUserByName(modal.getTextInputValue("participant"), true))[0];
+                    participant = (await api.Twitch.getUserByName(interaction.fields.getTextInputValue("participant"), true))[0];
                 } catch (err) {
                     handleError(err);
                     return;
                 }
     
-                if (copyCache[modal.user.id].host.id === participant.id
-                    || copyCache[modal.user.id].participants.find(x => x.id === participant.id)) {
+                if (copyCache[interaction.user.id].host.id === participant.id
+                    || copyCache[interaction.user.id].participants.find(x => x.id === participant.id)) {
                     handleError("Participant already exists in this group!")
                     return;
                 }
 
-                copyCache[modal.user.id].participants = [
-                    ...copyCache[modal.user.id].participants,
+                copyCache[interaction.user.id].participants = [
+                    ...copyCache[interaction.user.id].participants,
                     participant,
                 ]
 
-                updateCopyMessage(copyCache[modal.user.id]);
+                updateCopyMessage(copyCache[interaction.user.id]);
 
-                modal.reply("Success!").then(message => {
-                    modal.deleteReply().catch(api.Logger.warning);
+                interaction.reply("Success!").then(message => {
+                    interaction.deleteReply().catch(api.Logger.warning);
                 }, api.Logger.severe)
             } else {
                 handleError("Lost copy cache. Please try again!")

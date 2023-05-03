@@ -30,8 +30,10 @@ updateTwitchUsernames();
 updateDiscordUsernames();
 setTimeout(updateEntryUsernames, 5 * SECONDS_TO_MILLISECONDS);
 
-setInterval(updateUsers, 10 * SECONDS_TO_MILLISECONDS);
+setInterval(updateUsers, 1 * MINUTES_TO_MILLISECONDS);
 setInterval(updateTwitchUsernames, 1 * MINUTES_TO_MILLISECONDS);
 setInterval(updateDiscordUsernames, 1 * MINUTES_TO_MILLISECONDS);
 setInterval(updateLiveChannels, 15 * SECONDS_TO_MILLISECONDS);
 setInterval(updateEntryUsernames, 3 * HOURS_TO_MILLISECONDS);
+
+process.on("uncaughtException", global.api.Logger.severe);

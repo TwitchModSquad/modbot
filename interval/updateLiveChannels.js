@@ -1,9 +1,11 @@
 const con = require("../database");
 const config = require("../config.json");
 
-const {MessageEmbed} = require("discord.js");
+const {EmbedBuilder} = require("discord.js");
 
 const api = require("../api/index");
+
+const client = require("../discord/discord");
 
 const getLiveChannel = () => {
     return new Promise((resolve, reject) => {
@@ -82,37 +84,36 @@ module.exports = () => {
                         con.query("insert into live (identity_id) values (?);", [identity.id], async err => {
                             if (err) global.api.Logger.warning(err);
 
-                            const embed = new MessageEmbed()
+                            const embed = new EmbedBuilder()
                                 .setAuthor({name: `🔴 ${user.display_name} is now live!`})
                                 .setTitle(stream.title)
                                 .setColor(0x7d3bdc)
-                                .setURL("https://twitch.tv/" + user.display_name.toLowerCase())
+                                .setURL("https://twitch.tv/" + user.login)
                                 .setImage(stream.getThumbnailUrl(256, 144))
-                                .addField("Game", stream.gameName, true)
-                                .addField("Viewer Count", ""+stream.viewers, true)
+                                .addFields(
+                                    {
+                                        name: "Game",
+                                        value: stream.gameName,
+                                        inline: true,
+                                    },
+                                    {
+                                        name: "Viewer Count",
+                                        value: String(stream.viewers),
+                                        inline: true,
+                                    }
+                                )
                                 .setTimestamp(stream.startDate)
                                 .setFooter({text: `${user.display_name} : Live 🔴`, iconURL: user.profile_image_url});
                 
-                            channel.send({content: ' ', embeds: [embed]});
+                            channel.send({embeds: [embed]});
 
-                            con.query("select id from discord__guild where represents_id = ?;", [identity.id], (err, res) => {
-                                if (!err) {
-                                    res.forEach(guildres => {
-                                        api.Discord.getGuild(guildres.id).then(guild => {
-                                            guild.getSetting("lv-channel", "channel").then(async channel => {
-                                                if (channel) {
-                                                    let mentionEveryone = false;
+                            api.Discord.listeners.filter(x => x.event === "live").forEach(listener => {
+                                if (!listener.data) return;
 
-                                                    try {
-                                                        mentionEveryone = await guild.getSetting("lv-everyone", "boolean");
-                                                    }catch (err) {global.api.Logger.warning(err)}
-
-                                                    channel.send({content: mentionEveryone ? '@everyone' : ' ', embeds: [embed]});
-                                                }
-                                            }).catch(global.api.Logger.warning);
-                                        }).catch(global.api.Logger.warning);
-                                    });
-                                } else global.api.Logger.warning(err);
+                                let streamers = listener.data.split(",");
+                                if (streamers.includes(String(user.id))) {
+                                    listener.channel.send({embeds: [embed]}).catch(api.Logger.warning);
+                                }
                             });
                         });
                     } else {
@@ -126,20 +127,20 @@ module.exports = () => {
 
                 con.query("update live set end_time = now() where identity_id = ?;", [identity.id], err => {
                     if (err) {
-                        global.api.Logger.warning();
+                        global.api.Logger.warning(err);
                         return;
                     }
 
                     let user = identity.twitchAccounts[0];
 
-                    const embed = new MessageEmbed()
+                    const embed = new EmbedBuilder()
                         .setTitle(`${user.display_name} has gone offline!`)
                         .setColor(0x451b7f)
-                        .setURL("https://twitch.tv/" + user.display_name.toLowerCase())
+                        .setURL("https://twitch.tv/" + user.login)
                         .setTimestamp(new Date())
                         .setFooter({text: `${user.display_name} : Offline`, iconURL: user.profile_image_url});
         
-                    channel.send({content: ' ', embeds: [embed]});
+                    channel.send({embeds: [embed]});
                 });
             });
         });

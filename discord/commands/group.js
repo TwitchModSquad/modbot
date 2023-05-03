@@ -1,201 +1,73 @@
-const { MessageEmbed, MessageButton, MessageActionRow } = require("discord.js");
+const { ChatInputCommandInteraction, ActionRowBuilder, SlashCommandBuilder, SlashCommandStringOption, SlashCommandSubcommandBuilder, EmbedBuilder, ButtonStyle, ButtonBuilder } = require("discord.js");
 const api = require("../../api/index");
 const con = require("../../database");
 
 const config = require("../../config.json");
 
+const createSubcommand = new SlashCommandSubcommandBuilder()
+    .setName("create")
+    .setDescription("Create a new group")
+    .addStringOption(
+        new SlashCommandStringOption()
+            .setName("game")
+            .setDescription("Hosted game for this group")
+            .setRequired(true)
+    )
+    .addStringOption(
+        new SlashCommandStringOption()
+            .setName("twitch-name-host")
+            .setDescription("Add a Twitch username to this group")
+            .setRequired(true)
+    );
+
+for (let i = 2; i <= 20; i++) {
+    createSubcommand.addStringOption(
+        new SlashCommandStringOption()
+            .setName("twitch-name-" + i)
+            .setDescription("Add a Twitch username to this group")
+    );
+}
+
+const cmdData = new SlashCommandBuilder()
+    .setName("group")
+    .setDescription("Create, modify and view TMS groups")
+    .addSubcommand(createSubcommand)
+    .addSubcommand(
+        new SlashCommandSubcommandBuilder()
+            .setName("refresh")
+            .setDescription("Refreshes group embeds")
+            .addStringOption(
+                new SlashCommandStringOption()
+                    .setName("id")
+                    .setDescription("Group ID")
+                    .setRequired(true)
+            )
+    )
+    .addSubcommand(
+        new SlashCommandSubcommandBuilder()
+            .setName("setnickname")
+            .setDescription("Sets a streamer's nickname for use in group commands")
+            .addStringOption(
+                new SlashCommandStringOption()
+                    .setName("streamer")
+                    .setDescription("Streamer's twitch name to set")
+                    .setRequired(true)
+                    .setAutocomplete(true)
+            )
+            .addStringOption(
+                new SlashCommandStringOption()
+                    .setName("nickname")
+                    .setDescription("New nickname for this streamer. Omit this option to unset the nickname")
+            )
+    )
+    .setDMPermission(false);
+
 const command = {
-    data: {
-        name: 'group'
-        , description: 'Create, modify and view TMS groups'
-        , options: [
-            {
-                type: 1,
-                name: "create",
-                description: "Create a new group",
-                options: [
-                    {
-                        type: 3,
-                        name: "game",
-                        description: "Hosted game for this group",
-                        required: true,
-                    },
-                    {
-                        type: 3,
-                        name: "twitch-name-host",
-                        description: "Add a Twitch username to this group",
-                        required: true,
-                        autocomplete: true,
-                    },
-                    {
-                        type: 3,
-                        name: "twitch-name-2",
-                        description: "Add a Twitch username to this group",
-                        required: false,
-                        autocomplete: true,
-                    },
-                    {
-                        type: 3,
-                        name: "twitch-name-3",
-                        description: "Add a Twitch username to this group",
-                        required: false,
-                        autocomplete: true,
-                    },
-                    {
-                        type: 3,
-                        name: "twitch-name-4",
-                        description: "Add a Twitch username to this group",
-                        required: false,
-                        autocomplete: true,
-                    },
-                    {
-                        type: 3,
-                        name: "twitch-name-5",
-                        description: "Add a Twitch username to this group",
-                        required: false,
-                        autocomplete: true,
-                    },
-                    {
-                        type: 3,
-                        name: "twitch-name-6",
-                        description: "Add a Twitch username to this group",
-                        required: false,
-                        autocomplete: true,
-                    },
-                    {
-                        type: 3,
-                        name: "twitch-name-7",
-                        description: "Add a Twitch username to this group",
-                        required: false,
-                        autocomplete: true,
-                    },
-                    {
-                        type: 3,
-                        name: "twitch-name-8",
-                        description: "Add a Twitch username to this group",
-                        required: false,
-                        autocomplete: true,
-                    },
-                    {
-                        type: 3,
-                        name: "twitch-name-9",
-                        description: "Add a Twitch username to this group",
-                        required: false,
-                        autocomplete: true,
-                    },
-                    {
-                        type: 3,
-                        name: "twitch-name-10",
-                        description: "Add a Twitch username to this group",
-                        required: false,
-                        autocomplete: true,
-                    },
-                    {
-                        type: 3,
-                        name: "twitch-name-11",
-                        description: "Add a Twitch username to this group",
-                        required: false,
-                        autocomplete: true,
-                    },
-                    {
-                        type: 3,
-                        name: "twitch-name-12",
-                        description: "Add a Twitch username to this group",
-                        required: false,
-                        autocomplete: true,
-                    },
-                    {
-                        type: 3,
-                        name: "twitch-name-13",
-                        description: "Add a Twitch username to this group",
-                        required: false,
-                        autocomplete: true,
-                    },
-                    {
-                        type: 3,
-                        name: "twitch-name-14",
-                        description: "Add a Twitch username to this group",
-                        required: false,
-                        autocomplete: true,
-                    },
-                    {
-                        type: 3,
-                        name: "twitch-name-15",
-                        description: "Add a Twitch username to this group",
-                        required: false,
-                        autocomplete: true,
-                    },
-                    {
-                        type: 3,
-                        name: "twitch-name-16",
-                        description: "Add a Twitch username to this group",
-                        required: false,
-                        autocomplete: true,
-                    },
-                    {
-                        type: 3,
-                        name: "twitch-name-17",
-                        description: "Add a Twitch username to this group",
-                        required: false,
-                        autocomplete: true,
-                    },
-                    {
-                        type: 3,
-                        name: "twitch-name-18",
-                        description: "Add a Twitch username to this group",
-                        required: false,
-                        autocomplete: true,
-                    },
-                    {
-                        type: 3,
-                        name: "twitch-name-19",
-                        description: "Add a Twitch username to this group",
-                        required: false,
-                        autocomplete: true,
-                    },
-                    {
-                        type: 3,
-                        name: "twitch-name-20",
-                        description: "Add a Twitch username to this group",
-                        required: false,
-                        autocomplete: true,
-                    },
-                ],
-            },
-            {
-                type: 1,
-                name: "refresh",
-                description: "Refreshes group embeds",
-                options: [
-                    {
-                        type: 3,
-                        name: "id",
-                        description: "Group ID",
-                        required: true,
-                    },
-                ],
-            },
-            {
-                type: 1,
-                name: "setnickname",
-                description: "Sets a streamer's nickname for use in group commands",
-                options: [
-                    {
-                        type: 3,
-                        name: "streamer",
-                        description: "Streamer's twitch name to set",
-                        required: true,
-                        autocomplete: true,
-                    },
-                    {
-                        type: 3,
-                        name: "nickname",
-                        description: "New nickname for this streamer. Omit this option to unset the nickname",
-                    },
-                ],
-            },
-        ]
-    },
+    data: cmdData,
+    /**
+     * Execution function for this command
+     * @param {ChatInputCommandInteraction} interaction 
+     */
     async execute(interaction) {
         let subcommand = interaction.options.getSubcommand();
 
@@ -252,12 +124,12 @@ const command = {
                         hostIdentity = await api.getFullIdentity(host.identity.id);
                     }
                     
-                    const embed = new MessageEmbed()
+                    const embed = new EmbedBuilder()
                         .setTitle(game + " hosted by " + host.display_name)
                         .setAuthor({iconURL: host.profile_image_url, name: host.display_name})
                         .setColor(0x772ce8)
                         .addFields([
-                            {name: "Host", value: "[" + host.display_name + "](https://twitch.tv/" + host.display_name.toLowerCase() + ")" + (hostIdentity === null || hostIdentity.discordAccounts.length === 0 ? "" : " [<@" + hostIdentity.discordAccounts[0].id + ">]"), inline: true},
+                            {name: "Host", value: "[" + host.display_name + "](https://twitch.tv/" + host.login + ")" + (hostIdentity === null || hostIdentity.discordAccounts.length === 0 ? "" : " [<@" + hostIdentity.discordAccounts[0].id + ">]"), inline: true},
                             {name: "Posted By", value: interaction.member.toString(), inline: true},
                         ]);
 
@@ -268,7 +140,7 @@ const command = {
 
                         if (participantList !== "") participantList += "\n";
 
-                        participantList += "**" + (i + 1) + "** - [" + user.display_name + "](https://twitch.tv/" + user.display_name.toLowerCase() + ")";
+                        participantList += "**" + (i + 1) + "** - [" + user.display_name + "](https://twitch.tv/" + user.login + ")";
 
                         if (user.identity?.id) {
                             let identity = await api.getFullIdentity(user.identity.id);
@@ -278,27 +150,27 @@ const command = {
                         }
                     }
 
-                    const editButton = new MessageButton()
+                    const editButton = new ButtonBuilder()
                         .setCustomId("edit-group")
                         .setLabel("Edit")
-                        .setStyle("SECONDARY");
+                        .setStyle(ButtonStyle.Secondary);
 
-                    const startButton = new MessageButton()
+                    const startButton = new ButtonBuilder()
                         .setCustomId("start-group")
                         .setLabel("Start Event")
-                        .setStyle("SUCCESS");
+                        .setStyle(ButtonStyle.Success);
 
-                    const setGroupCommand = new MessageButton()
+                    const setGroupCommand = new ButtonBuilder()
                         .setCustomId("set-command")
                         .setLabel("Set Group Command")
-                        .setStyle("PRIMARY");
+                        .setStyle(ButtonStyle.Primary);
 
-                    const row = new MessageActionRow()
+                    const row = new ActionRowBuilder()
                         .addComponents(editButton, startButton, setGroupCommand);
 
                     embed.addFields([{name: "Participants", value: participantList, inline: false}]);
                         
-                    interaction.reply({content: ' ', embeds: [embed], components: [row], fetchReply: true}).then(message => {
+                    interaction.reply({embeds: [embed], components: [row], fetchReply: true}).then(message => {
                         const postWithId = id => {
                             con.query("select * from `group` where id = ?;", [id], (err, res) => {
                                 if (err) {
@@ -307,7 +179,7 @@ const command = {
                                     if (res.length === 0) {
                                         embed.setURL(config.pub_domain + "g/" + id);
                                         embed.setFooter({text: "ID: " + id, iconURL: "https://tms.to/assets/images/logos/logo.webp"});
-                                        message.edit({content: ' ', embeds: [embed], components: [row]}).then(() => {}, api.Logger.warning);
+                                        message.edit({embeds: [embed], components: [row]}).then(() => {}, api.Logger.warning);
                                         con.query("insert into `group` (id, message, created_by, game) values (?, ?, ?, ?);", [id, message.id, user.identity.id, game], err => {
                                             if (err) {
                                                 api.Logger.severe(err);

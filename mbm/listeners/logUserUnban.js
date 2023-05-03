@@ -1,4 +1,4 @@
-const {MessageEmbed} = require("discord.js");
+const {EmbedBuilder, codeBlock, cleanCodeBlockContent, AuditLogEvent} = require("discord.js");
 const {Discord} = require("../../api/index");
 const config = require("../../config.json");
 
@@ -8,7 +8,7 @@ const getUnbanInfo = ban => {
             // Fetch a couple audit logs than just one as new entries could've been added right after this event was emitted.
             const fetchedLogs = await ban.guild.fetchAuditLogs({
                 limit: 6,
-                type: 'GUILD_BAN_REMOVE'
+                type: AuditLogEvent.MemberBanRemove
             }).catch(global.api.Logger.warning);
 
             fetchedLogs.entries.forEach(e => global.api.Logger.info(e.extra));
@@ -37,34 +37,48 @@ const listener = {
                 guild.removeUserBan(user).then(() => {}, global.api.Logger.warning);
             }).catch(global.api.Logger.warning);
 
-            guild.getSetting("lde-enabled", "boolean").then(enabled => {
-                guild.getSetting("lde-user-unban", "boolean").then(unbanEnabled => {
-                    if (enabled && unbanEnabled) {
-                        guild.getSetting("lde-channel", "channel").then(async channel => {
-                            let author = ban.user;
-                            channel.send({content: ' ', embeds: [new MessageEmbed()
-                                    .setTitle("User Unbanned")
-                                    .setDescription(`User ${ban.user} was unbanned from the guild`)
-                                    .setColor(0x595959)
-                                    .setAuthor({name: author.username, iconURL: author.avatarURL()})]});
-                        }).catch(global.api.Logger.warning);
-                    }
-                }).catch(global.api.Logger.warning);
-            }).catch(global.api.Logger.warning);
+            let author = ban.user;
+
+            let listeners = guild.listeners.filter(x => x.event === "userBan");
+
+            if (listeners.length > 0) {
+
+                const embed = new EmbedBuilder()
+                    .setTitle("User Unbanned")
+                    .setDescription(`User ${ban.user} was unbanned from the guild`)
+                    .setColor(0x595959)
+                    .setAuthor({name: author.username, iconURL: author.displayAvatarURL()});
+
+                listeners.forEach(listener => {
+                    listener.channel.send({embeds: [embed]})
+                        .catch(api.Logger.warning);
+                });
+
+            }
 
             global.client.discord.channels.fetch(config.liveban_channel).then(banChannel => {
-                const embed = new MessageEmbed()
+                const embed = new EmbedBuilder()
                         .setTitle("Discord User Unbanned!")
                         .setDescription(`User ${ban.user} was unbanned from the guild \`${ban.guild.name}\``)
                         .setURL(`https://tms.to/d/${ban.user.id}`)
                         .setColor(0xb53131)
                         .setAuthor({name: ban.guild.name, iconURL: ban.guild.iconURL()});
 
-                if (unbanInfo?.reason) embed.addField("Reason", "```" + unbanInfo.reason.toString().replace(/\\`/g, "`").replace(/`/g, "\\`") + "```", true);
+                if (unbanInfo?.reason)
+                    embed.addFields({
+                        name: "Reason",
+                        value: codeBlock(cleanCodeBlockContent(unbanInfo.reason.toString())),
+                        inline: true,
+                    });
 
-                if (unbanInfo?.executor) embed.addField("Moderator", unbanInfo.executor.toString(), true);
+                if (unbanInfo?.executor)
+                    embed.addFields({
+                        name: "Moderator",
+                        value: unbanInfo.executor.toString(),
+                        inline: true,
+                    });
 
-                banChannel.send({content: ' ', embeds: [embed]});
+                banChannel.send({embeds: [embed]});
             });
         }).catch(global.api.Logger.warning);
     }

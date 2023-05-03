@@ -38,7 +38,7 @@
                 <%
                 chat.forEach(chatLog => {
                     const STREAMER_NAME_TARGET = 15;
-                    let streamerName = users[chatLog.streamer_id].display_name.toLowerCase()
+                    let streamerName = users[chatLog.streamer_id].login
                 %>
                     <div class="chat-log<%= chatLog.deleted ? " deleted" : "" %><%= chatLog.message.startsWith("!") ? " command" : "" %>">
                         <div class="chat-header">

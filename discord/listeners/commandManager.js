@@ -1,4 +1,4 @@
-const {MessageEmbed} = require("discord.js");
+const {EmbedBuilder} = require("discord.js");
 const client = global.client.discord;
 
 const config = require("../../config.json");
@@ -15,21 +15,21 @@ const listener = {
         let cmd = client.commands.get(interaction.commandName);
 
         const success = message => {
-            const embed = new MessageEmbed()
+            const embed = new EmbedBuilder()
                 .setTitle("Success!")
                 .setDescription(message)
                 .setColor(0x772ce8);
 
-            interaction.reply({content: ' ', embeds: [embed], ephemeral: true})
+            interaction.reply({embeds: [embed], ephemeral: true})
         }
 
         const error = message => {
-            const embed = new MessageEmbed()
+            const embed = new EmbedBuilder()
                 .setTitle("Error!")
                 .setDescription(message)
                 .setColor(0xe83b3b);
 
-            interaction.reply({content: ' ', embeds: [embed], ephemeral: true})
+            interaction.reply({embeds: [embed], ephemeral: true})
         }
 
         interaction.success = success;

@@ -1,10 +1,11 @@
 const con = require("../../database");
+const config = require("../../config.json");
 
 const User = require("../User");
 const Identity = require("../Identity");
 const DiscordGuild = require("./DiscordGuild");
 
-const {MessageEmbed} = require("discord.js");
+const {EmbedBuilder, codeBlock} = require("discord.js");
 
 const DISCORD_CDN = "https://cdn.discordapp.com/";
 
@@ -74,11 +75,7 @@ class DiscordUser extends User {
      * @returns {string}
      */
     getShortlink() {
-        if (this.identity?.id) {
-            return "https://tms.to/i/" + this.identity.id;
-        } else {
-            return "https://tms.to/d/" + this.id;
-        }
+        return `${config.pub_domain}panel/user/${this.id}`;
     }
 
     /**
@@ -101,7 +98,6 @@ class DiscordUser extends User {
                             await global.api.Discord.getUserById(res[i].owner_id),
                             res[i].name
                         );
-                    await guild.getSettings();
                     
                     guilds = [
                         ...guilds,
@@ -116,11 +112,11 @@ class DiscordUser extends User {
     /**
      * Generated a Discord Embed for the user.
      * 
-     * @returns {Promise<MessageEmbed>}
+     * @returns {Promise<EmbedBuilder>}
      */
     discordEmbed() {
         return new Promise(async (resolve, reject) => {
-            const embed = new MessageEmbed()
+            const embed = new EmbedBuilder()
                     .setAuthor({name: this.name + "#" + this.discriminator, iconURL: this.avatar_url, url: this.getShortlink()})
                     .setThumbnail(this.avatar_url)
                     .setColor(0x772ce8)
@@ -132,10 +128,15 @@ class DiscordUser extends User {
             if (mutualGuilds.length > 0) {
                 let guilds = "";
                 mutualGuilds.forEach(guild => {
-                    if (guilds !== "") guild += "\n";
+                    if (guilds !== "") guilds += "\n";
                     guilds += guild.name;
                 });
-                embed.addField("Guilds", "```"+guilds+"```");
+                embed.addFields(
+                    {
+                        name: "Guilds",
+                        value: codeBlock(guilds),
+                    }
+                );
             }
 
             resolve(embed);

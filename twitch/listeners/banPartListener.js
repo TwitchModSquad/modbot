@@ -14,7 +14,7 @@ const listener = {
                 let dchnl = global.modSquadGuild.channels.cache.find(dchnl => dchnl.id == config.liveban_channel);
     
                 if (dchnl.isText()) {
-                    const embed = new Discord.MessageEmbed()
+                    const embed = new Discord.EmbedBuilder()
                             // Set the title of the field
                             .setTitle(`Bot Action Detected`)
                             // Set the description of the field
@@ -22,15 +22,15 @@ const listener = {
                             // Set the color of the embed
                             .setColor(0x8c1212);
     
-                    dchnl.send({content: ' ', embeds: [embed]});
+                    dchnl.send({embeds: [embed]});
                 }
             }
 
             api.Logger.warning(`Parting from channel ${streamer.display_name} for exceeding BPM threshold of ${PART_THRESHOLD}`);
-            global.partFromChannel(streamer.display_name.toLowerCase());
+            global.partFromChannel(streamer.login);
 
             setTimeout(() => {
-                global.listenOnChannel(streamer.display_name.toLowerCase());
+                global.listenOnChannel(streamer.login);
             }, PART_TIME * 60 * 1000);
         }
     }
