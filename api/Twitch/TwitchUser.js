@@ -10,6 +10,8 @@ const FullIdentity = require("../FullIdentity");
 
 const TwitchTimeout = require("./TwitchTimeout");
 const TwitchBan = require("./TwitchBan");
+const TwitchUsername = require("./TwitchUsername");
+const TwitchRole = require("./TwitchRole");
 
 const https = require("https");
 
@@ -51,7 +53,7 @@ const sleep = ms => {
 }
 
 function comma(x) {
-    if (!x) return "";
+    if (!x) return "0";
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
@@ -437,6 +439,84 @@ class TwitchUser extends User {
     }
 
     /**
+     * Utilizes an oAuth token to retrieve moderators, VIPs, and editors for a channel
+     * 
+     * @param {string} token
+     * @returns {Promise<void>}
+     */
+    refreshStreamerRoles(token) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let editors = await global.api.Authentication.Twitch.getEditors(token, this.id);
+                let mods = await global.api.Authentication.Twitch.getMods(token, this.id);
+                let vips = await global.api.Authentication.Twitch.getVIPs(token, this.id);
+                
+                await con.pquery("update twitch__role set last_known = now() where streamer_id = ?;", [this.id]);
+
+                editors.forEach(editor => {
+                    con.query("insert into twitch__role (user_id, streamer_id, role) values (?, ?, 'editor') on duplicate key update last_known = null, updated = now();", [editor.id, this.id], err => {
+                        if (err) global.api.Logger.severe(err);
+                    });
+                });
+
+                mods.forEach(mod => {
+                    con.query("insert into twitch__role (user_id, streamer_id, role) values (?, ?, 'moderator') on duplicate key update last_known = null, updated = now();", [mod.id, this.id], err => {
+                        if (err) global.api.Logger.severe(err);
+                    });
+                });
+
+                vips.forEach(vip => {
+                    con.query("insert into twitch__role (user_id, streamer_id, role) values (?, ?, 'vip') on duplicate key update last_known = null, updated = now();", [vip.id, this.id], err => {
+                        if (err) global.api.Logger.severe(err);
+                    });
+                });
+
+                resolve();
+            } catch(err) {
+                reject(err);
+            }
+        });
+    }
+
+    /**
+     * Returns a list of roles in which this user has in other communities and roles in this user's channel
+     * @param {boolean} includeInactive
+     * @returns {Promise<TwitchRole[]>}
+     */
+    getRoles(includeInactive = false) {
+        return new Promise((resolve, reject) => {
+            con.query(`select * from twitch__role where (user_id = ? or streamer_id = ?)${includeInactive ? "" : " and last_known is null"};`, [this.id, this.id], async (err, res) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+
+                let roles = [];
+
+                for (let i = 0; i < res.length; i++) {
+                    let role = res[i];
+
+                    roles = [
+                        ...roles,
+                        new TwitchRole(
+                            role.user_id === this.id ? this : await global.api.Twitch.getUserById(role.user_id),
+                            role.streamer_id === this.id ? this : await global.api.Twitch.getUserById(role.streamer_id),
+                            role.role,
+                            new Date(role.first_known),
+                            new Date(role.updated),
+                            role.last_known !== null ? new Date(role.last_known) : null,
+                            role.source,
+                            role.visibility
+                        ),
+                    ]
+                }
+
+                resolve(roles);
+            });
+        });
+    }
+
+    /**
      * Gets a list of active Twitch communities for this user
      * 
      * @returns {Promise<[{user: TwitchUser, chatCount: number, lastActive: number}]>}
@@ -463,6 +543,37 @@ class TwitchUser extends User {
                     ]
                 }
                 resolve(users);
+            });
+        });
+    }
+
+    /**
+     * Returns any potential alt accounts for this user
+     * @returns {Promise<TwitchUsername[]>}
+     */
+    getNames() {
+        return new Promise((resolve, reject) => {
+            con.query("select * from twitch__username where id = ? order by last_seen asc;", [this.id], (err, res) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+
+                let result = [];
+
+                res.forEach(name => {
+                    result = [
+                        ...result,
+                        new TwitchUsername(
+                            this.id,
+                            name.display_name,
+                            new Date(name.first_seen),
+                            name.last_seen !== null ? new Date(name.last_seen) : null,
+                        ),
+                    ]
+                });
+
+                resolve(result);
             });
         });
     }

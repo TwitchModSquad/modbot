@@ -1,0 +1,156 @@
+header {
+    background-color: var(--primary-tms-color);
+    box-shadow: var(--shadow);
+}
+
+.wrapper {
+    position: relative;
+    width: calc(100% - 3em);
+    max-width: 60em;
+    padding: 1em;
+    margin: 0 auto;
+}
+
+header nav {
+    position: absolute;
+    top: 50%;
+    right: .2em;
+    transform: translateY(-50%);
+}
+
+header a {
+    color: var(--primary-text-color);
+    text-decoration: none;
+    transition: 250ms;
+    padding: .4em .8em;
+    border-radius: .3em;
+    opacity: 1;
+}
+
+header nav a:hover,
+header nav a:focus {
+    opacity: .9;
+}
+
+header nav a img {
+    width: 1.4em;
+    height: 1.4em;
+    border-radius: .7em;
+    vertical-align: bottom;
+}
+
+header nav a.highlight {
+    background-color: var(--primary-text-color);
+    color: var(--secondary-tms-color);
+    box-shadow: var(--shadow);
+}
+
+header .heading {
+    font-size: 1.2em;
+}
+
+h1 {
+    font-size: 1.6em;
+    font-weight: 300;
+}
+
+footer {
+    color: var(--secondary-text-color);
+}
+
+footer a {
+    color: var(--secondary-text-color);
+    text-decoration: underline;
+}
+
+section {
+    background-color: var(--secondary-background-color);
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+    border-radius: 0.3em;
+    margin: 0.8em;
+    padding: 0.8em;
+}
+
+section h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: -0.8em;
+    margin-bottom: 0.8em;
+    padding: 0.8em;
+    border-bottom: 1px solid rgba(0,0,0,0.2);
+}
+
+.user-lookup {
+    background-color: var(--tertiary-background-color);
+    color: var(--primary-text-color);
+    width: 100%;
+    padding: .8em 1em;
+    border: 1px solid var(--primary-background-color);
+    border-radius: .4em;
+    box-shadow: var(--shadow), 2px 2px 35px rgba(0,0,0,0.3) inset;
+}
+
+.results {
+    margin: .8em 0;
+}
+
+.results small {
+    display: block;
+    text-align: center;
+}
+
+button.button {
+    padding: .4em .6em;
+}
+
+.profile .pfp {
+    display: block;
+    margin: 0 auto;
+    width: 10em;
+    height: 10em;
+    border-radius: 5em;
+}
+
+.profile .id {
+    display: block;
+    text-align: center;
+    opacity: .9;
+}
+
+.profile h3 {
+    text-align: center;
+    margin: .2em 0;
+}
+
+.profile h4 {
+    font-size: 1em;
+    font-weight: 600;
+    margin: 0;
+}
+
+.profile pre {
+    margin: .2em 0;
+}
+
+.profile small {
+    display: block;
+    font-size: .7em;
+}
+
+.tms-member {
+    width: 1.5em;
+    height: 1.5em;
+    vertical-align: bottom;
+    border-radius: .75em;
+}
+
+.partner-badge {
+    width: 1.2em;
+    height: 1.2em;
+    vertical-align: bottom;
+}
+
+.scroll-container {
+    max-height: 20em;
+    overflow-y: auto;
+}
