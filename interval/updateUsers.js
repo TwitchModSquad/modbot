@@ -1,8 +1,6 @@
 const con = require("../database");
 const api = require("../api/index");
 
-const GET_MODS_THRESHOLD = 3500;
-
 let waiting = false;
 
 module.exports = () => {
@@ -43,7 +41,7 @@ module.exports = () => {
         helixUsers.forEach(async helixUser => {
             let user = await api.Twitch.getUserById(helixUser.id);
 
-            if (helixUser.displayName.toLowerCase() !== user.login) {
+            if (helixUser.displayName.toLowerCase() !== user.display_name.toLowerCase()) {
                 con.query("update twitch__username set last_seen = now() where id = ? and display_name = ?;", [user.id, user.display_name]);
                 con.query("insert into twitch__username (id, display_name) values (?, ?) on duplicate key update display_name = ?;", [user.id, helixUser.displayName, helixUser.displayName]);
             }
@@ -71,14 +69,8 @@ module.exports = () => {
                 let followers = await api.Twitch.Direct.helix.users.getFollows({followedUser: userId});
 
                 con.query("update twitch__user set follower_count = ? where id = ?;", [followers.total, userId]);
-
-                /*if (followers.total >= GET_MODS_THRESHOLD) {
-                    let user = await api.Twitch.getUserById(userId);
-                    await user.refreshMods(false);
-                }*/
             } catch (err) {
-                api.Logger.warning("An error occurred while updating follower counts & moderators:");
-                api.Logger.warning(err);
+                global.api.Logger.warning(err);
             }
         });
     });

@@ -131,41 +131,6 @@ class API {
 
         return str;
     }
-
-    /**
-     * Generates a table-like format from tabular rows
-     * @param {[...[...string]]} rows 
-     * @param {number} padding
-     * @param {number} minimumWidth
-     * @param {boolean} alignRight
-     * @returns {string}
-     */
-    stringTable(rows, padding = 3, minimumWidth = 5, alignRight = false) {
-        let cellWidth = [];
-        
-        rows.forEach(row => {
-            row.forEach((cell, cellNum) => {
-                if (!cellWidth[cellNum]) cellWidth[cellNum] = minimumWidth;
-                if (cellWidth[cellNum] < cell.length + padding) cellWidth[cellNum] = String(cell).length + padding;
-            });
-        });
-        
-        let result = "";
-
-        rows.forEach(row => {
-            if (result !== "") result += "\n";
-
-            row.forEach((cell, cellNum) => {
-                if (!alignRight) result += " ".repeat(Math.max(cellWidth[cellNum] - cell.length), 0);
-                
-                result += cell;
-
-                if (alignRight) result += " ".repeat(Math.max(cellWidth[cellNum] - cell.length), 0);
-            })
-        });
-
-        return result;
-    }
 }
 
 let api = new API();

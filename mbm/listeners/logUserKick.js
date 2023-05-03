@@ -1,4 +1,4 @@
-const {EmbedBuilder, codeBlock, cleanCodeBlockContent, AuditLogEvent} = require("discord.js");
+const {MessageEmbed} = require("discord.js");
 const {Discord} = require("../../api/index");
 
 const getKickInfo = member => {
@@ -7,7 +7,7 @@ const getKickInfo = member => {
             // Fetch a couple audit logs than just one as new entries could've been added right after this event was emitted.
             const fetchedLogs = await member.guild.fetchAuditLogs({
                 limit: 6,
-                type: AuditLogEvent.MemberKick
+                type: 'MEMBER_KICK'
             }).catch(global.api.Logger.warning);
             
             const auditEntry = fetchedLogs.entries.find(a =>
@@ -45,40 +45,36 @@ const listener = {
                 }).catch(global.api.Logger.warning);
             }
 
-            let author = member.user;
+            guild.getSetting("lde-enabled", "boolean").then(enabled => {
+                if (enabled) {
+                    guild.getSetting("lde-channel", "channel").then(async channel => {
+                        guild.getSetting("lde-user-kick", "boolean").then(kickEnabled => {
+                            guild.getSetting("lde-user-leave", "boolean").then(leaveEnabled => {
+                                let author = member.user;
 
-            let listeners = guild.listeners.filter(x => x.event === "userKick" || x.event === "userLeave");
-
-            if (listeners.length > 0) {
-                let embed = new EmbedBuilder()
-                        .setTitle("Member Left the Guild")
-                        .setDescription(`User ${member} ${kickInfo ? "was kicked from" : "has left"} the guild.`)
-                        .setColor(0xb53131)
-                        .setAuthor({name: author.username, iconURL: author.displayAvatarURL()});
-
-                if (kickInfo?.reason) {
-                    embed.addFields({
-                        name: "Reason",
-                        value: codeBlock(cleanCodeBlockContent(kickInfo.reason.toString())),
-                        inline: true,
-                    });
+                                if (!((kickInfo && kickEnabled) || (!kickInfo && leaveEnabled))) return;
+        
+                                let embed = new MessageEmbed()
+                                        .setTitle("Member Left the Guild")
+                                        .setDescription(`User ${member} ${kickInfo ? "was kicked from" : "has left"} the guild.`)
+                                        .setColor(0xb53131)
+                                        .setAuthor({name: author.username, iconURL: author.avatarURL()});
+        
+                                if (kickInfo?.reason) {
+                                    embed.addField("Reason", "```" + kickInfo.reason.toString().replace(/\\`/g, "`").replace(/`/g, "\\`") + "```", true);
+                                }
+        
+                                if (kickInfo?.executor) {
+                                    embed.addField("Moderator", kickInfo.executor.toString(), true);
+                                }
+        
+                                channel.send({content: ' ', embeds: [embed]});
+                            }).catch(global.api.Logger.warning);
+                        }).catch(global.api.Logger.warning);
+                    }).catch(global.api.Logger.warning);
                 }
-
-                if (kickInfo?.executor) {
-                    embed.addFields({
-                        name: "Moderator",
-                        value: kickInfo.executor.toString(),
-                        inline: true,
-                    });
-                }
-
-                listeners.forEach(listener => {
-                    if ((kickInfo && listener.event === "userKick") || (!kickInfo && listener.event === "userLeave"))
-                        listener.channel.send({embeds: [embed]})
-                            .catch(api.Logger.warning);
-                });
-            }
-        }, () => {});
+            }).catch(global.api.Logger.warning);
+        }).catch(global.api.Logger.warning);
     }
 };
 

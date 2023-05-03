@@ -1,5 +1,6 @@
-const { EmbedBuilder, StringSelectMenuBuilder, ActionRowBuilder, ButtonBuilder, ButtonInteraction, StringSelectMenuInteraction, ModalBuilder, TextInputBuilder, TextInputStyle, ButtonStyle } = require("discord.js");
-
+const { MessageEmbed, MessageSelectMenu, MessageActionRow, MessageButton } = require("discord.js");
+const {Modal, TextInputComponent, showModal} = require("discord-modals");
+const Discord = require("discord.js");
 const con = require("../../database");
 const api = require("../../api/index");
 
@@ -29,23 +30,23 @@ const completeGroupList = async (group, interaction, handleError, cache) => {
     const streamer = cache[interaction.user.id].streamer;
 
     if (method === "gencmd" || method === "sendcmd") {
-        const layout = new TextInputBuilder()
-            .setCustomId("layout")
-            .setLabel("Command Layout")
-            .setStyle(TextInputStyle.Short)
-            .setMinLength(3)
-            .setMaxLength(128)
-            .setRequired(true)
-            .setValue(await getGroupCommand(streamer));
-
-        const modal = new ModalBuilder()
+        const modal = new Modal()
             .setCustomId("group-cmd")
             .setTitle("Edit Command Layout")
             .addComponents(
-                    new ActionRowBuilder().addComponents(layout)
-                );
+                new TextInputComponent()
+                    .setCustomId("layout")
+                    .setLabel("Command Layout")
+                    .setStyle("SHORT")
+                    .setMinLength(3)
+                    .setMaxLength(128)
+                    .setRequired(true)
+                    .setDefaultValue(await getGroupCommand(streamer)));
 
-        interaction.showModal(modal);
+        showModal(modal, {
+            client: global.client.discord,
+            interaction: interaction,
+        });
     } else if (method === "gengrp") {
         interaction.reply({content: await group.generateGroupString(streamer), ephemeral: true})
         delete listener.cache[interaction.user.id];
@@ -61,7 +62,7 @@ const listener = {
     cache: {},
     copyCache: {},
     updateCopyMessage: cache => {
-        const embed = new EmbedBuilder()
+        const embed = new MessageEmbed()
             .setTitle("Copy Event")
             .setDescription("**Copying event** - " + cache.oldGroup.game + " hosted by " + cache.oldGroup.host.display_name + " *[old data]*")
             .addFields([
@@ -72,7 +73,7 @@ const listener = {
                 },
                 {
                     name: "Host",
-                    value: `[${cache.host.display_name}](https://twitch.tv/${cache.host.login})`,
+                    value: `[${cache.host.display_name}](https://twitch.tv/${cache.host.display_name.toLowerCase()})`,
                     inline: true,
                 },
                 {
@@ -81,17 +82,17 @@ const listener = {
                 }
             ]);
 
-        const addParticipantsButton = new ButtonBuilder()
+        const addParticipantsButton = new MessageButton()
             .setCustomId("copy-participant-add")
             .setLabel("Add Participant")
-            .setStyle(ButtonStyle.Primary);
+            .setStyle("PRIMARY");
 
-        const createButton = new ButtonBuilder()
+        const createButton = new MessageButton()
             .setCustomId("copy-create")
             .setLabel("Create Group")
-            .setStyle(ButtonStyle.Success);
+            .setStyle("SUCCESS");
 
-        const removeParticipantsSelect = new StringSelectMenuBuilder()
+        const removeParticipantsSelect = new MessageSelectMenu()
             .setCustomId("copy-participant-remove")
             .setPlaceholder("Remove Participants")
             .setMinValues(1)
@@ -115,7 +116,7 @@ const listener = {
             let participant = cache.participants[i];
             if (participantString !== "") participantString += "\n";
 
-            participantString += `${i+1} - [${participant.display_name}](https://twitch.tv/${participant.login})`;
+            participantString += `${i+1} - [${participant.display_name}](https://twitch.tv/${participant.display_name.toLowerCase()})`;
         }
 
         embed.addFields([
@@ -125,26 +126,22 @@ const listener = {
             }
         ])
 
-        const row = new ActionRowBuilder()
+        const row = new MessageActionRow()
             .addComponents(addParticipantsButton, createButton);
 
-        const removeParticipantsRow = new ActionRowBuilder()
+        const removeParticipantsRow = new MessageActionRow()
             .addComponents(removeParticipantsSelect);
 
-        cache.modal.editReply({embeds: [embed], components: [row, removeParticipantsRow], ephemeral: true});
+        cache.modal.editReply({content: ' ', embeds: [embed], components: [row, removeParticipantsRow], ephemeral: true});
     },
-    /**
-     * Listener for the group manager
-     * @param {ButtonInteraction|StringSelectMenuInteraction} interaction 
-     */
     async listener (interaction) {
         const handleSuccess = message => {
-            interaction.reply({embeds: [new EmbedBuilder().setTitle(message).setColor(0x2dad3e)], ephemeral: true})
+            interaction.reply({content: ' ', embeds: [new Discord.MessageEmbed().setTitle(message).setColor(0x2dad3e)], ephemeral: true})
         }
 
         const handleError = (err, method = "reply", content = ' ') => {
             global.api.Logger.warning(err);
-            interaction[method]({content: content, embeds: [new EmbedBuilder().setTitle("Uh oh!").setDescription(err).setColor(0x9e392f)], ephemeral: true})
+            interaction[method]({content: content, embeds: [new Discord.MessageEmbed().setTitle("Uh oh!").setDescription(err).setColor(0x9e392f)], ephemeral: true})
         }
 
         if (interaction.isButton()) {
@@ -178,23 +175,24 @@ const listener = {
                     handleError("Unable to find linked Twitch user");
                 });
             } else if (interaction.component.customId.startsWith("group-addpartic-")) {
-                const participant = new TextInputBuilder()
-                    .setCustomId("participant")
-                    .setLabel("Twitch Name")
-                    .setStyle(TextInputStyle.Short)
-                    .setMinLength(3)
-                    .setMaxLength(25)
-                    .setPlaceholder("Full Twitch Username")
-                    .setRequired(true);
-                
-                const modal = new ModalBuilder()
+                let modal = new Modal()
                     .setCustomId(interaction.component.customId)
                     .setTitle("Add a Participant")
                     .addComponents(
-                        new ActionRowBuilder().addComponents(participant)
+                        new TextInputComponent()
+                            .setCustomId("participant")
+                            .setLabel("Twitch Name")
+                            .setStyle("SHORT")
+                            .setMinLength(3)
+                            .setMaxLength(25)
+                            .setPlaceholder("Full Twitch Username")
+                            .setRequired(true)
                     );
 
-                interaction.showModal(modal);
+                showModal(modal, {
+                    client: global.client.discord,
+                    interaction: interaction,
+                })
             } else if (interaction.component.customId.startsWith("group-delete-")) {
                 api.Group.getGroupById(interaction.component.customId.replace("group-delete-", "")).then(group => {
                     api.Discord.getUserById(interaction.user.id).then(user => {
@@ -218,23 +216,24 @@ const listener = {
                     });
                 }, handleError);
             } else if (interaction.component.customId.startsWith("group-setgame-")) {
-                const game = new TextInputBuilder()
-                    .setCustomId("game")
-                    .setLabel("Game")
-                    .setStyle(TextInputStyle.Short)
-                    .setMinLength(3)
-                    .setMaxLength(64)
-                    .setPlaceholder("New Game Title")
-                    .setRequired(true);
-                
-                const modal = new ModalBuilder()
+                let modal = new Modal()
                     .setCustomId(interaction.component.customId)
                     .setTitle("Set Game")
                     .addComponents(
-                        new ActionRowBuilder().addComponents(game)
+                        new TextInputComponent()
+                            .setCustomId("game")
+                            .setLabel("Game")
+                            .setStyle("SHORT")
+                            .setMinLength(3)
+                            .setMaxLength(64)
+                            .setPlaceholder("New Game Title")
+                            .setRequired(true)
                     );
 
-                interaction.showModal(modal);
+                showModal(modal, {
+                    client: global.client.discord,
+                    interaction: interaction,
+                })
             } else if (interaction.component.customId === "start-group") {
                 con.query("select id from `group` where message = ?;", [interaction.message.id], (err, res) => {
                     if (err) {
@@ -306,14 +305,14 @@ const listener = {
                                 if (user.identity?.id) {
                                     api.getFullIdentity(user.identity.id).then(identity => {
                                         identity.getActiveModeratorChannels().then(async streamers => {
-                                            const embed = new EmbedBuilder()
+                                            const embed = new Discord.MessageEmbed()
                                                 .setTitle("Generate Group Command")
                                                 .setDescription("Utilize any of the following methods to generate a group command for your streamer.")
                                                 .addFields([
                                                     {name: "General Group Command", value: await group.generateGroupString(), inline: false},
                                                     {name: "TMS-Hosted Command", value: "In order to manage TMS-hosted commands to allow for immediate change to TMS groups, utilize the Discord slash commands `/command enable` and `/command disable`.", inline: false}]);
                 
-                                            const selectMethod = new StringSelectMenuBuilder()
+                                            const selectMethod = new Discord.MessageSelectMenu()
                                                 .setCustomId("cmd-selmethod-" + group.id)
                                                 .setMinValues(1)
                                                 .setMaxValues(1)
@@ -336,7 +335,7 @@ const listener = {
                                                     },
                                                 ]);
                 
-                                            const selectStreamer = new StringSelectMenuBuilder()
+                                            const selectStreamer = new Discord.MessageSelectMenu()
                                                 .setCustomId("cmd-selstreamer-" + group.id)
                                                 .setPlaceholder("Select Streamer")
                                                 .setMinValues(1)
@@ -370,13 +369,13 @@ const listener = {
                                                 return;
                                             }
                                             
-                                            const row = new ActionRowBuilder()
+                                            const row = new Discord.MessageActionRow()
                                                 .addComponents(selectMethod);
 
-                                            const row2 = new ActionRowBuilder()
+                                            const row2 = new Discord.MessageActionRow()
                                                 .addComponents(selectStreamer);
                 
-                                            interaction.reply({embeds: [embed], components: [row, row2], ephemeral: true});
+                                            interaction.reply({content: ' ', embeds: [embed], components: [row, row2], ephemeral: true});
                                         }, handleError)
                                     }, err => {
                                         handleError("You are not properly linked to TMS!");
@@ -404,20 +403,20 @@ const listener = {
                             api.Discord.getUserById(interaction.user.id).then(user => {
                                 if (user.identity?.id) {
                                     if (group.created_by.id === user.identity.id) {
-                                        const embed = new EmbedBuilder()
+                                        const embed = new Discord.MessageEmbed()
                                             .setTitle("Confirm Recover")
                                             .setDescription("Recovering a group removes the end time and start time, allowing the group to be restarted.\nThis is not recommended unless the group was started by accident.\nIf you're trying to recreate the same or similar group, please copy this group instead.")
                                             .setColor(0x772ce8);
 
-                                        const recoverConfirm = new ButtonBuilder()
+                                        const recoverConfirm = new Discord.MessageButton()
                                             .setCustomId("recover-group-" + group.id)
                                             .setLabel("Confirm Recover")
-                                            .setStyle(ButtonStyle.Primary);
+                                            .setStyle("PRIMARY");
 
-                                        const row = new ActionRowBuilder()
+                                        const row = new Discord.MessageActionRow()
                                             .addComponents(recoverConfirm);
 
-                                        interaction.reply({embeds: [embed], components: [row], ephemeral: true});
+                                        interaction.reply({content: ' ', embeds: [embed], components: [row], ephemeral: true});
                                     } else {
                                         handleError("You must be the creator of this group in order to execute this function.");
                                     }
@@ -480,36 +479,33 @@ const listener = {
                         api.Group.getGroupById(res[0].id).then(group => {
                             api.Discord.getUserById(interaction.user.id).then(user => {
                                 if (user.identity?.id) {
-                                    const game = new TextInputBuilder()
-                                        .setCustomId("game")
-                                        .setLabel("Game")
-                                        .setStyle(TextInputStyle.Short)
-                                        .setMinLength(3)
-                                        .setMaxLength(64)
-                                        .setPlaceholder("Group game name")
-                                        .setRequired(true)
-                                        .setValue(group.game);
-
-
-                                    const host = new TextInputBuilder()
-                                        .setCustomId("host")
-                                        .setLabel("Host")
-                                        .setStyle(TextInputStyle.Short)
-                                        .setMinLength(3)
-                                        .setMaxLength(25)
-                                        .setPlaceholder("Group host (Twitch name)")
-                                        .setRequired(true)
-                                        .setValue(group.host.display_name);
-
-                                    const modal = new ModalBuilder()
+                                    const modal = new Modal()
                                         .setCustomId("group-copy-" + group.id)
                                         .setTitle("Copy group " + group.id)
                                         .addComponents(
-                                                new ActionRowBuilder().addComponents(game),
-                                                new ActionRowBuilder().addComponents(host)
-                                            );
+                                            new TextInputComponent()
+                                                .setCustomId("game")
+                                                .setLabel("Game")
+                                                .setStyle("SHORT")
+                                                .setMinLength(3)
+                                                .setMaxLength(64)
+                                                .setPlaceholder("Group game name")
+                                                .setRequired(true)
+                                                .setDefaultValue(group.game),
+                                            new TextInputComponent()
+                                                .setCustomId("host")
+                                                .setLabel("Host")
+                                                .setStyle("SHORT")
+                                                .setMinLength(3)
+                                                .setMaxLength(25)
+                                                .setPlaceholder("Group host (Twitch name)")
+                                                .setRequired(true)
+                                                .setDefaultValue(group.host.display_name));
 
-                                    interaction.showModal(modal);
+                                    showModal(modal, {
+                                        client: global.client.discord,
+                                        interaction: interaction,
+                                    })
                                 } else {
                                     handleError("You are not properly linked to TMS!");
                                 }
@@ -522,23 +518,23 @@ const listener = {
                     }
                 });
             } else if (interaction.component.customId === "copy-participant-add") {
-                const participant = new TextInputBuilder()
-                    .setCustomId("participant")
-                    .setLabel("Participant")
-                    .setStyle(TextInputStyle.Short)
-                    .setMinLength(3)
-                    .setMaxLength(25)
-                    .setPlaceholder("New Twitch User")
-                    .setRequired(true);
-
-                const modal = new ModalBuilder()
+                const modal = new Modal()
                     .setCustomId("copy-participant-add")
                     .setTitle("Add participant to copied group")
                     .addComponents(
-                            new ActionRowBuilder().addComponents(participant)
-                        );
+                        new TextInputComponent()
+                            .setCustomId("participant")
+                            .setLabel("Participant")
+                            .setStyle("SHORT")
+                            .setMinLength(3)
+                            .setMaxLength(25)
+                            .setPlaceholder("New Twitch User")
+                            .setRequired(true));
 
-                interaction.showModal(modal);
+                showModal(modal, {
+                    client: global.client.discord,
+                    interaction: interaction,
+                })
             } else if (interaction.component.customId === "copy-create") {
                 if (listener.copyCache.hasOwnProperty(interaction.user.id)) {
                     let cache = listener.copyCache[interaction.user.id];
@@ -550,12 +546,12 @@ const listener = {
                                     hostIdentity = await api.getFullIdentity(cache.host.identity.id);
                                 }
 
-                                const embed = new EmbedBuilder()
+                                const embed = new MessageEmbed()
                                     .setTitle(cache.game + " hosted by " + cache.host.display_name)
                                     .setAuthor({iconURL: cache.host.profile_image_url, name: cache.host.display_name})
                                     .setColor(0x772ce8)
                                     .addFields([
-                                        {name: "Host", value: "[" + cache.host.display_name + "](https://twitch.tv/" + cache.host.login + ")" + (hostIdentity === null || hostIdentity.discordAccounts.length === 0 ? "" : " [<@" + hostIdentity.discordAccounts[0].id + ">]"), inline: true},
+                                        {name: "Host", value: "[" + cache.host.display_name + "](https://twitch.tv/" + cache.host.display_name.toLowerCase() + ")" + (hostIdentity === null || hostIdentity.discordAccounts.length === 0 ? "" : " [<@" + hostIdentity.discordAccounts[0].id + ">]"), inline: true},
                                         {name: "Posted By", value: interaction.member.toString(), inline: true},
                                     ]);
 
@@ -566,7 +562,7 @@ const listener = {
 
                                     if (participantList !== "") participantList += "\n";
 
-                                    participantList += "**" + (i + 1) + "** - [" + user.display_name + "](https://twitch.tv/" + user.login + ")";
+                                    participantList += "**" + (i + 1) + "** - [" + user.display_name + "](https://twitch.tv/" + user.display_name.toLowerCase() + ")";
 
                                     if (user.identity?.id) {
                                         let identity = await api.getFullIdentity(user.identity.id);
@@ -576,29 +572,29 @@ const listener = {
                                     }
                                 }
 
-                                const editButton = new ButtonBuilder()
+                                const editButton = new MessageButton()
                                     .setCustomId("edit-group")
                                     .setLabel("Edit")
-                                    .setStyle(ButtonStyle.Secondary);
+                                    .setStyle("SECONDARY");
 
-                                const startButton = new ButtonBuilder()
+                                const startButton = new MessageButton()
                                     .setCustomId("start-group")
                                     .setLabel("Start Event")
-                                    .setStyle(ButtonStyle.Success);
+                                    .setStyle("SUCCESS");
                                     
-                                const setGroupCommand = new ButtonBuilder()
+                                const setGroupCommand = new MessageButton()
                                     .setCustomId("set-command")
                                     .setLabel("Set Group Command")
-                                    .setStyle(ButtonStyle.Primary);
+                                    .setStyle("PRIMARY");
 
-                                const row = new ActionRowBuilder()
+                                const row = new MessageActionRow()
                                     .addComponents(editButton, startButton, setGroupCommand);
 
                                 embed.addFields([{name: "Participants", value: participantList, inline: false}]);
 
                                 delete listener.copyCache[interaction.user.id];
                                     
-                                interaction.reply({embeds: [embed], components: [row], fetchReply: true}).then(message => {
+                                interaction.reply({content: ' ', embeds: [embed], components: [row], fetchReply: true}).then(message => {
                                     const postWithId = id => {
                                         con.query("select * from `group` where id = ?;", [id], (err, res) => {
                                             if (err) {
@@ -607,7 +603,7 @@ const listener = {
                                                 if (res.length === 0) {
                                                     embed.setURL(config.pub_domain + "g/" + id);
                                                     embed.setFooter({text: "ID: " + id, iconURL: "https://tms.to/assets/images/logos/logo.webp"});
-                                                    message.edit({embeds: [embed], components: [row]}).then(() => {}, api.Logger.warning);
+                                                    message.edit({content: ' ', embeds: [embed], components: [row]}).then(() => {}, api.Logger.warning);
                                                     con.query("insert into `group` (id, message, created_by, game) values (?, ?, ?, ?);", [id, message.id, identity.id, cache.game], err => {
                                                         if (err) {
                                                             api.Logger.severe(err);
@@ -649,7 +645,7 @@ const listener = {
             }
         }
 
-        if (interaction.isStringSelectMenu()) {
+        if (interaction.isSelectMenu()) {
             if (interaction.component.customId.startsWith("group-rempartic-")) {
                 api.Discord.getUserById(interaction.user.id).then(async discordUser => {
                     if (discordUser.identity?.id) {

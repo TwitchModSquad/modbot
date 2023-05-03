@@ -13,12 +13,6 @@ const SIGNON_URI = config.pub_domain + "signon/";
 
 const redirect = (req, res) => {
     if (req.cookies?.hasOwnProperty && req.cookies?.hasOwnProperty("return_uri")) {
-        res.cookie("return_uri", "/signon/", {
-            domain: config.main_domain,
-            maxAge: -1,
-            path: "/",
-            secure: true,
-        });
         res.redirect(req.cookies.return_uri);
     } else
         res.redirect(SIGNON_URI);
@@ -82,7 +76,6 @@ router.get("/twitch", async (req, res) => {
 
         if (oauthData.hasOwnProperty("status") && oauthData.status === 400) {
             res.redirect(api.Authentication.Twitch.TWITCH_URL);
-            return;
         }
 
         let user;

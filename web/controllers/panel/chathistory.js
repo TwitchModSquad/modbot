@@ -3,16 +3,12 @@ const router = express.Router();
 
 const con = require("../../../database");
 const api = require("../../../api/");
-const config = require("../../../config.json");
 
 const EMOTE_URL = "https://static-cdn.jtvnw.net/emoticons/v1/{{id}}/1.0";
 
 const BADGES_URL = "/assets/images/badges/";
 const TWITCH_BADGES_URL = BADGES_URL + "twitch/";
 const TMS_BADGES_URL = BADGES_URL + "tms/";
-
-const TWITCH_USER_REGEX = /@(\w{4,})/g;
-const URL_REGEX = /(https?:\/\/)?(\w+(\.[a-zA-Z]\w+)+\/?[0-9A-Za-z-_~:/#\[\]@!$&?'()*+,;%=]*)/g;
 
 let cachedChatters = [];
 let cachedStreamers = [];
@@ -149,8 +145,7 @@ router.get("/", async (req, res) => {
                 .replace("&", "&amp;")
                 .replace("<", "&lt;")
                 .replace(">", "&gt;")
-                .replace("&lt;3", "<3")
-                .replace(URL_REGEX, `<a href="https://$2" target="__blank" onclick="return confirm('This is an external link and can\\'t be protected by TMS. Are you sure you want to continue?');">$&</a>`); // hack to reverse <3 from &lt;3
+                .replace("&lt;3", "<3"); // hack to reverse <3 to &lt;3
 
             if (chatLog.emotes) {
                 let replacements = [];
@@ -171,9 +166,6 @@ router.get("/", async (req, res) => {
                     chatLog.message = chatLog.message.split(replacement.emoteString).join(replacement.html);
                 })
             }
-
-            chatLog.message = chatLog.message
-                .replace(TWITCH_USER_REGEX, `<a href="${config.pub_domain}panel/user/$1" target="__blank">$&</a>`);
 
             let badges = "";
 
@@ -202,10 +194,9 @@ router.get("/", async (req, res) => {
 
             if (user.identity?.admin) {
                 addBadge(TMS_BADGES_URL + "admin.png", "tms admin", "TMS Administrator");
-            } else if (user.identity?.mod) {
+            }
+            if (user.identity?.mod) {
                 addBadge(TMS_BADGES_URL + "mod.png", "tms mod", "TMS Moderator");
-            } else if (user.identity?.authenticated) {
-                addBadge(TMS_BADGES_URL + "tms.png", "tms member", "TMS Member");
             }
 
             data.chat = [

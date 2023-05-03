@@ -16,7 +16,7 @@ const listener = {
                 if (err) api.Logger.severe(err);
             });
         } else {
-            api.Logger.warning(`Not logging ban in #${streamer.login} due to exceeding BPM threshold (${BPM_LOG_MAXIMUM})`)
+            api.Logger.warning(`Not logging ban in #${streamer.display_name.toLowerCase()} due to exceeding BPM threshold (${BPM_LOG_MAXIMUM})`)
         }
     }
 };

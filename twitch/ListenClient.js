@@ -109,10 +109,7 @@ class ListenClient {
             channel,
         ]
         if (this.client)
-            this.client.join(channel).catch(err => {
-                api.Logger.warning("Error occurred while joining #" + channel + ":");
-                api.Logger.warning(err);
-            });
+            this.client.join(channel).catch(api.Logger.warning);
     }
     
     /**
@@ -163,6 +160,7 @@ class ListenClient {
     connect() {
         this.client = new tmi.Client({
             options: {
+                debug: true,
                 // joinInterval: 5000,
                 skipMembership: true,
             },
@@ -185,7 +183,7 @@ class ListenClient {
      * @return {boolean|null}
      */
     isMod(streamer) {
-        const botState = this.client.userstate["#" + streamer.login];
+        const botState = this.client.userstate["#" + streamer.display_name.toLowerCase()];
         if (botState !== undefined) {
             return botState.mod;
         } else {

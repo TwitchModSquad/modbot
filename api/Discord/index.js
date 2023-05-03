@@ -3,15 +3,11 @@ const con = require("../../database");
 const Identity = require("../Identity");
 const DiscordUser = require("./DiscordUser");
 const DiscordGuild = require("./DiscordGuild");
+const DiscordGuildSetting = require("./DiscordGuildSetting");
 
 const Cache = require("../Cache/Cache");
 const AssumedDiscordUser = require("./AssumedDiscordUser");
 const Assumption = require("../Assumption");
-const DiscordListener = require("./DiscordListener");
-
-const sleep = ms => {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
 
 /**
  * Utility class for Discord services
@@ -31,42 +27,6 @@ class Discord {
      * @type {Cache}
      */
     guildCache = new Cache();
-
-    /**
-     * Whether or not listeners have loaded in or not
-     * @type {boolean}
-     */
-    listenersInitialized = false;
-
-    /**
-     * Represents all listeners for all guilds
-     * 
-     * @type {DiscordListener[]}
-     */
-    listeners = [];
-
-    /**
-     * Init discord guild listeners
-     */
-    init() {
-        con.query("select * from discord__listener;", async (err, res) => {
-            if (!err) { 
-                for (let i = 0; i < res.length; i++) {
-                    let listener = res[i];
-                    this.listeners.push(new DiscordListener(
-                            listener.id,
-                            await global.client.mbm.guilds.fetch(listener.guild),
-                            await global.client.mbm.channels.fetch(listener.channel),
-                            listener.event,
-                            listener.data
-                        )
-                    );
-                }
-                this.listenersInitialized = true;
-                global.api.Logger.info("Loaded " + this.listeners.length + " listener(s)");
-            } else global.api.Logger.severe(err);
-        });
-    }
 
     /**
      * Internal method for retrieving a user if it is not present in the database
@@ -224,12 +184,7 @@ class Discord {
      * @returns {Promise<DiscordGuild>}
      */
     getGuild(id, overrideCache) {
-        return this.guildCache.get(id, async (resolve, reject) => {
-            while (!this.listenersInitialized) {
-                global.api.Logger.warning("Guild requested without listeners intialized");
-                await sleep(250);
-            }
-
+        return this.guildCache.get(id, (resolve, reject) => {
             con.query("select * from discord__guild where id = ?;", [id], async (err, res) => {
                 if (err) {
                     reject(err);
@@ -242,9 +197,10 @@ class Discord {
                         row.id,
                         await global.api.getFullIdentity(row.represents_id),
                         await this.getUserById(row.owner_id),
-                        row.name,
-                        this.listeners.filter(x => x.guild.id === id)
+                        row.name
                     );
+
+                    await guild.getSettings();
 
                     resolve(guild);
                 } else {

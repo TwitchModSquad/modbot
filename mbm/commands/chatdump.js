@@ -1,9 +1,9 @@
-const {MessageEmbed, AttachmentBuilder, SlashCommandBuilder, SlashCommandStringOption, SlashCommandIntegerOption, SlashCommandNumberOption, SlashCommandBooleanOption, PermissionFlagsBits} = require("discord.js");
+const {MessageEmbed, MessageAttachment} = require("discord.js");
 
 const con = require("../../database");
 
 const errorEmbed = message => {
-    return {embeds: [new MessageEmbed()
+    return {content: ' ', embeds: [new MessageEmbed()
             .setTitle("Error:")
             .setDescription(message)
             .setColor(0xed3734)], ephemeral: true};
@@ -14,56 +14,54 @@ const formatDate = date => {
 }
 
 const command = {
-    data: new SlashCommandBuilder()
-        .setName("chatdump")
-        .setDescription("Dumps a chat log file following the given queries")
-        .addStringOption(
-            new SlashCommandStringOption()
-                .setName("streamer")
-                .setDescription("Search by streamer username")
-                .setRequired(false)
-                .setAutocomplete(true)
-        )
-        .addStringOption(
-            new SlashCommandStringOption()
-                .setName("user")
-                .setDescription("Search by chatter username")
-                .setRequired(false)
-                .setAutocomplete(true)
-        )
-        .addNumberOption(
-            new SlashCommandNumberOption()
-                .setName("start")
-                .setDescription("Relative start time for chat logs, in hours. Ex: 1 would search for anything less than 1 hour ago")
-                .setRequired(false)
-        )
-        .addNumberOption(
-            new SlashCommandNumberOption()
-                .setName("end")
-                .setDescription("Relative end time for chat logs, in hours. Ex: 1 would search for anything greater than 1 hour ago")
-                .setRequired(false)
-        )
-        .addIntegerOption(
-            new SlashCommandIntegerOption()
-                .setName("limit")
-                .setDescription("Maximum chat messages to be sent. Default/Maximum: 10,000/500,000")
-                .setMinValue(1)
-                .setMaxValue(500000)
-                .setRequired(false)
-        )
-        .addBooleanOption(
-            new SlashCommandBooleanOption()
-                .setName("ephemeral")
-                .setDescription("'True' if you only want the dump to be viewable by you. Default: True")
-                .setRequired(false)
-        )
-        .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
-        .setDMPermission(false),
+    data: {
+        name: 'chatdump'
+        , description: 'Dumps a chat log file following the given queries'
+        , options: [
+            {
+                type: 3,
+                name: "streamer",
+                description: "Search by Streamer username",
+                required: false,
+                autocomplete: true,
+            },
+            {
+                type: 3,
+                name: "user",
+                description: "Search by Chatter username",
+                required: false,
+                autocomplete: true,
+            },
+            {
+                type: 10,
+                name: "start",
+                description: "Relative start time for chat logs, in hours. Ex: 1 would search for anything less than 1 hour ago",
+                required: false,
+            },
+            {
+                type: 10,
+                name: "end",
+                description: "Relative end time for chat logs, in hours. Ex: 1 would search for anything greater than 1 hour ago",
+                required: false,
+            },
+            {
+                type: 4,
+                name: "limit",
+                description: "Maximum chat messages to be sent. Default/Maximum: 10,000/500,000",
+                min_value: 1,
+                max_value: 500000,
+                required: false,
+            },
+            {
+                type: 5,
+                name: "ephemeral",
+                description: "'True' if you only want the dump to be viewable by you. Default: True",
+                required: false,
+            },
+        ]
+        , default_permission: false
+    },
     global: false,
-    /**
-     * Called when this command is executed
-     * @param {CommandInteraction} interaction 
-     */
     async execute(interaction) {
         let streamer = interaction.options.getString("streamer", false);
         let user = interaction.options.getString("user", false);
@@ -155,12 +153,12 @@ const command = {
                 let log = res[i];
                 let streamer = await global.api.Twitch.getUserById(log.streamer_id);
                 let user = await global.api.Twitch.getUserById(log.user_id);
-                str += formatDate(new Date(log.timesent)) + " [#" + streamer.login + "] " + user.display_name + ": " + log.message + "\n";
+                str += formatDate(new Date(log.timesent)) + " [#" + streamer.display_name.toLowerCase() + "] " + user.display_name + ": " + log.message + "\n";
             }
             
-            const attachment = new AttachmentBuilder(Buffer.from(str, 'utf-8'), {name: "dump-" + Date.now() + ".txt", description: "Chat history!", content_type: "text/plain"});
+            const attachment = new MessageAttachment(Buffer.from(str, 'utf-8'), "dump-" + Date.now() + ".txt", {description: "Stuff!", content_type: "text/plain"});
             
-            interaction.editReply({ephemeral: ephemeral, files: [attachment]});
+            interaction.editReply({content: ' ', ephemeral: ephemeral, files: [attachment]});
         });
     }
 };

@@ -6,12 +6,12 @@ module.exports = {
     description: "Leaves all active groups for this user",
     async execute(streamer, chatter, tags, alias, args, message) {
         const handleError = err => {
-            global.client.ban.say(streamer.login, chatter.display_name + ", an error occurred while processing this command!");
+            global.client.ban.say(streamer.display_name.toLowerCase(), chatter.display_name + ", an error occurred while processing this command!");
             api.Logger.severe(err);
         }
 
         const handleExpectedError = err => {
-            global.client.ban.say(streamer.login, chatter.display_name + ", " + err);
+            global.client.ban.say(streamer.display_name.toLowerCase(), chatter.display_name + ", " + err);
         }
 
         const badges = tags.badges || {};
@@ -34,11 +34,11 @@ module.exports = {
                                     await group.removeParticipants([streamer], identity);
                                     left++;
                                 } else
-                                    global.client.ban.say(streamer.login, `${chatter.display_name}, can't leave group ${group.id}, ${streamer.display_name} is the host! Try to stop the group instead`);
+                                    global.client.ban.say(streamer.display_name.toLowerCase(), `${chatter.display_name}, can't leave group ${group.id}, ${streamer.display_name} is the host! Try to stop the group instead`);
                             }
 
                             if (left > 0)
-                                global.client.ban.say(streamer.login, `${chatter.display_name}, left ${left} group${left === 1 ? "" : "s"}!`);
+                                global.client.ban.say(streamer.display_name.toLowerCase(), `${chatter.display_name}, left ${left} group${left === 1 ? "" : "s"}!`);
                         } catch(err2) {
                             handleError(err2);
                         }

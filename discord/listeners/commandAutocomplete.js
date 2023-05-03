@@ -25,7 +25,7 @@ const listener = {
                                     });
     
                                     streamers = streamers
-                                        .filter(x => x.login.startsWith(focused.value.toLowerCase()))
+                                        .filter(x => x.display_name.toLowerCase().startsWith(focused.value.toLowerCase()))
                                         .map(x => {return {name: x.display_name, value: x.display_name}});
     
                                     interaction.respond(streamers);

@@ -3,7 +3,6 @@ const api = require("../../api");
 const formatting = require("../Formatting");
 
 const Discord = require("discord.js");
-const { ButtonStyle } = require("discord.js");
 
 const listener = {
     name: "groupBanListener",
@@ -28,12 +27,12 @@ const listener = {
                 try {
                     const embed = await formatting.parseBanEmbed(streamer, chatter, bpm, timebanned);
 
-                    const crossbanButton = new Discord.ButtonBuilder()
+                    const crossbanButton = new Discord.MessageButton()
                             .setCustomId("cb-" + chatter.id)
                             .setLabel("Crossban")
-                            .setStyle(ButtonStyle.Danger);
+                            .setStyle("DANGER");
                     
-                    const row = new Discord.ActionRowBuilder()
+                    const row = new Discord.MessageActionRow()
                             .addComponents(crossbanButton);
 
                     thread.send({content: '@here', embeds: [embed], components: [row]}).catch(api.Logger.warning);
