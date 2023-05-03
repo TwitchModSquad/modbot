@@ -1,4 +1,4 @@
-const { EmbedBuilder, ButtonBuilder, ActionRowBuilder, StringSelectMenuBuilder, ThreadChannel, Message, ButtonStyle } = require("discord.js");
+const { MessageEmbed, MessageButton, MessageActionRow, MessageSelectMenu, ThreadChannel, Message } = require("discord.js");
 const FullIdentity = require("../FullIdentity");
 const TwitchUser = require("../Twitch/TwitchUser");
 
@@ -134,7 +134,7 @@ class Group extends Cachable {
 
     /**
      * Generates an embed of this Group
-     * @type {Promise<EmbedBuilder>}
+     * @type {Promise<MessageEmbed>}
      */
     generateEmbed() {
         return new Promise(async (resolve, reject) => {
@@ -144,14 +144,14 @@ class Group extends Cachable {
                     hostIdentity = await global.api.getFullIdentity(this.host.identity.id);
                 }
 
-                const embed = new EmbedBuilder()
+                const embed = new MessageEmbed()
                     .setTitle(this.game + " hosted by " + this.host.display_name)
                     .setURL(config.pub_domain + "g/" + this.id)
                     .setAuthor({iconURL: this.host.profile_image_url, name: this.host.display_name})
                     .setColor(0x772ce8)
                     .setFooter({text: "ID: " + this.id, iconURL: "https://tms.to/assets/images/logos/logo.webp"})
                     .addFields([
-                        {name: "Host", value: "[" + this.host.display_name + "](https://twitch.tv/" + this.host.login + ")" + (hostIdentity === null || hostIdentity.discordAccounts.length === 0 ? "" : " [<@" + hostIdentity.discordAccounts[0].id + ">]"), inline: true},
+                        {name: "Host", value: "[" + this.host.display_name + "](https://twitch.tv/" + this.host.display_name.toLowerCase() + ")" + (hostIdentity === null || hostIdentity.discordAccounts.length === 0 ? "" : " [<@" + hostIdentity.discordAccounts[0].id + ">]"), inline: true},
                         {name: "Posted By", value: `<@${this.created_by.discordAccounts[0].id}>`, inline: true},
                     ]);
 
@@ -162,7 +162,7 @@ class Group extends Cachable {
 
                     if (participantList !== "") participantList += "\n";
 
-                    participantList += "**" + (i + 1) + "** - [" + participant.display_name + "](https://twitch.tv/" + participant.login + ")";
+                    participantList += "**" + (i + 1) + "** - [" + participant.display_name + "](https://twitch.tv/" + participant.display_name.toLowerCase() + ")";
 
                     if (participant.identity?.id) {
                         let identity = await api.getFullIdentity(participant.identity.id);
@@ -193,55 +193,55 @@ class Group extends Cachable {
     }
 
     /**
-     * Generates the ActionRowBuilder for this group
-     * @type {Promise<ActionRowBuilder>}
+     * Generates the MessageActionRow for this group
+     * @type {Promise<MessageActionRow>}
      */
     generateComponents() {
         return new Promise((resolve, reject) => {
 
-            const setGroupCommand = new ButtonBuilder()
+            const setGroupCommand = new MessageButton()
                 .setCustomId("set-command")
                 .setLabel("Set Group Command")
-                .setStyle(ButtonStyle.Primary);
+                .setStyle("PRIMARY");
 
-            const row = new ActionRowBuilder();
+            const row = new MessageActionRow();
 
             if (!this.endtime) {
-                const editButton = new ButtonBuilder()
+                const editButton = new MessageButton()
                     .setCustomId("edit-group")
                     .setLabel("Edit")
-                    .setStyle(ButtonStyle.Secondary);
+                    .setStyle("SECONDARY");
 
                 row.addComponents(editButton)
 
                 
                 if (this.active) {
-                    const stopButton = new ButtonBuilder()
+                    const stopButton = new MessageButton()
                         .setCustomId("stop-group")
                         .setLabel("Stop Event")
-                        .setStyle(ButtonStyle.Danger);
+                        .setStyle("DANGER");
 
                     row.addComponents(stopButton);
                 } else {
-                    const startButton = new ButtonBuilder()
+                    const startButton = new MessageButton()
                         .setCustomId("start-group")
                         .setLabel("Start Event")
-                        .setStyle(ButtonStyle.Success);
+                        .setStyle("SUCCESS");
 
                     row.addComponents(startButton);
                 }
 
                 row.addComponents(setGroupCommand);
             } else {
-                const recoverGroup = new ButtonBuilder()
+                const recoverGroup = new MessageButton()
                     .setCustomId("recover-group")
                     .setLabel("Recover Event")
-                    .setStyle(ButtonStyle.Secondary);
+                    .setStyle("SECONDARY");
 
-                const copyGroup = new ButtonBuilder()
+                const copyGroup = new MessageButton()
                     .setCustomId("copy-group")
                     .setLabel("Copy Event")
-                    .setStyle(ButtonStyle.Primary);
+                    .setStyle("PRIMARY");
                 
                 row.addComponents(recoverGroup, copyGroup);
             }
@@ -254,7 +254,7 @@ class Group extends Cachable {
      * Generates the edit message for this group
      * @param {boolean} showDelete 
      * @param {FullIdentity} executor 
-     * @returns {Promise<{content:string,embeds:EmbedBuilder[],components:ActionRowBuilder[],ephemeral:boolean}>}
+     * @returns {Promise<{content:string,embeds:MessageEmbed[],components:MessageActionRow[],ephemeral:boolean}>}
      */
     generateEditMessage(showDelete = false, executor = null) {
         return new Promise((resolve, reject) => {
@@ -263,33 +263,33 @@ class Group extends Cachable {
                 if (err) global.api.Logger.severe(err);
             });
 
-            const embed = new EmbedBuilder()
+            const embed = new MessageEmbed()
                 .setTitle("Edit Group")
                 .setColor(0x772ce8)
-                .setDescription(`\`${this.game}\` hosted by [${this.host.display_name}](https://twitch.tv/${this.host.login})`)
+                .setDescription(`\`${this.game}\` hosted by [${this.host.display_name}](https://twitch.tv/${this.host.display_name.toLowerCase()})`)
                 .setFooter({text: "ID: " + this.id, iconURL: "https://tms.to/assets/images/logos/logo.webp"});
 
-            const setStartTime = new ButtonBuilder()
+            const setStartTime = new MessageButton()
                 .setLabel("Set Start Time")
-                .setStyle(ButtonStyle.Link)
+                .setStyle("LINK")
                 .setURL(`${config.pub_domain}g/${token}/settime`);
 
-            const setGame = new ButtonBuilder()
+            const setGame = new MessageButton()
                 .setCustomId("group-setgame-" + this.id)
                 .setLabel("Set Game")
-                .setStyle(ButtonStyle.Secondary);
+                .setStyle("SECONDARY");
 
-            const addParticipant = new ButtonBuilder()
+            const addParticipant = new MessageButton()
                 .setCustomId("group-addpartic-" + this.id)
                 .setLabel("Add Participant")
-                .setStyle(ButtonStyle.Primary);
+                .setStyle("PRIMARY");
 
-            const deleteButton = new ButtonBuilder()
+            const deleteButton = new MessageButton()
                 .setCustomId("group-delete-" + this.id)
                 .setLabel("Delete")
-                .setStyle(ButtonStyle.Danger);
+                .setStyle("DANGER");
 
-            const removeParticipants = new StringSelectMenuBuilder()
+            const removeParticipants = new MessageSelectMenu()
                 .setCustomId("group-rempartic-" + this.id)
                 .setMinValues(1)
                 .setMaxValues(this.participants.length)
@@ -297,15 +297,15 @@ class Group extends Cachable {
 
             removeParticipants.addOptions(this.participants.map(x => {return {value: ""+x.id, label: x.display_name}}))
 
-            const buttonRow = new ActionRowBuilder()
+            const buttonRow = new MessageActionRow()
                 .addComponents(setStartTime, setGame, addParticipant);
 
             if (showDelete) buttonRow.addComponents(deleteButton);
 
-            const removeParticipantsRow = new ActionRowBuilder()
+            const removeParticipantsRow = new MessageActionRow()
                 .addComponents(removeParticipants);
 
-            resolve({embeds: [embed], components: [buttonRow, removeParticipantsRow], ephemeral: true});
+            resolve({content: ' ', embeds: [embed], components: [buttonRow, removeParticipantsRow], ephemeral: true});
         });
     }
 
@@ -337,7 +337,7 @@ class Group extends Cachable {
 
                     
                     try {
-                        await global.client.listen.client.say(streamer.login, command);
+                        await global.client.listen.client.say(streamer.display_name.toLowerCase(), command);
 
                         let isMod = global.client.listen.isMod(streamer);
 
@@ -356,7 +356,7 @@ class Group extends Cachable {
 
                 if (success === "" && unmodded === "" && unknown === "" && error === "") return;
 
-                let embed = new EmbedBuilder()
+                let embed = new MessageEmbed()
                     .setTitle("Updated Group Commands")
                     .setDescription("We updated group commands in the following channels!");
 
@@ -384,7 +384,7 @@ class Group extends Cachable {
         return new Promise((resolve, reject) => {
             global.client.discord.channels.fetch(config.groups_channel).then(channel => {
                 channel.messages.fetch(this.message).then(async message => {
-                    message.edit({embeds: [await this.generateEmbed()], components: [await this.generateComponents()]}).then(resolve, reject);
+                    message.edit({content: ' ', embeds: [await this.generateEmbed()], components: [await this.generateComponents()]}).then(resolve, reject);
                 }, reject);
             }, reject)
         });
@@ -432,10 +432,10 @@ class Group extends Cachable {
 
     /**
      * Returns the base update embed for Group updates
-     * @returns {EmbedBuilder}
+     * @returns {MessageEmbed}
      */
     getUpdate() {
-        return new EmbedBuilder()
+        return new MessageEmbed()
             .setTitle("Group Update")
             .setColor(0x4d8ef7)
             .setFooter({text: "ID: " + this.id, iconURL: "https://tms.to/assets/images/logos/logo.webp"});
@@ -443,7 +443,7 @@ class Group extends Cachable {
 
     /**
      * Sends the update embed into the thread channel
-     * @param {EmbedBuilder} embed
+     * @param {MessageEmbed} embed
      * @param {FullIdentity} executor 
      * @returns {Promise<Message>}
      */
@@ -451,7 +451,7 @@ class Group extends Cachable {
         return new Promise((resolve, reject) => {
             embed.setAuthor({name: executor.name, iconURL: executor.avatar_url});
             this.getThread().then(thread => {
-                thread.send({embeds: [embed]}).then(resolve, reject);
+                thread.send({content: ' ', embeds: [embed]}).then(resolve, reject);
             }, reject);
         });
     }
@@ -543,8 +543,8 @@ class Group extends Cachable {
                 } else {
                     if (executor) this.sendUpdate(this.getUpdate()
                         .addFields([
-                            {name: "Old Host", value: `[${this.host.display_name}](https://twitch.tv/${this.host.login})`, inline: true},
-                            {name: "New Host", value: `[${user.display_name}](https://twitch.tv/${user.login})`, inline: true},
+                            {name: "Old Host", value: `[${this.host.display_name}](https://twitch.tv/${this.host.display_name.toLowerCase()})`, inline: true},
+                            {name: "New Host", value: `[${user.display_name}](https://twitch.tv/${user.display_name.toLowerCase()})`, inline: true},
                         ]), executor).catch(global.api.Logger.warning);
                     this.host = user;
                     this.participants = this.participants.filter(x => x.id !== user.id);
@@ -569,7 +569,7 @@ class Group extends Cachable {
                     } else {
                         if (executor) this.sendUpdate(this.getUpdate()
                             .addFields([
-                                {name: "New Participant", value: `[${participant.display_name}](https://twitch.tv/${participant.login})`, inline: true},
+                                {name: "New Participant", value: `[${participant.display_name}](https://twitch.tv/${participant.display_name.toLowerCase()})`, inline: true},
                             ]), executor).catch(global.api.Logger.warning);
                         this.participants = [
                             ...this.participants,
@@ -600,7 +600,7 @@ class Group extends Cachable {
                     let participant = participants[i];
                     if (participant.id !== this.host.id) {
                         if (participantString !== "") participantString += "\n";
-                        participantString += `[${participant.display_name}](https://twitch.tv/${participant.login})`;
+                        participantString += `[${participant.display_name}](https://twitch.tv/${participant.display_name.toLowerCase()})`;
                         await con.pquery("delete from group__user where group_id = ? and user_id = ? and host = false;", [this.id, participant.id]);
                         this.participants = this.participants.filter(x => x.id !== participant.id);
                     }
@@ -759,7 +759,7 @@ class Group extends Cachable {
         let groupString = host;
 
         this.participants.forEach((participant, i) => {
-            groupString += "/" + encodeURI(participant.login);
+            groupString += "/" + encodeURI(participant.display_name.toLowerCase());
         });
 
         return groupString;

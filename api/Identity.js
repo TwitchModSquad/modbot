@@ -1,7 +1,6 @@
 const con = require("../database");
-const config = require("../config.json");
 
-const {EmbedBuilder} = require("discord.js");
+const {MessageEmbed} = require("discord.js");
 
 /**
  * Identities a specific "identity," which can consist of Twitch users and/or Discord users.
@@ -59,13 +58,13 @@ class Identity {
     /**
      * Generated a Discord Embed for the user.
      * 
-     * @returns {Promise<EmbedBuilder[]>}
+     * @returns {Promise<MessageEmbed[]>}
      */
     discordEmbed() {
         return new Promise(async (resolve, reject) => {
             let embeds = [];
 
-            const identityEmbed = new EmbedBuilder()
+            const identityEmbed = new MessageEmbed()
                     .setAuthor({name: this.name, url: this.getShortlink()})
                     .setDescription(this.name)
                     .setFooter({text: "TMS Identity #" + this.id, iconURL: "https://tms.to/assets/images/logos/logo.webp"})
@@ -82,7 +81,7 @@ class Identity {
      * @returns {string}
      */
     getShortlink() {
-        return `${config.pub_domain}i/${this.id}`;
+        return "https://tms.to/i/" + this.id;
     }
 
     /**

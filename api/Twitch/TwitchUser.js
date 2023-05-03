@@ -2,7 +2,7 @@ const con = require("../../database");
 
 require("../index");
 
-const {EmbedBuilder, codeBlock} = require("discord.js");
+const {MessageEmbed} = require("discord.js");
 
 const User = require("../User");
 const Identity = require("../Identity");
@@ -135,7 +135,13 @@ class TwitchUser extends User {
 
     constructor(id, identity, login, display_name, email, profile_image_url, offline_image_url, description, view_count, follower_count, affiliation) {
         super(id, identity);
-        
+
+        if (login === null) {
+            console.trace(display_name);
+        }
+        if (display_name === null) {
+            console.trace(login);
+        }
         this.login = login;
         this.display_name = display_name;
         this.email = email;
@@ -174,7 +180,7 @@ class TwitchUser extends User {
 
             https.request({
                 host: "modlookup.3v.fi",
-                path: "/api/user-v3/" + this.login + "?limit=100&cursor="
+                path: "/api/user-v3/" + this.display_name.toLowerCase() + "?limit=100&cursor="
             }, response => {
                 let str = "";
     
@@ -222,7 +228,7 @@ class TwitchUser extends User {
                                         let active = user.follower_count >= FOLLOWER_REQUIREMENT || user.affiliation === "partner";
 
                                         if (active && global.listenOnChannel) {
-                                            global.listenOnChannel(user.login);
+                                            global.listenOnChannel(user.display_name.toLowerCase());
                                         }
 
                                         con.query("insert into identity__moderator (identity_id, modfor_id, active) values (?, ?, ?) on duplicate key update active = ?;", [thisUser.identity.id, identity.id, active, active]);
@@ -281,10 +287,9 @@ class TwitchUser extends User {
      * Refresh the moderators under a channel name.
      * Warning: This may take an extended amount of time!
      * 
-     * @param {boolean} createIdentities
      * @returns {Promise<TwitchUser[]>}
      */
-    refreshMods(createIdentities = true) {
+    refreshMods() {
         return new Promise(async (resolve, reject) => {
             if (!connected) {
                 while (!connected) {
@@ -293,18 +298,12 @@ class TwitchUser extends User {
                 }
             }
 
-            if (this.identity === null && createIdentities) {
+            if (this.identity === null) {
                 let identity = new FullIdentity(null, this.display_name, false, false, false, [this], []);
                 await identity.post();
             }
 
-            let mods = null;
-            try {
-                mods = await modClient.mods(this.display_name);
-            } catch(err) {
-                reject(err);
-                return;
-            }
+            let mods = await modClient.mods(this.display_name);
 
             let finalMods = [];
 
@@ -313,16 +312,12 @@ class TwitchUser extends User {
                     let users = await global.api.Twitch.getUserByName(mods[i], true);
 
                     for (let y = 0; y < users.length; y++) {
-                        if (users[y].identity === null && createIdentities) {
+                        if (users[y].identity === null) {
                             let identity = new FullIdentity(null, users[y].display_name, false, false, false, [users[y]], []);
                             await identity.post();
                         }
-                        
-                        con.query("insert into twitch__role (user_id, streamer_id, role, source) values (?, ?, 'moderator', 'legacy') on duplicate key update updated = now();", [users[y].id, this.id], err => {
-                            if (err) global.api.Logger.warning(err);
-                        });
 
-                        if (this.identity?.id && users[y].identity?.id && createIdentities) {
+                        if (this.identity?.id && users[y].identity?.id) {
                             con.query("insert into identity__moderator (identity_id, modfor_id, active) values (?, ?, ?) on duplicate key update active = ?;", [users[y].identity.id, this.identity.id, this.follower_count >= FOLLOWER_REQUIREMENT, this.follower_count >= FOLLOWER_REQUIREMENT]);
                         }
                     }
@@ -583,111 +578,50 @@ class TwitchUser extends User {
      * @returns {string}
      */
     getShortlink() {
-        return `${config.pub_domain}panel/user/${this.id}`;
+        if (this.identity?.id) {
+            return "https://tms.to/i/" + this.identity.id;
+        } else {
+            return "https://tms.to/t/" + this.id;
+        }
     }
 
     /**
      * Generated a Discord Embed for the user.
      * 
-     * @returns {Promise<EmbedBuilder>}
+     * @returns {Promise<MessageEmbed>}
      */
     discordEmbed() {
         return new Promise(async (resolve, reject) => {
-            const embed = new EmbedBuilder()
+            const embed = new MessageEmbed()
                     .setAuthor({name: this.display_name, iconURL: this.profile_image_url, url: this.getShortlink()})
                     .setColor(0x772ce8)
                     .setThumbnail(this.profile_image_url)
-                    .setDescription(`\`\`\`${this.id}\`\`\`**Name: **${this.display_name}\n**Followers: **${comma(this.follower_count)}\n**Views: **${comma(this.view_count)}\n[Profile](https://twitch.tv/${this.login})`)
+                    .setDescription(`\`\`\`${this.id}\`\`\`**Name: **${this.display_name}\n**Followers: **${comma(this.follower_count)}\n**Views: **${comma(this.view_count)}\n[Profile](https://twitch.tv/${this.display_name.toLowerCase()})`)
                     .setFooter({text: "TMS Twitch User #" + this.id, iconURL: "https://tms.to/assets/images/logos/logo.webp"});
 
             if (this.description && this.description !== "")
-                embed.addFields({
-                    name: "Description",
-                    value: codeBlock(this.description),
-                    inline: false,
-                });
+                embed.addField("Description", "```\n" + this.description + "```", false);
 
             const streamers = await this.getStreamers();
             const mods = await this.getMods();
             const activeCommunities = await this.getActiveCommunities();
-            const bans = await this.getBans();
 
             if (streamers.length > 0) {
                 let streamerStr = "";
                 streamers.forEach(streamer => {
                     if (streamerStr !== "") streamerStr += "\n";
-                    streamerStr += `**${streamer.display_name}** : [Profile](https://twitch.tv/${streamer.login})`;
+                    streamerStr += `**${streamer.display_name}** : [Profile](https://twitch.tv/${streamer.display_name.toLowerCase()})`;
                 });
-
-                if (streamerStr.length <= 1024) {
-                    embed.addFields({
-                        name: "Streamers",
-                        value: streamerStr,
-                        inline: true,
-                    });
-                
-                } else global.api.Logger.warning("Exceeded character count for streamers");
+                embed.addField("Streamers", streamerStr, true);
             }
 
             if (mods.length > 0) {
                 let modsStr = "";
                 mods.forEach(mod => {
                     if (modsStr !== "") modsStr += "\n";
-                    modsStr += `**${mod.display_name}** : [Profile](https://twitch.tv/${mod.login})`;
+                    modsStr += `**${mod.display_name}** : [Profile](https://twitch.tv/${mod.display_name.toLowerCase()})`;
                 });
-
-                if (modsStr.length <= 1024) {
-                    embed.addFields({
-                        name: "Moderators",
-                        value: modsStr,
-                        inline: true,
-                    });
-                } else global.api.Logger.warning("Exceeded character count for mods");
-            }
-
-            if (activeCommunities.length > 0) {
-                let rows = activeCommunities
-                    .map(x => [x.user.display_name, new Date(x.lastActive).toLocaleDateString(), String(x.chatCount)])
-                    .slice(0, 20);
-
-                rows = [
-                    ["Streamer", "Last Active", "Messages"],
-                    ...rows,
-                ]
-
-                let communitiesStr = global.api.stringTable(rows, 3, 5);
-
-                if (communitiesStr.length <= 950) {
-                    embed.addFields({
-                        name: "Active Communities",
-                        value: `[View online at tms.to](${this.getShortlink()})\n` + codeBlock(communitiesStr),
-                        inline: false,
-                    });
-                } else global.api.Logger.warning("Exceeded character count for active communities");
-            }
-
-            if (bans.length > 0) {
-                let result = "";
-
-                bans.forEach(ban => {
-                    if (result.length < 800) {
-                        if (result !== "") result += "\n";
-
-                        if (ban.discord_message && bans.length <= 8) {
-                            result += `[${ban.channel.display_name} on ${new Date(ban.time).toLocaleDateString()}${ban.active ? "" : " \[inactive\]"}](https://discord.com/channels/${config.modsquad_discord}/${config.liveban_channel}/${ban.discord_message})`;
-                        } else {
-                            result += ban.channel.display_name + " on " + new Date(ban.time).toLocaleDateString();
-                        }
-                    }
-                });
-
-                if (result.length <= 1024) {
-                    embed.addFields({
-                        name: "Bans",
-                        value: result,
-                        inline: false,
-                    });
-                } else global.api.Logger.warning("Exceeded character count for bans");
+                embed.addField("Moderators", modsStr, true);
             }
 
             resolve(embed);

@@ -1,7 +1,7 @@
 const con = require("../database");
 
 const TwitchUser = require("../api/Twitch/TwitchUser");
-const {EmbedBuilder, codeBlock} = require("discord.js");
+const {MessageEmbed} = require("discord.js");
 
 const refreshTokens = require("./RefreshTokens");
 const Discord = require("discord.js");
@@ -74,7 +74,7 @@ class Formatting {
      * @param {TwitchUser} chatter
      * @param {number} bpm
      * @param {number} timebanned 
-     * @returns {Promise<EmbedBuilder>}
+     * @returns {Promise<MessageEmbed>}
      */
     parseBanEmbed(streamer, chatter, bpm, timebanned) {
         return new Promise((resolve, reject) => {
@@ -83,10 +83,10 @@ class Formatting {
                 chatter.id
             ], async (err, res) => {
                 // Build the skeleton embed for the ban message 
-                const embed = new Discord.EmbedBuilder()
+                const embed = new Discord.MessageEmbed()
                         .setTitle(`User was Banned!`)
                         .setURL(chatter.getShortlink())
-                        .setAuthor({name: streamer.display_name, iconURL: streamer.profile_image_url, url: "https://twitch.tv/" + streamer.login})
+                        .setAuthor({name: streamer.display_name, iconURL: streamer.profile_image_url, url: "https://twitch.tv/" + streamer.display_name.toLowerCase()})
                         .setDescription(`User \`${chatter.display_name}\` was banned from channel \`${streamer.display_name}\``)
                         .setColor(0xe83b3b);
 
@@ -117,18 +117,8 @@ class Formatting {
                             if (ban.reason && ban.reason.length > 0)
                                 reason = ban.reason;
 
-                            embed.addFields(
-                                {
-                                    name: "Moderator",
-                                    value: codeBlock(moderator.display_name),
-                                    inline: true,
-                                },
-                                {
-                                    name: "Reason",
-                                    value: codeBlock(reason),
-                                    inline: true,
-                                }
-                            );
+                            embed.addField("Moderator", `\`\`\`${moderator.display_name}\`\`\``, true);
+                            embed.addField("Reason", `\`\`\`${reason}\`\`\``, true)
                             
                             con.query("update twitch__ban set moderator_id = ?, reason = ? where timebanned = ? and streamer_id = ? and user_id = ?;", [
                                 moderator.id,
@@ -165,11 +155,7 @@ class Formatting {
 
                     if (logs == "") logs = "There are no logs in this channel from this user!";
 
-                    embed.addFields({
-                        name: `Chat Log in \`${streamer.display_name}\``,
-                        value: codeBlock(logs),
-                        inline: false,
-                    });
+                    embed.addField(`Chat Log in \`${streamer.display_name}\``, "```" + logs + "```", false);
                 }
 
                 const lares = await con.pquery("select streamer.display_name as channel, max(timesent) as lastactive from twitch__chat join twitch__user as streamer on twitch__chat.streamer_id = streamer.id where user_id = ? group by streamer.display_name;", [chatter.id]);
@@ -204,7 +190,7 @@ class Formatting {
 
                 // Assemble active channels
                 lares.forEach(xchnl => {
-                    activeChannels += "\n" + xchnl.channel + (' '.repeat(Math.max(1, longestChannelName + ACTIVE_CHANNEL_PADDING - xchnl.channel.length))) + this.parseDate(parseInt(xchnl.lastactive)) + (bannedChannels.includes(xchnl.channel) || xchnl.channel.toLowerCase() === streamer.login ? ' [❌ banned]' : '');
+                    activeChannels += "\n" + xchnl.channel + (' '.repeat(Math.max(1, longestChannelName + ACTIVE_CHANNEL_PADDING - xchnl.channel.length))) + this.parseDate(parseInt(xchnl.lastactive)) + (bannedChannels.includes(xchnl.channel) || xchnl.channel.toLowerCase() === streamer.display_name.toLowerCase() ? ' [❌ banned]' : '');
 
                     bannedChannels.splice(bannedChannels.indexOf(xchnl.channel), 1);
                 });
@@ -220,11 +206,7 @@ class Formatting {
 
                 // Add the field, if any active channels were found (which should pretty much always be true)
                 if (activeChannels !== "")
-                    embed.addFields({
-                        name: "Active in Channels:",
-                        value: codeBlock(`Channel${' '.repeat(longestChannelName + ACTIVE_CHANNEL_PADDING - 7)}Last Active${activeChannels}`),
-                        inline: false,
-                    });
+                    embed.addField(`Active in Channels:`, `\`\`\`\nChannel${' '.repeat(longestChannelName + ACTIVE_CHANNEL_PADDING - 7)}Last Active${activeChannels}\`\`\``);
                 
                 resolve(embed);
             });

@@ -1,14 +1,13 @@
 const con = require("../../database");
+const DiscordGuildSetting = require("./DiscordGuildSetting");
 const DiscordUser = require("./DiscordUser");
-const DiscordListener = require("./DiscordListener");
+const defaultSettings = require("../../mbm/settings.json");
 
-const chatdumpCommand = require("../../mbm/commands/chatdump");
-const listenerCommand = require("../../mbm/commands/listener");
+const settingCommand = require("../../mbm/commands/setting");
 const userCommand = require("../../mbm/commands/user");
-const userContextCommand = require("../../mbm/commands/userContext");
+const chatdumpCommand = require("../../mbm/commands/chatdump");
 
 const config = require("../../config.json");
-const { TextChannel } = require("discord.js");
 
 class DiscordGuild {
     /**
@@ -40,11 +39,156 @@ class DiscordGuild {
     name;
 
     /**
-     * Represents listeners in this guild
+     * Represents settings for this guild
      * 
-     * @type {DiscordListener[]}
+     * @type {DiscordGuildSetting[]}
      */
-    listeners;
+    settings;
+
+    /**
+     * Removes a setting from the database
+     * @param {string} name 
+     * @returns {Promise<DiscordGuildSetting[]>}
+     */
+    removeSetting(setting) {
+        return new Promise((resolve, reject) => {
+            if (!this.settings) {
+                reject("Settings was not retrieved. Call getSettings before using removeSetting");
+                return;
+            }
+            con.query("delete from discord__setting where guild_id = ? and setting = ?;", [
+                this.id,
+                setting
+            ], (err) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                this.settings = this.settings.filter(x => x.setting !== setting);
+                resolve(this.settings);
+            });
+        });
+    }
+
+    /**
+     * Sets a setting locally. Does not post
+     * @param {string} setting 
+     * @param {any} value 
+     * @param {string} type
+     * @returns {Promise<DiscordGuildSetting[]>}
+     */
+    setSetting(setting, value, type) {
+        return new Promise((resolve, reject) => {
+            this.settings = this.settings.filter(x => x.setting !== setting);
+            this.settings = [
+                ...this.settings,
+                new DiscordGuildSetting(setting, value, type),
+            ]
+            resolve(this.settings);
+        });
+    }
+
+    /**
+     * Internal command to match a value to a specific type
+     * @param {any} value 
+     * @param {string} type 
+     * @returns {Promise<string|number|boolean|Channel|User|Role>}
+     */
+    #typeMatchSetting(value, type) {
+        return new Promise((resolve, reject) => {
+            if (value === undefined || value === null) {
+                resolve(null)
+                return;
+            }
+            if (type === "string") {
+                resolve(value);
+            } else if (type === "boolean") {
+                resolve(value == 1);
+            } else if (type === "user") {
+                global.client.mbm.users.fetch(value).then(resolve, () => reject("Discord user was not found!"));
+            } else if (type === "channel") {
+                global.client.mbm.channels.fetch(value).then(resolve, () => reject("Discord channel was not found!"));
+            } else if (type === "role") {
+                global.client.mbm.guilds.fetch(this.id).then(guild => {
+                    guild.roles.fetch(value).then(resolve, () => reject("Discord role was not found!"));
+                }, () => reject("Could not find Discord guild!"));
+            } else if (type === "number") {
+                try {
+                    resolve(Number(value));
+                } catch(err) {
+                    reject(err);
+                }
+            } else {
+                reject("Unknown type " + type);
+            }
+        });
+    }
+
+    /**
+     * Gets a setting
+     * @param {string} setting
+     * @param {string} expectedType
+     * @returns {Promise<string|number|boolean|Channel|User|Role>} Returns value of the setting
+     */
+    getSetting(setting, expectedType) {
+        return new Promise((resolve, reject) => {
+            if (!this.settings) {
+                reject("Settings was not retrieved. Call getSettings before using getSetting");
+                return;
+            }
+            let guildSetting = this.settings.find(x => x.setting === setting);
+
+            if (guildSetting) {
+                if (guildSetting.type !== expectedType) {
+                    reject(`Type mismatch: Expected ${expectedType} got ${guildSetting.type}`);
+                    return;
+                }
+
+                this.#typeMatchSetting(guildSetting.value, guildSetting.type).then(resolve, reject);
+            } else {
+                let defaultSetting = defaultSettings.find(x => x.value === setting);
+
+                if (defaultSetting) {
+                    if (defaultSetting.type !== expectedType) {
+                        reject(`Type mismatch: Expected ${expectedType} got ${defaultSetting.type}`);
+                        return;
+                    }
+
+                    this.#typeMatchSetting(defaultSetting.default, defaultSetting.type).then(resolve, reject);
+                } else {
+                    reject("Setting was not found");
+                }
+            }
+        });
+    }
+
+    /**
+     * Grabs settings from the database.
+     * @returns {Promise<DiscordGuildSetting[]}
+     */
+    getSettings() {
+        return new Promise((resolve, reject) => {
+            con.query("select * from discord__setting where guild_id = ?;", [this.id], (err, res) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+
+                let settings = [];
+
+                res.forEach(setting => {
+                    settings = [
+                        ...settings,
+                        new DiscordGuildSetting(setting.setting, setting.value, setting.type),
+                    ]
+                });
+
+                this.settings = settings;
+
+                resolve(settings);
+            });
+        });
+    }
 
     /**
      * Add a punishment for a user
@@ -155,7 +299,7 @@ class DiscordGuild {
             const commands = guild.commands.cache;
             let command = commands.find(x => commandData.name === x.name);
 
-            if (command && config.force_command_push) {
+            if (config.force_command_push) {
                 await command.delete();
                 command = null;
             }
@@ -180,18 +324,9 @@ class DiscordGuild {
     addCommands(guild) {
         return new Promise(async (resolve, reject) => {
             try {
-                await this.#addCommand(guild, chatdumpCommand.data);
-                await this.#addCommand(guild, listenerCommand.data);
+                await this.#addCommand(guild, settingCommand.data);
                 await this.#addCommand(guild, userCommand.data);
-                await this.#addCommand(guild, userContextCommand.data);
-
-                if (guild.commands.cache.find(command => command.name === "register")) {
-                    try {
-                        await guild.commands.cache.find(command => command.name === "register").delete();
-                    } catch(err) {
-                        global.api.Logger.warning(err);
-                    }
-                }
+                await this.#addCommand(guild, chatdumpCommand.data);
                 
                 resolve();
             } catch (err) {
@@ -201,89 +336,17 @@ class DiscordGuild {
     }
 
     /**
-     * Adds a Listener to this guild
-     * @param {TextChannel} channel 
-     * @param {string} event 
-     * @param {string?} data 
-     * @returns {Promise<DiscordListener>}
-     */
-    addListener(channel, event, data) {
-        return new Promise((resolve, reject) => {
-            if (channel.guild?.id !== this.id) {
-                reject("Channel guild does not match the guild that the listener was added to");
-                return;
-            }
-
-            con.query("insert into discord__listener (guild, channel, event, data) values (?, ?, ?, ?);", [
-                this.id,
-                channel.id,
-                event,
-                data
-            ], err => {
-                if (!err) {
-                    con.query("select id from discord__listener where guild = ? and channel = ? and event = ?;", [this.id, channel.id, event], (err, res) => {
-                        if (!err) {
-                            if (res.length > 0) {
-                                let listener = new DiscordListener(res[0].id, channel.guild, channel, event, data);
-                                
-                                this.listeners = [
-                                    ...this.listeners,
-                                    listener,
-                                ]
-
-                                global.api.Discord.listeners = [
-                                    ...global.api.Discord.listeners,
-                                    listener,
-                                ];
-            
-                                resolve(listener);
-                            } else {
-                                reject("Unable to find listener");
-                            }
-                        } else {
-                            reject(err);
-                        }
-                    })
-                } else {
-                    reject(err);
-                }
-            });
-        });
-    }
-
-    /**
-     * Removes a listener from the guild
-     * @param {DiscordListener} listener
-     * @returns {Promise<void>} 
-     */
-    removeListener(listener) {
-        return new Promise((resolve, reject) => {
-            con.query("delete from discord__listener where id = ?;", [listener.id], err => {
-                if (!err) {
-                    this.listeners = this.listeners.filter(x => x.id !== listener.id);
-                    global.api.Discord.listeners = global.api.Discord.listeners.filter(x => x.id !== listener.id);
-
-                    resolve();
-                } else
-                    reject(err);
-            });
-        });
-    }
-
-    /**
      * Constructor for a DiscordGuild
      * @param {number} id 
      * @param {FullIdentity} represents 
      * @param {DiscordUser} owner 
      * @param {string} name 
-     * @param {DiscordListener} listeners
      */
-    constructor(id, represents, owner, name, listeners) {
+    constructor(id, represents, owner, name) {
         this.id = id;
         this.represents = represents;
         this.owner = owner;
         this.name = name;
-        this.listeners = listeners;
     }
 
     /**
@@ -307,6 +370,16 @@ class DiscordGuild {
                 if (err) {
                     reject(err);
                 } else {
+                    this.settings.forEach(setting => {
+                        con.query("insert into discord__setting (guild_id, setting, value, type) values (?, ?, ?, ?) on duplicate key update value = ?, type = ?;", [
+                            this.id,
+                            setting.setting,
+                            setting.value,
+                            setting.type,
+                            setting.value,
+                            setting.type,
+                        ], (err) => {if (err) global.api.Logger.warning(err);});
+                    })
                     resolve(this);
                     global.api.Discord.guildCache.remove(this.id);
                 }

@@ -6,7 +6,7 @@ const mime = require("mime-types");
 const Jimp = require("jimp");
 const fs = require("fs");
 
-const requireAuthenticated = require("./requireAuthenticatedRedirect");
+const requireAuthenticated = require("./requireAuthenticated");
 
 const router = Router();
 

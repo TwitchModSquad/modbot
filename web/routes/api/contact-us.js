@@ -1,5 +1,5 @@
 const {Router} = require("express");
-const {EmbedBuilder} = require("discord.js");
+const {MessageEmbed} = require("discord.js");
 const request = require('request');
 const bodyParser = require("body-parser");
 
@@ -57,7 +57,7 @@ router.post("/", (req, res) => {
         if (!global.client?.discord) res.json({success: false, error: "Unknown error. Please contact Twijn#8888 on Discord or twijn@twijn.net for support."});
         
         global.client.discord.channels.fetch(config.contact_us_response_channel).then(channel => {
-            const embed = new EmbedBuilder()
+            const embed = new MessageEmbed()
                     .setTitle(subject)
                     .setAuthor(contactInfo)
                     .setDescription(reqBody)
@@ -75,7 +75,7 @@ router.post("/", (req, res) => {
         });
 
         global.client.discord.users.fetch("267380687345025025").then(twijn => {
-            const embed = new EmbedBuilder()
+            const embed = new MessageEmbed()
                     .setTitle(subject)
                     .setAuthor(contactInfo)
                     .setDescription(reqBody)
