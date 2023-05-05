@@ -35,7 +35,7 @@ function formatNumber(num) {
 }
 
 function startSocket() {
-    const ws = new WebSocket("ws://localhost:8080/overview/ws");
+    const ws = new WebSocket("wss://tms.to/overview/ws");
 
     ws.addEventListener("open", function() {
         ws.send(""); // send empty string to request update
