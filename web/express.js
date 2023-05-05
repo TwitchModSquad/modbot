@@ -4,12 +4,13 @@ const config = require("../config.json");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 
+const app = express();
+const expressWs = require("express-ws")(app);
+
 const controllers = require("./controllers/");
 
 const routes = require("./routes/");
 const authenticate = require("./authenticate");
-
-const app = express();
 
 app.set("view engine", "ejs");
 
