@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Twitch Mod Squad</title>
+    
+    <%- include("../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/overview.css">
+    <link rel="stylesheet" href="/assets/css/containers.css">
+</head>
+<body>
+    <header>
+        <img src="/assets/images/logo.webp" alt="TMS Logo">
+        <h1>TMS Overview</h1>
+    </header>
+
+    <main>
+        <div class="container container-md">
+            <section class="col-8">
+                <h2>Most Active Users <small>(last minute)</small></h2>
+                <div>
+                    <canvas id="active-users" height="55"></canvas>
+                </div>
+            </section>
+            <section class="col-4">
+                <h2>Leaderboard</h2>
+                <table id="leaderboard">
+                    <tbody>
+                        <tr>
+                            <th>Top Streamer</th>
+                            <td><span id="streamer-display-name">Unknown Streamer</span></td>
+                            <td><small><span id="streamer-count">0</span> messages</small></td>
+                        </tr>
+                        <tr>
+                            <th>Top Chatter</th>
+                            <td><span id="chatter-display-name">Unknown Streamer</span></td>
+                            <td><small><span id="chatter-count">0</span> messages</small></td>
+                        </tr>
+                        <tr>
+                            <th>Most Banned</th>
+                            <td><span id="banned-display-name">Unknown Streamer</span></td>
+                            <td><small><span id="banned-count">0</span> bans</small></td>
+                        </tr>
+                        <tr>
+                            <th>Most Timed Out</th>
+                            <td><span id="timedout-display-name">Unknown Streamer</span></td>
+                            <td><small><span id="timedout-count">0</span> timeouts</small></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        Copyright &copy; <%= (new Date()).getFullYear() %> - Twitch Mod Squad :|: TMS is not affiliated with Twitch
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/assets/js/jquery.js"></script>
+    <script src="/assets/js/overview.js"></script>
+</body>
+</html>
