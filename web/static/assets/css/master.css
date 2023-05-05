@@ -79,3 +79,11 @@ pre {
 a {
     color: var(--secondary-text-color);
 }
+
+.small-profile-picture {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    margin: 0 .3em;
+}

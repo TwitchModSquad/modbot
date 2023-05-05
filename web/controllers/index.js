@@ -10,6 +10,7 @@ const group = require("./group/");
 
 const public = require("./public");
 const overview = require("./overview");
+const database = require("./database");
 
 authRouter.use("/signon", signon);
 authRouter.use("/panel", panel)
@@ -28,6 +29,7 @@ noAuthRouter.get("/ts", (req, res) => {
 });
 
 noAuthRouter.use("/", public);
+noAuthRouter.use("/db", database)
 
 module.exports = {
     noAuth: noAuthRouter,

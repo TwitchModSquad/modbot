@@ -1,0 +1,11 @@
+<section>
+    <h2><i class="fa-solid fa-user-magnifying-glass"></i> Search for Users</h2>
+
+    <form action="GET" id="twitch-user-lookup-form">
+        <input type="search" name="twitch-user-lookup" id="twitch-user-lookup" class="user-lookup" placeholder="Start typing a username..."<% if (locals?.query) { %> value="<%= query %>"<% } %>>
+    </form>
+
+    <div class="results"></div>
+
+    <button id="force-search" class="button">Force Search<span class="user-clone"></span></button>
+</section>

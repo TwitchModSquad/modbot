@@ -1,4 +1,8 @@
 const API_URI = "https://tms.to/api/";
+const DB_URI = "http://localhost:8080/db/";
+const DB_API_URI = DB_URI + "api/";
+
+const COOKIE_DOMAIN = "localhost";
 
 function createCookie(name, value, days) {
     if (days) {
@@ -26,6 +30,12 @@ function eraseCookie(name) {
     createCookie(name, "", -1);
 }
 
+$(function() {
+    $(".login").on("click", function() {
+        createCookie("db_return_to", window.location.href, 1/24);
+    });
+});
+
 const api = {
     get: function(uri) {
         return new Promise((resolve, reject) => {
@@ -44,13 +54,31 @@ const api = {
     }
 }
 
+function comma(x) {
+    if (!x) return "0";
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
 const parse = {
     account: {
         discord(object) {
             return `<a class="discord-user" href="/panel/user/${object.id}"><img src="${object.avatar_url}" /><div class="user-info"><div class="user-name">${object.name}<span class="discriminator">#${object.discriminator}</span></div><div class="user-stats">${object.id}</div></div></a>`;
         },
-        twitch(object) {
-            return `<a class="twitch-user" href="/panel/user/${object.id}"><img src="${object.profile_image_url}" /><div class="user-info"><div class="user-name">${object.display_name}</div><div class="user-stats">${object.id} <span class="bullet">&bullet;</span> ${object.follower_count}&nbsp;follower${object.follower_count == 1 ? "" : "s"} <span class="bullet">&bullet;</span> ${object.view_count}&nbsp;view${object.view_count == 1 ? "" : "s"}</div></div></a>`;
+        twitch(object, url = "/panel/user/{{id}}") {
+            return `<a class="twitch-user" href="${url.replace("{{id}}", object.id)}"><img src="${object.profile_image_url}" /><div class="user-info"><div class="user-name">${object.display_name}</div><div class="user-stats">${object.id} <span class="bullet">&bullet;</span> ${comma(object.follower_count)}&nbsp;follower${object.follower_count == 1 ? "" : "s"} <span class="bullet">&bullet;</span> ${comma(object.view_count)}&nbsp;view${object.view_count == 1 ? "" : "s"}</div></div></a>`;
         },
     },
 };
+
+$(function() {
+    $(".time").each((i,x) => {
+        x = $(x);
+        if (x.attr("data-time")) {
+            let str = new Date(Number(x.attr("data-time"))).toLocaleString();
+            if (str !== "Invalid Date") {
+                x.text(str);
+                x.attr("title", "Local time");
+            }
+        }
+    });
+});
