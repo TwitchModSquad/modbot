@@ -13,6 +13,12 @@ header img {
     padding: .5em;
 }
 
+header div {
+    flex-grow: 1;
+    text-align: right;
+    margin-right: 1em;
+}
+
 h1 {
     font-weight: normal;
     font-size: 1.5em;

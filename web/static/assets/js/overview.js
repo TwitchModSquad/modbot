@@ -19,6 +19,29 @@ const activeUsersChart = new Chart(activeUsers, {
     }
 });
 
+const chatActivity = document.getElementById("chat-activity");
+
+const chatActivityChart = new Chart(chatActivity, {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [{
+            label: 'Message Count',
+            data: [],
+            fill: true,
+            tension: 0.1
+        }]
+    },
+    options: {
+        indexAxis: "x",
+        scales: {
+            y: {
+                beginAtZero: true,
+            }
+        }
+    },
+});
+
 function comma(x) {
     if (!x) return "0";
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -32,6 +55,29 @@ function formatNumber(num) {
     } else {
         return comma(num);
     }
+}
+
+function formatUptime(num) {
+    let hours = 0;
+    let minutes = 0;
+
+    if (num >= 3600) {
+        hours = Math.floor(num / 3600);
+        num -= hours * 3600;
+    }
+    if (num >= 60) {
+        minutes = Math.floor(num / 60);
+        num -= minutes * 60;
+    }
+    
+    if (hours < 10)
+        hours = "0" + hours;
+    if (minutes < 10)
+        minutes = "0" + minutes;
+    if (num < 10)
+        num = "0" + num;
+
+    return hours + ":" + minutes + ":" + num;
 }
 
 function startSocket() {
@@ -59,14 +105,32 @@ function startSocket() {
             }
 
             if (msg.hasOwnProperty("leaderboard")) {
-                $("#streamer-display-name").text(msg.leaderboard.topStreamer.user.display_name);
-                $("#streamer-count").text(formatNumber(msg.leaderboard.topStreamer.count));
-                $("#chatter-display-name").text(msg.leaderboard.topChatter.user.display_name);
-                $("#chatter-count").text(formatNumber(msg.leaderboard.topChatter.count));
-                $("#banned-display-name").text(msg.leaderboard.topBanned.user.display_name);
-                $("#banned-count").text(comma(msg.leaderboard.topBanned.count));
-                $("#timedout-display-name").text(msg.leaderboard.topTimedOut.user.display_name);
-                $("#timedout-count").text(comma(msg.leaderboard.topTimedOut.count));
+                $("#streamer-display-name").text(msg.leaderboard?.topStreamer?.user?.display_name);
+                $("#streamer-count").text(formatNumber(msg.leaderboard?.topStreamer?.count));
+                $("#chatter-display-name").text(msg.leaderboard?.topChatter?.user?.display_name);
+                $("#chatter-count").text(formatNumber(msg.leaderboard?.topChatter?.count));
+                $("#banned-display-name").text(msg.leaderboard?.topBanned?.user?.display_name);
+                $("#banned-count").text(comma(msg.leaderboard?.topBanned?.count));
+                $("#timedout-display-name").text(msg.leaderboard?.topTimedOut?.user?.display_name);
+                $("#timedout-count").text(comma(msg.leaderboard?.topTimedOut?.count));
+            }
+
+            if (msg.hasOwnProperty("chatActivity")) {
+                let labels = [];
+                let data = [];
+
+                msg.chatActivity.forEach(activity => {
+                    labels.push((new Date(activity.date)).toLocaleTimeString());
+                    data.push(activity.count);
+                });
+
+                chatActivityChart.data.labels = labels;
+                chatActivityChart.data.datasets[0].data = data;
+                chatActivityChart.update();
+            }
+
+            if (msg.hasOwnProperty("uptime")) {
+                $("#uptime").text(formatUptime(msg.uptime));
             }
         } catch(err) {
             console.error(err);

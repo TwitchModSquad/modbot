@@ -5,7 +5,9 @@ const con = require("../../database");
 const api = require("../../api/");
 
 const ACTIVE_USERS_LIMIT = 10;
-const {activeUsers} = require("../../twitch/listeners/overviewActiveUsers");
+const {activeUsers, chatActivity} = require("../../twitch/listeners/overviewActiveUsers");
+
+const startTime = Math.floor(Date.now() / 1000);
 
 router.get("/", (req, res) => {
     res.render("pages/overview");
@@ -43,11 +45,18 @@ const updateLeaderboard = async () => {
 setInterval(updateLeaderboard, 30000);
 setTimeout(updateLeaderboard, 5000);
 
-const sendUpdate = async ws => {
-    ws.send(JSON.stringify({
+const sendUpdate = async (ws, all = false) => {
+    let data = {
         activeUsers: activeUsersStripped,
         leaderboard: leaderboard,
-    }));
+        uptime: Math.floor((Date.now()/1000) - startTime),
+    };
+
+    if (all) {
+        data.chatActivity = chatActivity;
+    }
+
+    ws.send(JSON.stringify(data));
 }
 
 let websockets = [];
@@ -58,7 +67,7 @@ router.ws("/ws", (ws, req) => {
     websockets.push(ws);
 
     ws.on("message", message => {
-        sendUpdate(ws);
+        sendUpdate(ws, true);
     });
 
     ws.on("close", () => {
@@ -70,6 +79,6 @@ setInterval(() => {
     websockets.forEach(ws => {
         sendUpdate(ws);
     });
-}, 2000);
+}, 1000);
 
 module.exports = router;
