@@ -7,11 +7,14 @@ const NORMAL_SCOPES = "user:read:email moderator:manage:banned_users";
 const STREAMER_SCOPES = "user:read:email moderator:manage:banned_users moderation:read";
 const ADD_MODERATOR_SCOPES = "user:read:email channel:manage:moderators";
 
+const DATABASE_SCOPES = "channel:read:editors channel:read:vips moderation:read";
+
 class TwitchAuthentication {
 
     TWITCH_URL = `https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=${config.twitch.client_id}&redirect_uri=${encodeURIComponent(config.api_domain + "auth/twitch")}&scope=${encodeURIComponent(NORMAL_SCOPES)}`;
     TWITCH_STREAMER_URL = `https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=${config.twitch.client_id}&redirect_uri=${encodeURIComponent(config.api_domain + "auth/twitch")}&scope=${encodeURIComponent(STREAMER_SCOPES)}`;
     TWITCH_ADDMOD_URL = `https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=${config.twitch.client_id}&redirect_uri=${encodeURIComponent(config.api_domain + "auth/twitch")}&scope=${encodeURIComponent(ADD_MODERATOR_SCOPES)}`;
+    DATABASE_TWITCH_URL = `https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=${config.twitch.client_id}&redirect_uri=${encodeURIComponent(config.db_domain + "auth/twitch")}&scope=${encodeURIComponent(DATABASE_SCOPES)}`
     TWITCH_REDIRECT = config.api_domain + "auth/twitch";
 
     
@@ -123,6 +126,123 @@ class TwitchAuthentication {
                     reject("Unable to request access token, reason: " + oauthData?.message);
                 }
             }, reject);
+        });
+    }
+
+    /**
+     * Gets a role via path, access token, and broadcaster ID
+     * @param {string} path 
+     * @param {string} accessToken 
+     * @param {number} broadcasterId 
+     * @returns {Promise<TwitchUser>}
+     */
+    getRole(path, accessToken, broadcasterId) {
+        return new Promise(async (resolve, reject) => {
+            let result = [];
+            const get = async cursor => {
+                return await fetch("https://api.twitch.tv/helix/"+path+"?first=100&broadcaster_id=" + encodeURIComponent(broadcasterId) + (cursor !== null ? "&after=" + cursor : ""), {
+                    method: 'GET',
+                    headers: {
+                        ["Client-ID"]: config.twitch.client_id,
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                });
+            }
+
+            try {
+                let cursor = null;
+                while(true) {
+                    let json = await (await get(cursor)).json();
+
+                    for (let i = 0; i < json.data.length; i++) {
+                        result = [
+                            ...result,
+                            await global.api.Twitch.getUserById(json.data[i].user_id, false, true)
+                        ]
+                    }
+
+                    if (json.pagination?.cursor) {
+                        cursor = json.pagination.cursor;
+                    } else break;
+                }
+                resolve(result);
+            } catch(err) {
+                reject(err);
+                return;
+            }
+        });
+    }
+
+    /**
+     * Returns a list of VIPs for a user access token
+     * @param {string} accessToken 
+     * @param {number} broadcasterId
+     * @returns {Promise<TwitchUser[]>}
+     */
+    getVIPs(accessToken, broadcasterId) {
+        return this.getRole("channels/vips", accessToken, broadcasterId)
+    }
+
+    /**
+     * Returns a list of moderators for a user access token
+     * @param {string} accessToken 
+     * @param {number} broadcasterId
+     * @returns {Promise<TwitchUser[]>}
+     */
+    getMods(accessToken, broadcasterId) {
+        return this.getRole("moderation/moderators", accessToken, broadcasterId)
+    }
+
+    /**
+     * Returns a list of editors for a user access token
+     * @param {string} accessToken 
+     * @param {number} broadcasterId
+     * @returns {Promise<TwitchUser[]>}
+     */
+    getEditors(accessToken, broadcasterId) {
+        return this.getRole("channels/editors", accessToken, broadcasterId)
+    }
+
+    /**
+     * Gets bans via access token and broadcaster ID
+     * @param {string} accessToken 
+     * @param {number} broadcasterId 
+     * @returns {Promise<TwitchUser>}
+     */
+    getBans(accessToken, broadcasterId) {
+        return new Promise(async (resolve, reject) => {
+            let result = [];
+            const get = async cursor => {
+                return await fetch("https://api.twitch.tv/helix/moderation/banned?first=100&broadcaster_id=" + encodeURIComponent(broadcasterId) + (cursor !== null ? "&after=" + cursor : ""), {
+                    method: 'GET',
+                    headers: {
+                        ["Client-ID"]: config.twitch.client_id,
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                });
+            }
+
+            try {
+                let cursor = null;
+                while(true) {
+                    let json = await (await get(cursor)).json();
+
+                    for (let i = 0; i < json.data.length; i++) {
+                        result = [
+                            ...result,
+                            await global.api.Twitch.getUserById(json.data[i].user_id, false, true)
+                        ]
+                    }
+
+                    if (json.pagination?.cursor) {
+                        cursor = json.pagination.cursor;
+                    } else break;
+                }
+                resolve(result);
+            } catch(err) {
+                reject(err);
+                return;
+            }
         });
     }
 

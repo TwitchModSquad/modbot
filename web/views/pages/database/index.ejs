@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>TMS : User Database</title>
+    
+    <%- include("../../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/database.css">
+    <link rel="stylesheet" href="/assets/css/button.css">
+
+</head>
+<body>
+    
+    <%- include("../../partials/database/header", {twitch_uri: twitch_uri, domain: domain, user: locals?.user}) %>
+
+    <main class="wrapper">
+        <h1>
+            <i class="fa-light fa-house"></i> Home
+        </h1>
+    </main>
+
+    <%- include("../../partials/database/footer", {user: locals?.user}) %>
+
+    <%- include("../../partials/js") %>
+
+</body>
+</html>
