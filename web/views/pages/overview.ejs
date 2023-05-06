@@ -12,6 +12,9 @@
     <header>
         <img src="/assets/images/logo.webp" alt="TMS Logo">
         <h1>TMS Overview</h1>
+        <div>
+            Uptime: <span id="uptime">00:00:00</span>
+        </div>
     </header>
 
     <main>
@@ -48,6 +51,14 @@
                         </tr>
                     </tbody>
                 </table>
+            </section>
+        </div>
+        <div class="container container-md">
+            <section class="col-6">
+                <h2>Chat Activity</h2>
+                <div>
+                    <canvas id="chat-activity" height="55"></canvas>
+                </div>
             </section>
         </div>
     </main>
