@@ -28,6 +28,9 @@ const updateLeaderboard = async () => {
     leaderboard.topStreamer.user = await api.Twitch.getUserById(leaderboard.topStreamer.user_id);
 }
 
+setInterval(updateLeaderboard, 120000);
+setTimeout(updateLeaderboard, 5000);
+
 const updateActiveUsers = async () => {
     let newActiveUsers = [];
     for (const id in activeUsers) {
@@ -46,9 +49,6 @@ const updateActiveUsers = async () => {
 
     activeUsersStripped = newActiveUsers;
 }
-
-setInterval(updateLeaderboard, 30000);
-setTimeout(updateLeaderboard, 5000);
 
 setInterval(updateActiveUsers, 5000);
 
