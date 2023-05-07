@@ -94,7 +94,7 @@ setInterval(() => {
     websockets.forEach(ws => {
         sendUpdate(ws);
     });
-}, 1000);
+}, 5000);
 
 global.overviewBroadcast = broadcast;
 

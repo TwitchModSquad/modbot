@@ -66,6 +66,7 @@ function formatNumber(num) {
     }
 }
 
+let uptime = 0;
 function formatUptime(num) {
     let hours = 0;
     let minutes = 0;
@@ -88,6 +89,11 @@ function formatUptime(num) {
 
     return hours + ":" + minutes + ":" + num;
 }
+
+setInterval(() => {
+    uptime++;
+    $("#uptime").text(formatUptime(uptime));
+}, 1000);
 
 function startSocket() {
     const ws = new WebSocket("ws://localhost:8080/overview/ws");
@@ -152,7 +158,8 @@ function startSocket() {
             }
 
             if (msg.hasOwnProperty("uptime")) {
-                $("#uptime").text(formatUptime(msg.uptime));
+                uptime = msg.uptime;
+                $("#uptime").text(formatUptime(uptime));
             }
         } catch(err) {
             console.error(err);
