@@ -1,4 +1,40 @@
 const CHAT_ACTIVITY_MAXIMUM = 500;
+const TOTAL_PAGES = 2;
+
+let page = 1;
+let pageTurning = false;
+function turnToPage(nextPage) {
+    if (nextPage > TOTAL_PAGES || nextPage < 1) return;
+    if (pageTurning) return;
+    pageTurning = true;
+
+    let currentPage = $("#page-" + page);
+    let targetPage = $("#page-" + nextPage);
+
+    currentPage.addClass("fade-out");
+    targetPage.addClass("fade-in");
+    targetPage.show();
+    targetPage.removeClass("fade-in");
+
+    page = nextPage;
+
+    setTimeout(function() {
+        currentPage.hide();
+        currentPage.removeClass("fade-out");
+        pageTurning = false;
+    }, 200);
+}
+
+let pauseInterval = null;
+let autoPageTurn = streamOverlay;
+
+function turnPage() {
+    if (!autoPageTurn) return;
+
+    turnToPage(page === TOTAL_PAGES ? 1 : page + 1);
+}
+
+setInterval(turnPage, 15000);
 
 const activeUsers = document.getElementById("active-users");
 
@@ -60,9 +96,9 @@ function comma(x) {
 
 function formatNumber(num) {
     if (num >= 1000000) {
-        return Math.floor(num/1000000) + "M";
+        return "<span title=\"" + comma(num) + "\">" + Math.floor(num/1000000) + "M</span>";
     } else if (num >= 1000) {
-        return Math.floor(num/1000) + "K";
+        return "<span title=\"" + comma(num) + "\">" + Math.floor(num/1000) + "K</span>";
     } else {
         return comma(num);
     }
@@ -123,9 +159,9 @@ function startSocket() {
 
             if (msg.hasOwnProperty("leaderboard")) {
                 $("#streamer-display-name").text(msg.leaderboard?.topStreamer?.user?.display_name);
-                $("#streamer-count").text(formatNumber(msg.leaderboard?.topStreamer?.count));
+                $("#streamer-count").html(formatNumber(msg.leaderboard?.topStreamer?.count));
                 $("#chatter-display-name").text(msg.leaderboard?.topChatter?.user?.display_name);
-                $("#chatter-count").text(formatNumber(msg.leaderboard?.topChatter?.count));
+                $("#chatter-count").html(formatNumber(msg.leaderboard?.topChatter?.count));
                 $("#banned-display-name").text(msg.leaderboard?.topBanned?.user?.display_name);
                 $("#banned-count").text(comma(msg.leaderboard?.topBanned?.count));
                 $("#timedout-display-name").text(msg.leaderboard?.topTimedOut?.user?.display_name);
@@ -161,9 +197,26 @@ function startSocket() {
                 chatActivityChart.update();
             }
 
+            if (msg.hasOwnProperty("count")) {
+                $("#bans").html(formatNumber(msg.count.bans));
+                $("#timeouts").html(formatNumber(msg.count.timeouts));
+                $("#streamers").html(formatNumber(msg.count.streamers));
+                $("#moderators").html(formatNumber(msg.count.moderators));
+            }
+
             if (msg.hasOwnProperty("uptime")) {
                 uptime = msg.uptime;
                 $("#uptime").text(formatUptime(uptime));
+            }
+
+            if (msg.hasOwnProperty("page") && streamOverlay) {
+                turnToPage(msg.page);
+                if (pauseInterval) clearInterval(pauseInterval);
+                autoPageTurn = false;
+                pauseInterval = setInterval(function() {
+                    autoPageTurn = true;
+                    pauseInterval = null;
+                }, 30000);
             }
         } catch(err) {
             console.error(err);

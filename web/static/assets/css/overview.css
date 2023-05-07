@@ -29,13 +29,33 @@ footer {
     color: var(--tertiary-text-color);
 }
 
+article {
+    position: fixed;
+    width: 100%;
+    top: 3.15em;
+    left: 0;
+    height: calc(100vh - 4em);
+    overflow-y: auto;
+    transition: 200ms;
+}
+
+article.fade-in {
+    opacity: 0;
+    left: 1em;
+}
+
+article.fade-out {
+    opacity: 0;
+    left: -1em;
+}
+
 section {
     background-color: #19181b;
     border: 1px solid #151417;
     border-radius: 6px;
     box-shadow: var(--shadow);
     padding: 0 1em 1em 1em;
-    margin: 1em;
+    margin: .5em;
 }
 
 section h2,
@@ -63,4 +83,20 @@ table {
 
 #leaderboard tr:nth-child(even) {
     background-color: #252428;
+}
+
+.expand {
+    display: block;
+    color: #fff;
+    font-size: 2em;
+    text-align: center;
+    padding: .25em 0;
+}
+
+.expand.red {
+    background-color: #d44343;
+}
+
+.expand.green {
+    background-color: #4cca4c;
 }

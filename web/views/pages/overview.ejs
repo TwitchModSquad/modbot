@@ -18,59 +18,103 @@
     </header>
 
     <main>
-        <div class="container container-md">
-            <section class="col-8">
-                <h2>Most Active Users <small>(last minute)</small></h2>
-                <div>
-                    <canvas id="active-users" height="55"></canvas>
+        <article id="page-1">
+            <div class="container container-sm">
+                <section class="col-8">
+                    <h2>Most Active Users <small>(last minute)</small></h2>
+                    <div>
+                        <canvas id="active-users" height="55"></canvas>
+                    </div>
+                </section>
+                <section class="col-4">
+                    <h2>Leaderboard</h2>
+                    <table id="leaderboard">
+                        <tbody>
+                            <tr>
+                                <th>Top Streamer</th>
+                                <td><span id="streamer-display-name">Unknown Streamer</span></td>
+                                <td><small><span id="streamer-count">0</span> messages</small></td>
+                            </tr>
+                            <tr>
+                                <th>Top Chatter</th>
+                                <td><span id="chatter-display-name">Unknown Streamer</span></td>
+                                <td><small><span id="chatter-count">0</span> messages</small></td>
+                            </tr>
+                            <tr>
+                                <th>Most Banned</th>
+                                <td><span id="banned-display-name">Unknown Streamer</span></td>
+                                <td><small><span id="banned-count">0</span> bans</small></td>
+                            </tr>
+                            <tr>
+                                <th>Most Timed Out</th>
+                                <td><span id="timedout-display-name">Unknown Streamer</span></td>
+                                <td><small><span id="timedout-count">0</span> timeouts</small></td>
+                            </tr>
+                            <tr>
+                                <th>Most Live (past month)</th>
+                                <td><span id="mostlive-display-name">Unknown Streamer</span></td>
+                                <td><small><span id="mostlive-count">0</span> streams</small></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+            <div class="container container-sm">
+                <section class="col-6">
+                    <h2>Chat Activity</h2>
+                    <div>
+                        <canvas id="chat-activity" height="85"></canvas>
+                    </div>
+                </section>
+                <div class="col-2">
+                    <section>
+                        <h2>Total Recorded Bans</h2>
+                        <div>
+                            <span id="bans" class="expand red">0K</span>
+                        </div>
+                    </section>
+                    <section>
+                        <h2>Total Recorded T/Os</h2>
+                        <div>
+                            <span id="timeouts" class="expand red">0K</span>
+                        </div>
+                    </section>
                 </div>
-            </section>
-            <section class="col-4">
-                <h2>Leaderboard</h2>
-                <table id="leaderboard">
-                    <tbody>
-                        <tr>
-                            <th>Top Streamer</th>
-                            <td><span id="streamer-display-name">Unknown Streamer</span></td>
-                            <td><small><span id="streamer-count">0</span> messages</small></td>
-                        </tr>
-                        <tr>
-                            <th>Top Chatter</th>
-                            <td><span id="chatter-display-name">Unknown Streamer</span></td>
-                            <td><small><span id="chatter-count">0</span> messages</small></td>
-                        </tr>
-                        <tr>
-                            <th>Most Banned</th>
-                            <td><span id="banned-display-name">Unknown Streamer</span></td>
-                            <td><small><span id="banned-count">0</span> bans</small></td>
-                        </tr>
-                        <tr>
-                            <th>Most Timed Out</th>
-                            <td><span id="timedout-display-name">Unknown Streamer</span></td>
-                            <td><small><span id="timedout-count">0</span> timeouts</small></td>
-                        </tr>
-                        <tr>
-                            <th>Most Live (past month)</th>
-                            <td><span id="mostlive-display-name">Unknown Streamer</span></td>
-                            <td><small><span id="mostlive-count">0</span> streams</small></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </section>
-        </div>
-        <div class="container container-md">
-            <section class="col-6">
-                <h2>Chat Activity</h2>
-                <div>
-                    <canvas id="chat-activity" height="75"></canvas>
+                <div class="col-2">
+                    <section>
+                        <h2>Monitored Channels</h2>
+                        <div>
+                            <span id="streamers" class="expand green">0</span>
+                        </div>
+                    </section>
+                    <section>
+                        <h2>Total Moderators</h2>
+                        <div>
+                            <span id="moderators" class="expand green">0</span>
+                        </div>
+                    </section>
                 </div>
-            </section>
-        </div>
+            </div>
+        </article>
+        <article id="page-2" style="display: none;">
+            This is page 2!
+        </article>
     </main>
 
     <footer>
+        <% if (!streamOverlay) { %>
+            <div class="pagination">
+                <button class="previous" type="button">Prev</button>
+                Page <div id="page-num">1</div>
+                <button class="next" type="button">Next</button>
+            </div>
+        <% } %>
         Copyright &copy; <%= (new Date()).getFullYear() %> - Twitch Mod Squad :|: TMS is not affiliated with Twitch
     </footer>
+
+    <script>
+        const streamOverlay = <%= streamOverlay ? "true" : "false" %>;
+    </script>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
