@@ -37,6 +37,6 @@ module.exports = {
                 mostActive = community;
         });
 
-        global.client.overview.say("twitchmodsquad", `Hello @${chatter.display_name}!! You have sent ${comma(totalChat)} message${totalChat === 1 ? "" : "s"} across ${communities.length} communities.${mostActive ? ` Your most active community is ${mostActive.user.display_name}, with ${mostActive.chatCount} message${mostActive.chatCount === 1 ? "" : "s"}` : ""}!${rankTable ? ` You are the #${comma(rankTable.indexOf(String(chatter.id)) + 1)} highest chatter on TMS!` : ""}`);
+        global.client.overview.say("twitchmodsquad", `Hello @${chatter.display_name}!! You have sent ${comma(totalChat)} message${totalChat === 1 ? "" : "s"} across ${communities.length} communities.${mostActive ? ` Your most active community is ${mostActive.user.display_name}, with ${comma(mostActive.chatCount)} message${mostActive.chatCount === 1 ? "" : "s"}` : ""}!${rankTable ? ` You are the #${comma(rankTable.indexOf(String(chatter.id)) + 1)} highest chatter on TMS!` : ""}`);
     },
 };
