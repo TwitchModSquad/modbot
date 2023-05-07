@@ -47,7 +47,7 @@ const chatActivityChart = new Chart(chatActivity, {
             },
             y: {
                 beginAtZero: true,
-                suggestedMax: 100,
+                suggestedMax: 20,
             }
         }
     },
