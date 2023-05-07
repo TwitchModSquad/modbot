@@ -15,7 +15,8 @@ const activeUsersChart = new Chart(activeUsers, {
     options: {
         scales: {
             y: {
-                beginAtZero: true
+                beginAtZero: true,
+                suggestedMax: 10,
             }
         }
     }
@@ -46,6 +47,7 @@ const chatActivityChart = new Chart(chatActivity, {
             },
             y: {
                 beginAtZero: true,
+                suggestedMax: 100,
             }
         }
     },
