@@ -26,24 +26,31 @@ const updateLeaderboard = async () => {
     leaderboard.topTimedOut.user = await api.Twitch.getUserById(leaderboard.topTimedOut.user_id);
     leaderboard.topChatter.user = await api.Twitch.getUserById(leaderboard.topChatter.user_id);
     leaderboard.topStreamer.user = await api.Twitch.getUserById(leaderboard.topStreamer.user_id);
+}
 
+const updateActiveUsers = async () => {
+    let newActiveUsers = [];
     for (const id in activeUsers) {
-        activeUsersStripped.push({
+        newActiveUsers.push({
             id: id,
             count: activeUsers[id].length,
         });
     }
 
-    activeUsersStripped.sort((a,b) => b.count - a.count);
-    activeUsersStripped = activeUsersStripped.slice(0, ACTIVE_USERS_LIMIT);
+    newActiveUsers.sort((a,b) => b.count - a.count);
+    newActiveUsers = newActiveUsers.slice(0, ACTIVE_USERS_LIMIT);
 
-    for (let i = 0; i < activeUsersStripped.length; i++) {
-        activeUsersStripped[i].displayName = (await api.Twitch.getUserById(activeUsersStripped[i].id)).display_name;
+    for (let i = 0; i < newActiveUsers.length; i++) {
+        newActiveUsers[i].displayName = (await api.Twitch.getUserById(newActiveUsers[i].id)).display_name;
     }
+
+    activeUsersStripped = newActiveUsers;
 }
 
 setInterval(updateLeaderboard, 30000);
 setTimeout(updateLeaderboard, 5000);
+
+setInterval(updateActiveUsers, 5000);
 
 const sendUpdate = async (ws, all = false) => {
     let data = {
@@ -75,10 +82,20 @@ router.ws("/ws", (ws, req) => {
     });
 });
 
+const broadcast = msg => {
+    if (typeof(msg) === "object") msg = JSON.stringify(msg);
+
+    websockets.forEach(ws => {
+        ws.send(msg);
+    });
+}
+
 setInterval(() => {
     websockets.forEach(ws => {
         sendUpdate(ws);
     });
 }, 1000);
 
-module.exports = router;
+global.overviewBroadcast = broadcast;
+
+module.exports = {router: router, websockets: websockets, broadcast: broadcast};

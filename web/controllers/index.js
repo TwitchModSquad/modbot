@@ -9,7 +9,7 @@ const join = require("./join");
 const group = require("./group/");
 
 const public = require("./public");
-const overview = require("./overview");
+const overview = require("./overview").router;
 const database = require("./database");
 
 authRouter.use("/signon", signon);
