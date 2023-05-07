@@ -128,6 +128,8 @@ function startSocket() {
                 $("#banned-count").text(comma(msg.leaderboard?.topBanned?.count));
                 $("#timedout-display-name").text(msg.leaderboard?.topTimedOut?.user?.display_name);
                 $("#timedout-count").text(comma(msg.leaderboard?.topTimedOut?.count));
+                $("#mostlive-display-name").text(msg.leaderboard?.mostLive?.user?.display_name);
+                $("#mostlive-count").text(comma(msg.leaderboard?.mostLive?.count));
             }
 
             if (msg.hasOwnProperty("chatActivity")) {

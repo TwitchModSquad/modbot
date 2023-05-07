@@ -21,11 +21,13 @@ const updateLeaderboard = async () => {
     leaderboard.topTimedOut = (await con.pquery("SELECT user_id, count(user_id) as `count` FROM twitch__timeout group by user_id order by `count` desc limit 1;"))[0];
     leaderboard.topChatter = (await con.pquery("SELECT chatter_id as user_id, chat_count as `count` FROM twitch__chat_chatters ORDER BY `count` desc;"))[0];
     leaderboard.topStreamer = (await con.pquery("SELECT streamer_id as user_id, chat_count as `count` FROM twitch__chat_streamers ORDER BY `count` desc;"))[0];
+    leaderboard.mostLive = (await con.pquery("SELECT twitch__user.id as user_id, count(live.identity_id) as `count` from live join twitch__user on twitch__user.identity_id = live.identity_id where start_time > date_sub(now(), interval 1 month) group by live.identity_id order by `count` desc limit 1;"))[0];
 
     leaderboard.topBanned.user = await api.Twitch.getUserById(leaderboard.topBanned.user_id);
     leaderboard.topTimedOut.user = await api.Twitch.getUserById(leaderboard.topTimedOut.user_id);
     leaderboard.topChatter.user = await api.Twitch.getUserById(leaderboard.topChatter.user_id);
     leaderboard.topStreamer.user = await api.Twitch.getUserById(leaderboard.topStreamer.user_id);
+    leaderboard.mostLive.user = await api.Twitch.getUserById(leaderboard.mostLive.user_id);
 }
 
 setInterval(updateLeaderboard, 120000);
