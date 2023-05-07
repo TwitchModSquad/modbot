@@ -10,25 +10,53 @@ const {activeUsers, chatActivity} = require("../../twitch/listeners/overviewActi
 const startTime = Math.floor(Date.now() / 1000);
 
 router.get("/", (req, res) => {
-    res.render("pages/overview");
+    res.render("pages/overview", {streamOverlay: false});
+});
+
+router.get("/stream", (req, res) => {
+    res.render("pages/overview", {streamOverlay: true});
 });
 
 const leaderboard = {};
 let activeUsersStripped = [];
 
-const updateLeaderboard = async () => {
+let count = {
+    bans: 0,
+    timeouts: 0,
+    streamers: 0,
+    moderators: 0,
+};
+
+const slowUpdate = async () => {
     leaderboard.topBanned = (await con.pquery("SELECT user_id, count(user_id) as `count` FROM twitch__ban group by user_id order by `count` desc limit 1;"))[0];
     leaderboard.topTimedOut = (await con.pquery("SELECT user_id, count(user_id) as `count` FROM twitch__timeout group by user_id order by `count` desc limit 1;"))[0];
     leaderboard.topChatter = (await con.pquery("SELECT chatter_id as user_id, chat_count as `count` FROM twitch__chat_chatters ORDER BY `count` desc;"))[0];
     leaderboard.topStreamer = (await con.pquery("SELECT streamer_id as user_id, chat_count as `count` FROM twitch__chat_streamers ORDER BY `count` desc;"))[0];
+    leaderboard.mostLive = (await con.pquery("SELECT twitch__user.id as user_id, count(live.identity_id) as `count` from live join twitch__user on twitch__user.identity_id = live.identity_id where start_time > date_sub(now(), interval 1 month) group by live.identity_id order by `count` desc limit 1;"))[0];
 
     leaderboard.topBanned.user = await api.Twitch.getUserById(leaderboard.topBanned.user_id);
     leaderboard.topTimedOut.user = await api.Twitch.getUserById(leaderboard.topTimedOut.user_id);
     leaderboard.topChatter.user = await api.Twitch.getUserById(leaderboard.topChatter.user_id);
     leaderboard.topStreamer.user = await api.Twitch.getUserById(leaderboard.topStreamer.user_id);
+    leaderboard.mostLive.user = await api.Twitch.getUserById(leaderboard.mostLive.user_id);
+
+    const bans = await con.pquery("select id from twitch__ban;");
+    count.bans = bans.length;
+
+    const timeouts = await con.pquery("select id from twitch__timeout;");
+    count.timeouts = timeouts.length;
+
+    const streamers = await con.pquery("select distinct identity__moderator.modfor_id from identity__moderator join twitch__user on twitch__user.identity_id = identity__moderator.modfor_id where active;");
+    count.streamers = streamers.length;
+
+    const moderators = await con.pquery("select distinct identity__moderator.identity_id from identity__moderator join twitch__user on twitch__user.identity_id = identity__moderator.identity_id where active;");
+    count.moderators = moderators.length;
 }
 
-const updateActiveUsers = async () => {
+setInterval(slowUpdate, 120000);
+setTimeout(slowUpdate, 5000);
+
+const fastUpdate = async () => {
     let newActiveUsers = [];
     for (const id in activeUsers) {
         newActiveUsers.push({
@@ -47,16 +75,14 @@ const updateActiveUsers = async () => {
     activeUsersStripped = newActiveUsers;
 }
 
-setInterval(updateLeaderboard, 30000);
-setTimeout(updateLeaderboard, 5000);
-
-setInterval(updateActiveUsers, 5000);
+setInterval(fastUpdate, 5000);
 
 const sendUpdate = async (ws, all = false) => {
     let data = {
         activeUsers: activeUsersStripped,
         leaderboard: leaderboard,
         uptime: Math.floor((Date.now()/1000) - startTime),
+        count: count,
     };
 
     if (all) {
@@ -94,7 +120,7 @@ setInterval(() => {
     websockets.forEach(ws => {
         sendUpdate(ws);
     });
-}, 1000);
+}, 5000);
 
 global.overviewBroadcast = broadcast;
 

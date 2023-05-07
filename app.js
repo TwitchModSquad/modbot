@@ -11,6 +11,9 @@ require("./mbm/mbm");
 // Load Twitch Module
 require("./twitch/twitch");
 
+// Load Overview Module
+require("./overview/overview");
+
 // Load Express Web Server
 require("./web/express");
 

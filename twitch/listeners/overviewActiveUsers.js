@@ -1,5 +1,5 @@
 const EXPIRE_CHAT = 60000;
-const CHAT_ACTIVITY_MAXIMUM = 250;
+const CHAT_ACTIVITY_MAXIMUM = 500;
 
 let chatCache = 0;
 
