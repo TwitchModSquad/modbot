@@ -13,7 +13,7 @@ setTimeout(async () => {
     rankTable = await con.pquery("SELECT chatter_id, sum(chat_count) as sm FROM twitch__chat_chatters group by chatter_id order by sm desc;");
     rankTable = rankTable.map(x => String(x.chatter_id));
     api.Logger.info(`Loaded ${rankTable.length} chatters for the rank table`);
-}, 5000);
+}, 30000);
 
 module.exports = {
     name: "userinfo",
