@@ -10,9 +10,9 @@ const listener = {
     chatActivity: [],
     listener: async (streamer, chatter, tags, message, self) => {
         if (!listener.activeUsers.hasOwnProperty(chatter.id))
-            listener.activeUsers[chatter.id] = [];
+            listener.activeUsers[String(chatter.id)] = [];
 
-        listener.activeUsers[chatter.id].push(Date.now());
+        listener.activeUsers[String(chatter.id)].push(Date.now());
 
         chatCache++;
     }
@@ -28,9 +28,15 @@ setInterval(() => {
         }
     }
 
-    listener.chatActivity.push({
+    const activity = {
         date: now,
         count: chatCache,
+    };
+
+    listener.chatActivity.push(activity);
+
+    global.overviewBroadcast({
+        chatActivityUpdate: activity,
     });
 
     if (listener.chatActivity.length > CHAT_ACTIVITY_MAXIMUM)

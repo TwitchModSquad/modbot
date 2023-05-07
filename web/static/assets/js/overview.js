@@ -1,3 +1,5 @@
+const CHAT_ACTIVITY_MAXIMUM = 500;
+
 const activeUsers = document.getElementById("active-users");
 
 const activeUsersChart = new Chart(activeUsers, {
@@ -35,6 +37,13 @@ const chatActivityChart = new Chart(chatActivity, {
     options: {
         indexAxis: "x",
         scales: {
+            x: {
+                type: "time",
+                ticks: {
+                    autoSkip: true,
+                    maxTicksLimit: 15,
+                },
+            },
             y: {
                 beginAtZero: true,
             }
@@ -120,12 +129,25 @@ function startSocket() {
                 let data = [];
 
                 msg.chatActivity.forEach(activity => {
-                    labels.push((new Date(activity.date)).toLocaleTimeString());
+                    labels.push(new Date(activity.date));
                     data.push(activity.count);
                 });
 
                 chatActivityChart.data.labels = labels;
                 chatActivityChart.data.datasets[0].data = data;
+                chatActivityChart.update();
+            }
+
+            if (msg.hasOwnProperty("chatActivityUpdate")) {
+                chatActivityChart.data.labels.push(msg.chatActivityUpdate.date);
+                chatActivityChart.data.datasets[0].data.push(msg.chatActivityUpdate.count);
+
+                if (chatActivityChart.data.labels.length > CHAT_ACTIVITY_MAXIMUM)
+                    chatActivityChart.data.labels.shift();
+
+                if (chatActivityChart.data.datasets[0].data.length > CHAT_ACTIVITY_MAXIMUM)
+                    chatActivityChart.data.datasets[0].data.shift();
+
                 chatActivityChart.update();
             }
 
