@@ -101,6 +101,18 @@ const hourlyBansChart = new Chart(hourlyBans, {
             data: [],
             fill: true,
             tension: 0.1
+        },
+        {
+            label: 'Timeouts',
+            data: [],
+            fill: true,
+            tension: 0.1
+        },
+        {
+            label: 'Chat Messages',
+            data: [],
+            fill: true,
+            tension: 0.1
         }]
     },
     options: {
