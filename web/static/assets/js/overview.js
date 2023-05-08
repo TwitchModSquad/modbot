@@ -1,6 +1,8 @@
 const CHAT_ACTIVITY_MAXIMUM = 500;
 const TOTAL_PAGES = 2;
 
+const followAlert = new Audio('/assets/sound/follow.wav');
+
 let page = 1;
 let pageTurning = false;
 function turnToPage(nextPage) {
@@ -316,6 +318,25 @@ function startSocket() {
 
             if (msg.hasOwnProperty("totalTimeoutTime")) {
                 $("#total-to").text(formatTime(msg.totalTimeoutTime));
+            }
+
+            if (msg.hasOwnProperty("recentFollowers")) {
+                let parsed = "";
+                msg.recentFollowers.forEach(follower => {
+                    parsed += `<div id="follower-${follower.id}"><img class="pfp" src="${follower.profile_image_url}"/> ${follower.display_name}</div>`;
+                });
+                $("#followers").html(parsed);
+            }
+
+            if (msg.hasOwnProperty("newFollow") && streamOverlay) {
+                $("#new-follow").html(parse.account.twitch(msg.newFollow, "https://twitch.tv/" + msg.newFollow.login));
+
+                $("#follow-modal").fadeIn(200);
+                followAlert.play();
+
+                setTimeout(function() {
+                    $("#follow-modal").fadeOut(200);
+                }, 4000);
             }
 
             if (msg.hasOwnProperty("page") && streamOverlay) {

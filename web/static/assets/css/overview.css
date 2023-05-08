@@ -119,3 +119,43 @@ button {
     border-radius: 3px;
     cursor: pointer;
 }
+
+#followers {
+    display: flex;
+}
+
+#followers > div {
+    display: inline-block;
+    margin: .2em .5em;
+    flex-grow: 1;
+}
+
+.pfp {
+    width: 1.1em;
+    height: 1.1em;
+    border-radius: 50%;
+}
+
+#follow-modal {
+    background-color: rgba(0,0,0,0.3);
+    display: flex;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    justify-content: center;
+    align-items: center;
+}
+
+#follow-modal section {
+    width: 30em;
+    background-color: var(--primary-text-color);
+    color: var(--primary-background-color);
+    border-color: var(--secondary-text-color);
+    box-shadow: var(--light-shadow);
+}
+
+#follow-modal section h2 {
+    border-color: var(--secondary-text-color);
+}
