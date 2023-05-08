@@ -90,30 +90,35 @@ const chatActivityChart = new Chart(chatActivity, {
     },
 });
 
-const hourlyBans = document.getElementById("hourly-bans");
+const hourlyActivity = document.getElementById("hourly-activity");
 
-const hourlyBansChart = new Chart(hourlyBans, {
+const hourlyActivityChart = new Chart(hourlyActivity, {
     type: 'line',
     data: {
         labels: [],
-        datasets: [{
-            label: 'Bans',
-            data: [],
-            fill: true,
-            tension: 0.1
-        },
-        {
-            label: 'Timeouts',
-            data: [],
-            fill: true,
-            tension: 0.1
-        },
-        {
-            label: 'Chat Messages',
-            data: [],
-            fill: true,
-            tension: 0.1
-        }]
+        datasets: [
+            {
+                label: 'Chat Messages',
+                data: [],
+                fill: true,
+                tension: 0.1,
+                yAxisID: "y1",
+            },
+            {
+                label: 'Bans',
+                data: [],
+                fill: true,
+                tension: 0.1,
+                yAxisID: "y",
+            },
+            {
+                label: 'Timeouts',
+                data: [],
+                fill: true,
+                tension: 0.1,
+                yAxisID: "y",
+            },
+        ]
     },
     options: {
         indexAxis: "x",
@@ -128,7 +133,17 @@ const hourlyBansChart = new Chart(hourlyBans, {
             y: {
                 beginAtZero: true,
                 suggestedMax: 20,
-            }
+                display: true,
+                positon: "left",
+            },
+            y1: {
+                suggestedMax: 750,
+                display: true,
+                position: "right",
+                grid: {
+                    drawOnChartArea: false,
+                },
+            },
         }
     },
 });
@@ -250,18 +265,24 @@ function startSocket() {
                 chatActivityChart.update();
             }
 
-            if (msg.hasOwnProperty("hourlyBans")) {
+            if (msg.hasOwnProperty("hourlyActivity")) {
                 let labels = [];
-                let data = [];
+                let messageData = [];
+                let banData = [];
+                let timeoutData = [];
 
-                msg.hourlyBans.forEach(banEntry => {
-                    labels.push(new Date(banEntry.date));
-                    data.push(banEntry.count);
+                msg.hourlyActivity.forEach(entry => {
+                    labels.push(new Date(entry.date));
+                    messageData.push(entry.messages);
+                    banData.push(entry.bans);
+                    timeoutData.push(entry.timeouts);
                 });
 
-                hourlyBansChart.data.labels = labels;
-                hourlyBansChart.data.datasets[0].data = data;
-                hourlyBansChart.update();
+                hourlyActivityChart.data.labels = labels;
+                hourlyActivityChart.data.datasets[0].data = messageData;
+                hourlyActivityChart.data.datasets[1].data = banData;
+                hourlyActivityChart.data.datasets[2].data = timeoutData;
+                hourlyActivityChart.update();
             }
 
             if (msg.hasOwnProperty("chatActivityUpdate")) {
