@@ -23,7 +23,7 @@
                 <section class="col-8">
                     <h2>Most Active Users <small>(last minute)</small></h2>
                     <div>
-                        <canvas id="active-users" height="55"></canvas>
+                        <canvas id="active-users" height="50"></canvas>
                     </div>
                 </section>
                 <section class="col-4">
@@ -111,11 +111,24 @@
                     </div>
                 </section>
             </div>
+            <section>
+                <h2>Recent Followers</h2>
+                <div id="followers"></div>
+            </section>
         </article>
         <article id="page-2" style="display: none;">
             This is page 2!
         </article>
     </main>
+
+    <div id="follow-modal" style="display: none;">
+        <section>
+            <h2>
+                New Follow!
+            </h2>
+            <div id="new-follow"></div>
+        </section>
+    </div>
 
     <footer>
         <% if (!streamOverlay) { %>
@@ -135,6 +148,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <script src="/assets/js/jquery.js"></script>
+    <script src="/assets/js/master.js"></script>
     <script src="/assets/js/overview.js"></script>
 </body>
 </html>

@@ -3,6 +3,7 @@ const router = express.Router();
 
 const con = require("../../database");
 const api = require("../../api/");
+const config = require("../../config.json");
 
 const ACTIVE_USERS_LIMIT = 10;
 const {activeUsers, chatActivity} = require("../../twitch/listeners/overviewActiveUsers");
@@ -22,6 +23,17 @@ let activeUsersStripped = [];
 let hourlyActivity = [];
 let lastBan = null;
 let totalTimeoutTime = 0;
+
+let lastFollowerId = null;
+let recentFollowers = [];
+
+const broadcast = msg => {
+    if (typeof(msg) === "object") msg = JSON.stringify(msg);
+
+    websockets.forEach(ws => {
+        ws.send(msg);
+    });
+}
 
 con.query("select timebanned from twitch__ban order by id desc limit 1;", (err, res) => {
     if (!err) {
@@ -91,6 +103,28 @@ const fastUpdate = async () => {
     }
 
     activeUsersStripped = newActiveUsers;
+
+    const followers = await api.Twitch.Direct.helix.users.getFollows({followedUser: config.twitch.id});
+    
+    if (followers.data.length > 0 && lastFollowerId !== followers.data[0].userId) {
+        let resolvedFollowers = [];
+        for (let i = 0; i < Math.min(followers.data.length, 9); i++) {
+            try {
+                resolvedFollowers.push(await api.Twitch.getUserById(followers.data[i].userId, false, true));
+            } catch(err) {
+                api.Logger.warning("Could not get user " + followers.data[i].userId);
+            }
+        }
+        recentFollowers = resolvedFollowers;
+        let broadcastObj = {
+            recentFollowers: recentFollowers,
+        };
+
+        if (lastFollowerId) broadcastObj.newFollow = resolvedFollowers[0];
+
+        broadcast(broadcastObj);
+        lastFollowerId = followers.data[0].userId;
+    }
 }
 
 setInterval(fastUpdate, 5000);
@@ -106,6 +140,7 @@ const sendUpdate = async (ws, all = false) => {
 
     if (all) {
         data.chatActivity = chatActivity;
+        data.recentFollowers = recentFollowers;
     }
 
     if (lastBan)
@@ -131,14 +166,6 @@ router.ws("/ws", (ws, req) => {
         websockets = websockets.filter(x => x.id !== ws.id);
     });
 });
-
-const broadcast = msg => {
-    if (typeof(msg) === "object") msg = JSON.stringify(msg);
-
-    websockets.forEach(ws => {
-        ws.send(msg);
-    });
-}
 
 setInterval(() => {
     websockets.forEach(ws => {
