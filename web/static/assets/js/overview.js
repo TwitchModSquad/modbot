@@ -17,6 +17,7 @@ function turnToPage(nextPage) {
     targetPage.removeClass("fade-in");
 
     page = nextPage;
+    $("#page-num").text(page);
 
     setTimeout(function() {
         currentPage.hide();
@@ -89,6 +90,37 @@ const chatActivityChart = new Chart(chatActivity, {
     },
 });
 
+const hourlyBans = document.getElementById("hourly-bans");
+
+const hourlyBansChart = new Chart(hourlyBans, {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [{
+            label: 'Bans',
+            data: [],
+            fill: true,
+            tension: 0.1
+        }]
+    },
+    options: {
+        indexAxis: "x",
+        scales: {
+            x: {
+                type: "time",
+                ticks: {
+                    autoSkip: true,
+                    maxTicksLimit: 15,
+                },
+            },
+            y: {
+                beginAtZero: true,
+                suggestedMax: 20,
+            }
+        }
+    },
+});
+
 function comma(x) {
     if (!x) return "0";
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -101,6 +133,28 @@ function formatNumber(num) {
         return "<span title=\"" + comma(num) + "\">" + Math.floor(num/1000) + "K</span>";
     } else {
         return comma(num);
+    }
+}
+
+const SECONDS_IN_MINUTE = 60;
+const SECONDS_IN_HOUR = SECONDS_IN_MINUTE * 60;
+const SECONDS_IN_DAY = SECONDS_IN_HOUR * 24;
+const SECONDS_IN_YEAR = SECONDS_IN_DAY * 365;
+function formatTime(num) {
+    if (num >= SECONDS_IN_YEAR) {
+        num = Math.floor(num / SECONDS_IN_YEAR * 10) / 10;
+        return `${num.toFixed(1)} year${num === 1 ? "" : "s"}`;
+    } else if (num >= SECONDS_IN_DAY) {
+        num = Math.floor(num / SECONDS_IN_DAY * 10) / 10;
+        return `${num.toFixed(1)} day${num === 1 ? "" : "s"}`;
+    } else if (num >= SECONDS_IN_HOUR) {
+        num = Math.floor(num / SECONDS_IN_HOUR * 10) / 10;
+        return `${num.toFixed(1)} hour${num === 1 ? "" : "s"}`;
+    } else if (num >= SECONDS_IN_MINUTE) {
+        num = Math.floor(num / SECONDS_IN_MINUTE * 10) / 10;
+        return `${num.toFixed(1)} minute${num === 1 ? "" : "s"}`;
+    } else {
+        return `${num.toFixed(1)} second${num === 1 ? "" : "s"}`;
     }
 }
 
@@ -184,6 +238,20 @@ function startSocket() {
                 chatActivityChart.update();
             }
 
+            if (msg.hasOwnProperty("hourlyBans")) {
+                let labels = [];
+                let data = [];
+
+                msg.hourlyBans.forEach(banEntry => {
+                    labels.push(new Date(banEntry.date));
+                    data.push(banEntry.count);
+                });
+
+                hourlyBansChart.data.labels = labels;
+                hourlyBansChart.data.datasets[0].data = data;
+                hourlyBansChart.update();
+            }
+
             if (msg.hasOwnProperty("chatActivityUpdate")) {
                 chatActivityChart.data.labels.push(msg.chatActivityUpdate.date);
                 chatActivityChart.data.datasets[0].data.push(msg.chatActivityUpdate.count);
@@ -207,6 +275,14 @@ function startSocket() {
             if (msg.hasOwnProperty("uptime")) {
                 uptime = msg.uptime;
                 $("#uptime").text(formatUptime(uptime));
+            }
+
+            if (msg.hasOwnProperty("lastBan")) {
+                $("#last-ban").text(formatTime(msg.lastBan) + " ago");
+            }
+
+            if (msg.hasOwnProperty("totalTimeoutTime")) {
+                $("#total-to").text(formatTime(msg.totalTimeoutTime));
             }
 
             if (msg.hasOwnProperty("page") && streamOverlay) {
@@ -237,3 +313,18 @@ function startSocket() {
 }
 
 $(startSocket);
+
+$(function() {
+    $(".previous").on("click", function() {
+        let nextPage = page - 1;
+        if (nextPage === 0) nextPage = TOTAL_PAGES;
+        console.log(nextPage)
+        turnToPage(nextPage);
+    });
+    $(".next").on("click", function() {
+        let nextPage = page + 1;
+        if (nextPage > TOTAL_PAGES) nextPage = 1;
+        console.log(nextPage)
+        turnToPage(nextPage);
+    });
+});
