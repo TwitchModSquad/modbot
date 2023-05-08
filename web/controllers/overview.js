@@ -19,7 +19,7 @@ router.get("/stream", (req, res) => {
 
 const leaderboard = {};
 let activeUsersStripped = [];
-let hourlyBans = [];
+let hourlyActivity = [];
 let lastBan = null;
 let totalTimeoutTime = 0;
 
@@ -68,7 +68,7 @@ const slowUpdate = async () => {
     const timeoutTime = await con.pquery("select sum(duration) as `sum` from twitch__timeout;");
     totalTimeoutTime = timeoutTime[0].sum;
 
-    hourlyBans = await con.pquery("SELECT timebanned AS `date`, count(active) as `count` FROM twitch__ban WHERE timebanned/1000 >= unix_timestamp(date_sub(now(), interval 3 day)) AND timebanned/1000 <= unix_timestamp(now()) GROUP BY HOUR(FROM_UNIXTIME(timebanned/1000)) ORDER BY timebanned;");
+    hourlyActivity = await con.pquery("select unix_timestamp(`time`)*1000 as `date`, bans, timeouts, messages from twitch__hourlystats order by `time` desc limit 48;");
 }
 
 setInterval(slowUpdate, 120000);
@@ -100,6 +100,7 @@ const sendUpdate = async (ws, all = false) => {
         activeUsers: activeUsersStripped,
         leaderboard: leaderboard,
         uptime: Math.floor((Date.now()/1000) - startTime),
+        hourlyActivity: hourlyActivity,
         count: count,
     };
 
@@ -111,8 +112,6 @@ const sendUpdate = async (ws, all = false) => {
         data.lastBan = Math.floor((Date.now() - lastBan)/1000);
     if (totalTimeoutTime)
         data.totalTimeoutTime = totalTimeoutTime;
-    if (hourlyBans)
-        data.hourlyBans = hourlyBans;
 
     ws.send(JSON.stringify(data));
 }
