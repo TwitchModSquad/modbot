@@ -4,7 +4,7 @@ const CHAT_ACTIVITY_MAXIMUM = 500;
 let chatCache = 0;
 
 const listener = {
-    name: "messageLog",
+    name: "overviewActiveUsers",
     eventName: "message",
     activeUsers: {},
     chatActivity: [],

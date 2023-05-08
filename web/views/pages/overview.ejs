@@ -66,34 +66,50 @@
                         <canvas id="chat-activity" height="85"></canvas>
                     </div>
                 </section>
-                <div class="col-2">
-                    <section>
-                        <h2>Total Recorded Bans</h2>
-                        <div>
-                            <span id="bans" class="expand red">0K</span>
-                        </div>
-                    </section>
-                    <section>
-                        <h2>Total Recorded T/Os</h2>
-                        <div>
-                            <span id="timeouts" class="expand red">0K</span>
-                        </div>
-                    </section>
-                </div>
-                <div class="col-2">
-                    <section>
-                        <h2>Monitored Channels</h2>
-                        <div>
-                            <span id="streamers" class="expand green">0</span>
-                        </div>
-                    </section>
-                    <section>
-                        <h2>Total Moderators</h2>
-                        <div>
-                            <span id="moderators" class="expand green">0</span>
-                        </div>
-                    </section>
-                </div>
+                <section class="col-6">
+                    <h2>Hourly Bans</h2>
+                    <div>
+                        <canvas id="hourly-bans" height="85"></canvas>
+                    </div>
+                </section>
+            </div>
+            <div class="container container-sm">
+                <section class="col-2">
+                    <h2>Total Recorded Bans</h2>
+                    <div>
+                        <span id="bans" class="expand red">0K</span>
+                    </div>
+                </section>
+                <section class="col-2">
+                    <h2>Total Recorded T/Os</h2>
+                    <div>
+                        <span id="timeouts" class="expand red">0K</span>
+                    </div>
+                </section>
+                <section class="col-2">
+                    <h2>Monitored Channels</h2>
+                    <div>
+                        <span id="streamers" class="expand green">0</span>
+                    </div>
+                </section>
+                <section class="col-2">
+                    <h2>Total Moderators</h2>
+                    <div>
+                        <span id="moderators" class="expand green">0</span>
+                    </div>
+                </section>
+                <section class="col-2">
+                    <h2>Last Ban</h2>
+                    <div>
+                        <span id="last-ban" class="expand red">a while ago</span>
+                    </div>
+                </section>
+                <section class="col-2">
+                    <h2>Total T/O Time</h2>
+                    <div>
+                        <span id="total-to" class="expand red">a very long time</span>
+                    </div>
+                </section>
             </div>
         </article>
         <article id="page-2" style="display: none;">
@@ -105,7 +121,7 @@
         <% if (!streamOverlay) { %>
             <div class="pagination">
                 <button class="previous" type="button">Prev</button>
-                Page <div id="page-num">1</div>
+                Page <span id="page-num">1</span>/2
                 <button class="next" type="button">Next</button>
             </div>
         <% } %>

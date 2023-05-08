@@ -13,7 +13,7 @@ setTimeout(async () => {
     rankTable = await con.pquery("SELECT chatter_id, sum(chat_count) as sm FROM twitch__chat_chatters group by chatter_id order by sm desc;");
     rankTable = rankTable.map(x => String(x.chatter_id));
     api.Logger.info(`Loaded ${rankTable.length} chatters for the rank table`);
-}, 5000);
+}, 30000);
 
 module.exports = {
     name: "userinfo",
@@ -37,6 +37,6 @@ module.exports = {
                 mostActive = community;
         });
 
-        global.client.overview.say("twitchmodsquad", `Hello @${chatter.display_name}!! You have sent ${comma(totalChat)} message${totalChat === 1 ? "" : "s"} across ${communities.length} communities.${mostActive ? ` Your most active community is ${mostActive.user.display_name}, with ${mostActive.chatCount} message${mostActive.chatCount === 1 ? "" : "s"}` : ""}!${rankTable ? ` You are the #${comma(rankTable.indexOf(String(chatter.id)) + 1)} highest chatter on TMS!` : ""}`);
+        global.client.overview.say("twitchmodsquad", `Hello @${chatter.display_name}!! You have sent ${comma(totalChat)} message${totalChat === 1 ? "" : "s"} across ${communities.length} communities.${mostActive ? ` Your most active community is ${mostActive.user.display_name}, with ${comma(mostActive.chatCount)} message${mostActive.chatCount === 1 ? "" : "s"}` : ""}!${rankTable ? ` You are the #${comma(rankTable.indexOf(String(chatter.id)) + 1)} highest chatter on TMS!` : ""}`);
     },
 };

@@ -32,7 +32,7 @@ footer {
 article {
     position: fixed;
     width: 100%;
-    top: 3.15em;
+    top: 4em;
     left: 0;
     height: calc(100vh - 4em);
     overflow-y: auto;
@@ -99,4 +99,23 @@ table {
 
 .expand.green {
     background-color: #4cca4c;
+}
+
+.pagination {
+    color: var(--primary-text-color);
+    font-size: 1.3em;
+}
+
+.pagination span {
+    display: inline-block;
+}
+
+button {
+    color: var(--primary-text-color);
+    background-color: var(--primary-tms-color);
+    border: none;
+    padding: .4em .8em;
+    margin: .4em;
+    border-radius: 3px;
+    cursor: pointer;
 }
