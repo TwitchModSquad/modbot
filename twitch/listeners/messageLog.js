@@ -21,6 +21,10 @@ const listener = {
         ], err => {
             if (err) api.Logger.warning(err);
         });
+
+        con.query("insert into twitch__hourlystats (time, messages) values (DATE_FORMAT(NOW(), '%Y-%m-%d %H:00'), 1) on duplicate key update messages = messages + 1;", err => {
+            if (err) api.Logger.warning(err);
+        });
     }
 };
 
