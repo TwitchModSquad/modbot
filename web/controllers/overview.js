@@ -7,7 +7,6 @@ const config = require("../../config.json");
 
 const ACTIVE_USERS_LIMIT = 10;
 const {activeUsers, chatActivity} = require("../../twitch/listeners/overviewActiveUsers");
-const {activeStreams} = require("../../interval/updateLiveChannels");
 
 const startTime = Math.floor(Date.now() / 1000);
 
@@ -28,6 +27,8 @@ let totalTimeoutTime = 0;
 let lastFollowerId = null;
 let recentFollowers = [];
 
+let hostedStreamer = null;
+
 let liveChart = [];
 
 let websockets = [];
@@ -46,7 +47,7 @@ const sendUpdate = async (ws, all = false) => {
         leaderboard: leaderboard,
         uptime: Math.floor((Date.now()/1000) - startTime),
         hourlyActivity: hourlyActivity,
-        activeStreams: activeStreams,
+        activeStreams: global.activeStreams,
         count: count,
     };
 
@@ -60,6 +61,8 @@ const sendUpdate = async (ws, all = false) => {
         data.lastBan = Math.floor((Date.now() - lastBan)/1000);
     if (totalTimeoutTime)
         data.totalTimeoutTime = totalTimeoutTime;
+    if (hostedStreamer)
+        data.hostedStreamer = hostedStreamer;
 
     ws.send(JSON.stringify(data));
 }
@@ -80,6 +83,22 @@ let count = {
     streamers: 0,
     moderators: 0,
 };
+
+const changeHostedStreamer = () => {
+    if (global.activeStreams.length > 0) {
+        let newHosted = global.activeStreams[Math.floor(Math.random()*global.activeStreams.length)].identity.twitchAccounts[0];
+        if (newHosted.id !== hostedStreamer?.id) {
+            hostedStreamer = newHosted;
+            api.Logger.info("New hosted streamer: " + hostedStreamer.display_name)
+        } else changeHostedStreamer();
+    } else {
+        hostedStreamer = null;
+        setTimeout(changeHostedStreamer, 5000);
+    }
+}
+
+setInterval(changeHostedStreamer, 15 * 60 * 60 * 1000); // 15 minutes
+setTimeout(changeHostedStreamer, 17.5 * 1000); // 17.5 seconds
 
 const slowUpdate = async () => {
     leaderboard.topBanned = (await con.pquery("SELECT user_id, count(user_id) as `count` FROM twitch__ban group by user_id order by `count` desc limit 1;"))[0];

@@ -242,6 +242,8 @@ setInterval(() => {
     $("#uptime").text(formatUptime(uptime));
 }, 1000);
 
+
+let hostedStreamer = null;
 function startSocket() {
     const ws = new WebSocket("ws://localhost:8080/overview/ws");
 
@@ -394,9 +396,17 @@ function startSocket() {
             if (msg.hasOwnProperty("activeStreams")) {
                 let parsed = "";
                 msg.activeStreams.forEach(stream => {
-                    parsed += `<tr><td>${stream.identity.twitchAccounts[0].display_name}</td><td>${stream.gameName}</td><td>${stream.viewers}</td></tr>`;
+                    parsed += `<tr><td>${stream.identity.twitchAccounts[0].display_name}</td><td>${stream.game}</td><td>${stream.viewers}</td></tr>`;
                 });
                 $("#active-streams").html(parsed);
+            }
+
+            if (msg.hasOwnProperty("hostedStreamer")) {
+                if (hostedStreamer?.id !== msg.hostedStreamer.id) {
+                    hostedStreamer = msg.hostedStreamer;
+
+                    $("#hosted-stream").attr("src",`https://player.twitch.tv/?channel=${hostedStreamer.login}&parent=tms.to`);
+                }
             }
 
             if (msg.hasOwnProperty("newFollow") && streamOverlay) {
