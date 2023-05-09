@@ -146,6 +146,7 @@ let interval = {
                     }
                 }
                 global.activeStreams = newActiveStreams;
+                global.activeStreams.sort((a, b) => b.viewers - a.viewers);
 
                 activeStreams.forEach(async activeStream => {
                     let identity = await api.getFullIdentity(activeStream.identity_id);
