@@ -443,13 +443,11 @@ $(function() {
     $(".previous").on("click", function() {
         let nextPage = page - 1;
         if (nextPage === 0) nextPage = TOTAL_PAGES;
-        console.log(nextPage)
         turnToPage(nextPage);
     });
     $(".next").on("click", function() {
         let nextPage = page + 1;
         if (nextPage > TOTAL_PAGES) nextPage = 1;
-        console.log(nextPage)
         turnToPage(nextPage);
     });
 });

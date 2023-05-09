@@ -147,7 +147,6 @@ let interval = {
                     }
                 }
                 interval.activeStreams = newActiveStreams;
-                console.log(interval.activeStreams);
 
                 activeStreams.forEach(async activeStream => {
                     let identity = await api.getFullIdentity(activeStream.identity_id);
