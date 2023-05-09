@@ -21,7 +21,7 @@ require("./web/express");
 const updateUsers = require("./interval/updateUsers");
 const updateTwitchUsernames = require("./interval/updateTwitchUsernames");
 const updateDiscordUsernames = require("./interval/updateDiscordUsernames");
-const updateLiveChannels = require("./interval/updateLiveChannels");
+const updateLiveChannels = require("./interval/updateLiveChannels").interval;
 const updateEntryUsernames = require("./interval/updateEntryUsernames");
 
 const SECONDS_TO_MILLISECONDS = 1000;

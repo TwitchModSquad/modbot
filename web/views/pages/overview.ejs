@@ -117,7 +117,31 @@
             </section>
         </article>
         <article id="page-2" style="display: none;">
-            This is page 2!
+            <div class="container container-md">
+                <section class="col-6">
+                    <h2>Hosted Stream</h2>
+                    <iframe id="hosted-stream" src="https://player.twitch.tv/?channel=gghayley&parent=localhost" frameborder="0" width="640" height="360"></iframe>
+                </section>
+                <section class="col-3">
+                    <h2>Live Streamers</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Streamer</th>
+                                <th>Game</th>
+                                <th>Viewers</th>
+                            </tr>
+                        </thead>
+                        <tbody id="active-streams">
+
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+            <section>
+                <h2>Viewer Count</h2>
+                <canvas id="viewer-count" height="50"></canvas>
+            </section>
         </article>
     </main>
 

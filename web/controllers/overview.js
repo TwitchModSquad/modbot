@@ -7,6 +7,7 @@ const config = require("../../config.json");
 
 const ACTIVE_USERS_LIMIT = 10;
 const {activeUsers, chatActivity} = require("../../twitch/listeners/overviewActiveUsers");
+const {activeStreams} = require("../../interval/updateLiveChannels");
 
 const startTime = Math.floor(Date.now() / 1000);
 
@@ -27,12 +28,40 @@ let totalTimeoutTime = 0;
 let lastFollowerId = null;
 let recentFollowers = [];
 
+let liveChart = [];
+
+let websockets = [];
+
 const broadcast = msg => {
     if (typeof(msg) === "object") msg = JSON.stringify(msg);
 
     websockets.forEach(ws => {
         ws.send(msg);
     });
+}
+
+const sendUpdate = async (ws, all = false) => {
+    let data = {
+        activeUsers: activeUsersStripped,
+        leaderboard: leaderboard,
+        uptime: Math.floor((Date.now()/1000) - startTime),
+        hourlyActivity: hourlyActivity,
+        activeStreams: activeStreams,
+        count: count,
+    };
+
+    if (all) {
+        data.chatActivity = chatActivity;
+        data.recentFollowers = recentFollowers;
+        data.liveChart = liveChart;
+    }
+
+    if (lastBan)
+        data.lastBan = Math.floor((Date.now() - lastBan)/1000);
+    if (totalTimeoutTime)
+        data.totalTimeoutTime = totalTimeoutTime;
+
+    ws.send(JSON.stringify(data));
 }
 
 con.query("select timebanned from twitch__ban order by id desc limit 1;", (err, res) => {
@@ -81,9 +110,33 @@ const slowUpdate = async () => {
     totalTimeoutTime = timeoutTime[0].sum;
 
     hourlyActivity = await con.pquery("select unix_timestamp(`time`)*1000 as `date`, bans, timeouts, messages from twitch__hourlystats order by `time` desc limit 48;");
+
+    let newLiveChart = [];
+    const liveActivity = await con.pquery("select u.id as user_id, a.time, a.viewers from live__activity as a join live as l on l.id = a.live_id join identity as i on i.id = l.identity_id join twitch__user as u on u.identity_id = i.id where `time` >= date_sub(now(), interval 1 day);");
+    for (let i = 0; i < liveActivity.length; i++) {
+        try {
+            let chart = newLiveChart.find(x => x.date === new Date(liveActivity[i].time).getTime()/1000);
+            if (!chart) {
+                chart = {date: (new Date(liveActivity[i].time).getTime() / 1000), data: []}
+                newLiveChart.push(chart);
+            }
+
+            chart.data.push({
+                user: await api.Twitch.getUserById(liveActivity[i].user_id), // we do not user identities here because identities are not cached
+                viewers: liveActivity[i].viewers,
+            });
+        } catch (err) {
+            api.Logger.warning(err);
+        }
+    }
+    liveChart = newLiveChart;
+
+    websockets.forEach(ws => {
+        sendUpdate(ws, true);
+    });
 }
 
-setInterval(slowUpdate, 120000);
+setInterval(slowUpdate, 240000);
 setTimeout(slowUpdate, 5000);
 
 const fastUpdate = async () => {
@@ -128,30 +181,6 @@ const fastUpdate = async () => {
 }
 
 setInterval(fastUpdate, 5000);
-
-const sendUpdate = async (ws, all = false) => {
-    let data = {
-        activeUsers: activeUsersStripped,
-        leaderboard: leaderboard,
-        uptime: Math.floor((Date.now()/1000) - startTime),
-        hourlyActivity: hourlyActivity,
-        count: count,
-    };
-
-    if (all) {
-        data.chatActivity = chatActivity;
-        data.recentFollowers = recentFollowers;
-    }
-
-    if (lastBan)
-        data.lastBan = Math.floor((Date.now() - lastBan)/1000);
-    if (totalTimeoutTime)
-        data.totalTimeoutTime = totalTimeoutTime;
-
-    ws.send(JSON.stringify(data));
-}
-
-let websockets = [];
 
 router.ws("/ws", (ws, req) => {
     ws.id = api.stringGenerator(8);
