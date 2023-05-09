@@ -70,18 +70,19 @@ section h3 {
 table {
     width: 100%;
     border-collapse: collapse;
+    overflow-y: auto;
 }
 
-#leaderboard th {
+table th {
     text-align: left;
 }
 
-#leaderboard th,
-#leaderboard td {
+table th,
+table td {
     padding: .25em;
 }
 
-#leaderboard tr:nth-child(even) {
+table tr:nth-child(even) {
     background-color: #252428;
 }
 

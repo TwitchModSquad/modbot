@@ -20,9 +20,8 @@ const getLiveChannel = () => {
 let count = 0;
 
 const ACTIVITY_UPDATE_PER_HOUR = 10;
-
+global.activeStreams = [];
 let interval = {
-    activeStreams: [],
     interval: () => {
         count++;
         con.query("select distinct tu.id from identity__moderator as im join twitch__user as tu on tu.identity_id = im.modfor_id where im.active = true;", async (err, res) => {
@@ -146,8 +145,7 @@ let interval = {
                         }
                     }
                 }
-                interval.activeStreams = newActiveStreams;
-                console.log(interval.activeStreams);
+                global.activeStreams = newActiveStreams;
 
                 activeStreams.forEach(async activeStream => {
                     let identity = await api.getFullIdentity(activeStream.identity_id);
