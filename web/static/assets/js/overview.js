@@ -150,6 +150,32 @@ const hourlyActivityChart = new Chart(hourlyActivity, {
     },
 });
 
+const viewerCount = document.getElementById("viewer-count");
+
+const viewerCountChart = new Chart(viewerCount, {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [],
+    },
+    options: {
+        indexAxis: "x",
+        scales: {
+            x: {
+                type: "time",
+                ticks: {
+                    autoSkip: true,
+                    maxTicksLimit: 15,
+                },
+            },
+            y: {
+                beginAtZero: false,
+                suggestedMax: 3000,
+            }
+        }
+    },
+});
+
 function comma(x) {
     if (!x) return "0";
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -287,6 +313,43 @@ function startSocket() {
                 hourlyActivityChart.update();
             }
 
+            if (msg.hasOwnProperty("liveChart")) {
+                let labels = [];
+                let datasets = [];
+
+                msg.liveChart.forEach(timeSlot => {
+                    labels.push(new Date(timeSlot.date * 1000));
+                    timeSlot.data.forEach(stream => {
+                        if (!datasets.find(x => x.label === stream.user.display_name)) {
+                            datasets.push({
+                                label: stream.user.display_name,
+                                data: [],
+                                fill: true,
+                                tension: 0.1
+                            });
+                        }
+                    });
+                });
+
+                msg.liveChart.forEach(timeSlot => {
+                    datasets.forEach(dataset => {
+                        let stream = timeSlot.data.find(x => x.user.display_name === dataset.label);
+                        if (stream) {
+                            dataset.data.push(stream.viewers);
+                        } else {
+                            dataset.data.push(NaN);
+                        }
+                    });
+                    timeSlot.data.forEach(stream => {
+                        datasets.find(x => x.label === stream.user.display_name).data.push();
+                    });
+                });
+
+                viewerCountChart.data.labels = labels;
+                viewerCountChart.data.datasets = datasets;
+                viewerCountChart.update();
+            }
+
             if (msg.hasOwnProperty("chatActivityUpdate")) {
                 chatActivityChart.data.labels.push(msg.chatActivityUpdate.date);
                 chatActivityChart.data.datasets[0].data.push(msg.chatActivityUpdate.count);
@@ -326,6 +389,14 @@ function startSocket() {
                     parsed += `<div id="follower-${follower.id}"><img class="pfp" src="${follower.profile_image_url}"/> ${follower.display_name}</div>`;
                 });
                 $("#followers").html(parsed);
+            }
+
+            if (msg.hasOwnProperty("activeStreams")) {
+                let parsed = "";
+                msg.activeStreams.forEach(stream => {
+                    parsed += `<tr><td>${stream.identity.twitchAccounts[0].display_name}</td><td>${stream.gameName}</td><td>${stream.viewers}</td></tr>`;
+                });
+                $("#active-streams").html(parsed);
             }
 
             if (msg.hasOwnProperty("newFollow") && streamOverlay) {
