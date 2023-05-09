@@ -87,6 +87,7 @@ table tr:nth-child(even) {
 }
 
 #active-stream-table {
+    display: block;
     max-height: 360px;
 }
 
