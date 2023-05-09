@@ -10,6 +10,7 @@ const group = require("./group/");
 
 const public = require("./public");
 const overview = require("./overview").router;
+const tools = require("./tools/");
 const database = require("./database");
 
 authRouter.use("/signon", signon);
@@ -19,6 +20,7 @@ noAuthRouter.use("/join", join);
 noAuthRouter.use("/g", group);
 noAuthRouter.use("/group", group);
 noAuthRouter.use("/overview", overview);
+noAuthRouter.use("/tools", tools);
 
 authRouter.get("/login", (req, res) => {
     res.redirect("/signon");
