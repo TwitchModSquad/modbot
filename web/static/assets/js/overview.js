@@ -406,6 +406,9 @@ function startSocket() {
                     hostedStreamer = msg.hostedStreamer;
 
                     $("#hosted-stream").attr("src",`https://player.twitch.tv/?channel=${hostedStreamer.login}&parent=tms.to`);
+                    $(".hosted-name").text(hostedStreamer.display_name);
+                    $("span.hosted-login").text(hostedStreamer.login);
+                    $("a.hosted-login").attr("href",hostedStreamer.login);
                 }
             }
 
