@@ -159,6 +159,11 @@ const viewerCountChart = new Chart(viewerCount, {
         datasets: [],
     },
     options: {
+        plugins: {
+            legend: {
+                display: false,
+            },
+        },
         indexAxis: "x",
         scales: {
             x: {
