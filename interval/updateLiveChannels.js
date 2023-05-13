@@ -151,7 +151,7 @@ let interval = {
                 activeStreams.forEach(async activeStream => {
                     let identity = await api.getFullIdentity(activeStream.identity_id);
 
-                    con.query("update live set end_time = now() where identity_id = ?;", [identity.id], err => {
+                    con.query("update live set end_time = now() where identity_id = ? and end_time is null;", [identity.id], err => {
                         if (err) {
                             global.api.Logger.warning(err);
                             return;
