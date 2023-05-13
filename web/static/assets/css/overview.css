@@ -29,7 +29,7 @@ footer {
     color: var(--tertiary-text-color);
 }
 
-article {
+article.page {
     position: fixed;
     width: 100%;
     top: 4em;
@@ -39,12 +39,12 @@ article {
     transition: 200ms;
 }
 
-article.fade-in {
+article.page.fade-in {
     opacity: 0;
     left: 1em;
 }
 
-article.fade-out {
+article.page.fade-out {
     opacity: 0;
     left: -1em;
 }
@@ -58,13 +58,18 @@ section {
     margin: .5em;
 }
 
-section h2,
-section h3 {
+section > h2,
+section > h3 {
     font-size: 1rem;
     font-weight: 600;
     margin: 0 -1em 1em -1em;
     padding: .6em 1em;
     border-bottom: 1px solid #151417;
+}
+
+section > h2 i,
+section > h3 i {
+    margin-right: .5em;
 }
 
 table {

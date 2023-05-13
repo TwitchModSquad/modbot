@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Twitch Mod Squad</title>
+    
+    <%- include("../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/overview.css">
+    <link rel="stylesheet" href="/assets/css/containers.css">
+    <link rel="stylesheet" href="/assets/css/overviewStreamer.css">
+</head>
+<body>
+    <header>
+        <img src="/assets/images/logo.webp" alt="TMS Logo">
+        <h1>TMS Overview - <%= streamer.display_name %></h1>
+    </header>
+
+    <main>
+        <div class="container container-md">
+            <section class="col-5">
+                <h2><i class="fa-brands fa-twitch"></i>Streamer Information</h2>
+                <div class="streamer-information">
+                    <img src="<%= streamer.profile_image_url %>" class="pfp" alt="Profile picture for <%= streamer.display_name %>">
+                    <div class="streamer-stats">
+                        <h3>
+                            <%= streamer.display_name %>
+                            <% if (streamer.affiliation === "partner") { %><img src="/assets/images/badges/twitch/partner.png" alt="partner" title="Twitch Partner" /><% } %>
+                            <% if (streamer.identity?.admin) { %><img src="/assets/images/badges/tms/admin.png" alt="tms administrator" title="TMS Administrator" /><% } %>
+                            <% if (streamer.identity?.mod) { %><img src="/assets/images/badges/tms/mod.png" alt="tms moderator" title="TMS Moderator" /><% } %>
+                            <span class="id"><%= streamer.id %></span>
+                        </h3>
+                        <strong>Follower Count: </strong><%= comma(streamer.follower_count) %><br/>
+                        <strong>View Count: </strong><%= comma(streamer.view_count) %><br/>
+                        <strong>Twitch Account: </strong><a href="https://twitch.tv/<%= streamer.login %>">https://twitch.tv/<%= streamer.login %></a>
+                    </div>
+                </div>
+            </section>
+            <section class="col-7">
+                <h2><i class="fa-sharp fa-solid fa-camera-movie"></i>Live History</h2>
+                <canvas id="live-history" height="50"></canvas>
+            </section>
+        </div>
+        <div class="container container-md">
+            <section class="col-3">
+                <h2><i class="fa-solid fa-ranking-star"></i>Top Chatters</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>
+                                Username
+                            </th>
+                            <th>
+                                Chat Count
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% highestChatters.forEach(chatter => { %>
+                        <tr>
+                            <td>
+                                <%= chatter.chatter.display_name %>
+                            </td>
+                            <td>
+                                <%- comma(chatter.chat_count) %>
+                            </td>
+                        </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </section>
+            <div class="col-4">
+                <section>
+                    <h2><i class="fa-solid fa-clapperboard"></i>Streamer Leaderboard</h2>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <th>Highest Chatter</th>
+                                <td><%= highestChatters[0].chatter.display_name %> (<%- formatNumber(highestChatters[0].chat_count) %> messages)</td>
+                            </tr>
+                            <tr>
+                                <th>Most Timed Out</th>
+                                <td><%= leaderboard.mostTimedOut.user.display_name %> (<%- formatNumber(leaderboard.mostTimedOut.count) %> timeouts)</td>
+                            </tr>
+                            <tr>
+                                <th>Total Rec. Streams</th>
+                                <td><%= leaderboard.totalStreams %></td>
+                            </tr>
+                            <% if (leaderboard.longestStream) { %>
+                            <tr>
+                                <th>Longest Stream</th>
+                                <td><%= leaderboard.longestStream %></td>
+                            </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const streamerDisplayName = "<%= streamer.display_name %>";
+        const liveHistoryLabels = [<% liveActivity.forEach((history, i) => { %><% if (i > 0 && new Date(history.time) - new Date(liveActivity[i-1].time) >= 10 * 60 * 60 * 1000) { %>new Date("<%= history.time %>")-10000,<% } %>new Date("<%= history.time %>"),<% }) %>];
+        const liveHistoryData = [<% liveActivity.forEach((history, i) => { %><% if (i > 0 && new Date(history.time) - new Date(liveActivity[i-1].time) >= 10 * 60 * 60 * 1000) { %>NaN,<% } %><%= history.viewers %>,<% }) %>];
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="/assets/js/jquery.js"></script>
+    <script src="/assets/js/master.js"></script>
+    <script src="/assets/js/overviewStreamer.js"></script>
+    <script src="https://kit.fontawesome.com/626a818b87.js" crossorigin="anonymous"> </script>
+</body>
+</html>

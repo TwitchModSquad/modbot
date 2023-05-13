@@ -10,12 +10,89 @@ const {activeUsers, chatActivity} = require("../../twitch/listeners/overviewActi
 
 const startTime = Math.floor(Date.now() / 1000);
 
+function comma(x) {
+    if (!x) return "0";
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+function formatNumber(num) {
+    if (num >= 1000000) {
+        return "<span title=\"" + comma(num) + "\">" + Math.floor(num/1000000) + "M</span>";
+    } else if (num >= 1000) {
+        return "<span title=\"" + comma(num) + "\">" + Math.floor(num/1000) + "K</span>";
+    } else {
+        return comma(num);
+    }
+}
+
+function formatTime(num) {
+    let hours = 0;
+    let minutes = 0;
+
+    if (num >= 3600) {
+        hours = Math.floor(num / 3600);
+        num -= hours * 3600;
+    }
+    if (num >= 60) {
+        minutes = Math.floor(num / 60);
+        num -= minutes * 60;
+    }
+    
+    if (hours < 10)
+        hours = "0" + hours;
+    if (minutes < 10)
+        minutes = "0" + minutes;
+    if (num < 10)
+        num = "0" + num;
+
+    return hours + ":" + minutes + ":" + num;
+}
+
 router.get("/", (req, res) => {
     res.render("pages/overview", {streamOverlay: false});
 });
 
 router.get("/stream", (req, res) => {
     res.render("pages/overview", {streamOverlay: true});
+});
+
+const streamerCache = {};
+router.get("/:streamer", (req, res) => {
+    api.Twitch.getUserByName(req.params.streamer).then(async streamers => {
+        const streamer = streamers[0];
+        if (streamer.identity?.id && (streamer.follower_count >= 5000 || streamer.affiliation === "partner")) {
+            if (!streamerCache.hasOwnProperty(streamer.id) || Date.now() - streamerCache[streamer.id].time >= 10 * 60 * 60 * 1000) {
+                const streams = await con.pquery("select round((end_time - start_time)/1000) as streamlength from live where identity_id = ? order by streamlength desc;", [
+                    streamer.identity.id
+                ]);
+                streamerCache[streamer.id] = {
+                    time: Date.now(),
+                    liveActivity: await con.pquery("SELECT live__activity.time, live__activity.viewers, live__activity.game_name FROM tms.live__activity join live on live_id = live.id where live.identity_id = ? and `time` > date_sub(now(), interval 7 day) order by `time` asc;", [
+                        streamer.identity.id,
+                    ]),
+                    highestChatters: await con.pquery("select chatter_id, chat_count from twitch__chat_chatters where streamer_id = ? order by chat_count desc limit 10;", [
+                        streamer.id,
+                    ]),
+                    leaderboard: {
+                        mostTimedOut: (await con.pquery("select user_id, count(user_id) as `count` from twitch__timeout where streamer_id = ? group by user_id order by `count` desc limit 1;", [
+                            streamer.id
+                        ]))[0],
+                        totalStreams: streams.length,
+                        longestStream: streams.length > 0 ? formatTime(streams[0].streamlength) : null,
+                    }
+                }
+                for (let i = 0; i < streamerCache[streamer.id].highestChatters.length; i++) {
+                    streamerCache[streamer.id].highestChatters[i].chatter = await api.Twitch.getUserById(streamerCache[streamer.id].highestChatters[i].chatter_id);
+                }
+                if (streamerCache[streamer.id].leaderboard.mostTimedOut) streamerCache[streamer.id].leaderboard.mostTimedOut.user = await api.Twitch.getUserById(streamerCache[streamer.id].leaderboard.mostTimedOut.user_id);
+            }
+            res.render("pages/overviewStreamer", {streamer: streamer, comma: comma, formatNumber: formatNumber, liveActivity: streamerCache[streamer.id].liveActivity, highestChatters: streamerCache[streamer.id].highestChatters, leaderboard: streamerCache[streamer.id].leaderboard});
+        } else {
+            res.send("This stream is currently not being monitored by TMS!");
+        }
+    }, err => {
+        res.send("Unknown user");
+    })
 });
 
 const leaderboard = {};
