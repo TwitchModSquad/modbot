@@ -1,8 +1,8 @@
 const API_URI = "https://tms.to/api/";
-const DB_URI = "http://localhost:8080/db/";
+const DB_URI = "https://db.tms.to/";
 const DB_API_URI = DB_URI + "api/";
 
-const COOKIE_DOMAIN = "localhost";
+const COOKIE_DOMAIN = "tms.to";
 
 function createCookie(name, value, days) {
     if (days) {
