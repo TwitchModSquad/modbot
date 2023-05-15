@@ -27,6 +27,7 @@
     "tmi.js": "^1.8.5",
     "twitch": "^4.6.7",
     "twitch-auth": "^4.6.7",
+    "twitter-api-v2": "^1.14.2",
     "uuid": "^8.3.2"
   },
   "devDependencies": {

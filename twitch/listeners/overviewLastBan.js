@@ -5,7 +5,6 @@ const listener = {
     eventName: "ban",
     listener: async (streamer, chatter, timebanned, userstate, bpm) => {
         lastBan = timebanned;
-        console.log(lastBan);
     }
 };
 

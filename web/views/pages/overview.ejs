@@ -18,7 +18,7 @@
     </header>
 
     <main>
-        <article id="page-1">
+        <article id="page-1" class="page">
             <div class="container container-sm">
                 <section class="col-8">
                     <h2>Most Active Users <small>(last minute)</small></h2>
@@ -116,8 +116,32 @@
                 <div id="followers"></div>
             </section>
         </article>
-        <article id="page-2" style="display: none;">
-            This is page 2!
+        <article id="page-2" class="page" style="display: none;">
+            <div class="container container-md">
+                <section class="col-6">
+                    <h2>Hosted Stream - Streamer: <span class="hosted-name">IVIronEnochXII</span> - View Stream: <a href="https://twitch.tv/ivironenochxii" class="hosted-login">https://twitch.tv/<span class="hosted-login">ivironenochxii</span></span></a></h2>
+                    <iframe id="hosted-stream" src="https://player.twitch.tv/?channel=ivironenochxii&parent=tms.to" frameborder="0" width="640" height="360"></iframe>
+                </section>
+                <section class="col-3">
+                    <h2>Live Streamers</h2>
+                    <table id="active-stream-table">
+                        <thead>
+                            <tr>
+                                <th>Streamer</th>
+                                <th>Game</th>
+                                <th>Viewers</th>
+                            </tr>
+                        </thead>
+                        <tbody id="active-streams">
+                            
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+            <section>
+                <h2>Viewer Count</h2>
+                <canvas id="viewer-count" height="50"></canvas>
+            </section>
         </article>
     </main>
 

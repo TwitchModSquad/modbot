@@ -1,0 +1,30 @@
+.streamer-information {
+    display: flex;
+}
+
+.streamer-information > img {
+    width: 128px;
+    height: 128px;
+    border-radius: 64px;
+    margin-right: 1em;
+}
+
+.streamer-stats h3 {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.streamer-stats h3 .id {
+    display: inline-block;
+    font-weight: 300;
+    font-size: .8rem;
+    opacity: .7;
+    margin-left: .2em;
+    margin-bottom: .8em;
+}
+
+.streamer-stats h3 img {
+    width: 1.2rem;
+    height: 1.2rem;
+    margin-left: .2em;
+}

@@ -1,3 +1,5 @@
+const con = require("../../database");
+
 const EXPIRE_CHAT = 60000;
 const CHAT_ACTIVITY_MAXIMUM = 500;
 
@@ -27,6 +29,13 @@ setInterval(() => {
             delete listener.activeUsers[id];
         }
     }
+
+    con.query("insert into twitch__hourlystats (time, messages) values (DATE_FORMAT(NOW(), '%Y-%m-%d %H:00'), ?) on duplicate key update messages = messages + ?;", [
+        chatCache,
+        chatCache,
+    ], err => {
+        if (err) api.Logger.warning(err);
+    });
 
     const activity = {
         date: now,
