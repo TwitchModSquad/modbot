@@ -226,7 +226,6 @@ class Discord {
     getGuild(id, overrideCache) {
         return this.guildCache.get(id, async (resolve, reject) => {
             while (!this.listenersInitialized) {
-                global.api.Logger.warning("Guild requested without listeners intialized");
                 await sleep(250);
             }
 
