@@ -5,13 +5,29 @@ const SCOPES = "guilds.join identify";
 
 class DiscordAuthentication {
 
-    DISCORD_URL = `https://discord.com/api/oauth2/authorize?client_id=${config.discord_auth.client_id}&redirect_uri=${encodeURIComponent(config.api_domain + "auth/discord")}&response_type=code&scope=${encodeURIComponent(SCOPES)}`;
+    DISCORD_URL = `https://discord.com/api/oauth2/authorize?client_id=${config.discord_auth.client_id}&redirect_uri={redirectURI}&response_type=code&scope={scope}`;
     DISCORD_REDIRECT = config.api_domain + "auth/discord";
-    
-    CONNECT_DISCORD_URL = `https://discord.com/api/oauth2/authorize?client_id=${config.discord_auth.client_id}&redirect_uri=${encodeURIComponent(config.api_domain + "connect/discord")}&response_type=code&scope=${encodeURIComponent(SCOPES)}`;
     CONNECT_REDIRECT = config.api_domain + "connect/discord";
 
-    async getToken(code, connect = false) {
+    /**
+     * Returns the OAuth2 URI given the scopes & redirect URI
+     * @param {string} scope 
+     * @param {string} redirectURI 
+     * @returns {string}
+     */
+    getURL(scope = "guilds.join identify", redirectURI = this.DISCORD_REDIRECT) {
+        return this.DISCORD_URL
+            .replace("{scope}", encodeURIComponent(scope))
+            .replace("{redirectURI}", encodeURIComponent(redirectURI));
+    }
+
+    /**
+     * Returns an access token from an OAuth code
+     * @param {string} code 
+     * @param {string} redirectURI 
+     * @returns {any}
+     */
+    async getToken(code, redirectURI = this.DISCORD_REDIRECT) {
         const oauthResult = await fetch('https://discord.com/api/oauth2/token', {
             method: 'POST',
             body: new URLSearchParams({
@@ -19,7 +35,7 @@ class DiscordAuthentication {
                 client_secret: config.discord_auth.secret_id,
                 code,
                 grant_type: 'authorization_code',
-                redirect_uri: connect ? this.CONNECT_REDIRECT : this.DISCORD_REDIRECT,
+                redirect_uri: redirectURI,
                 scope: 'identify',
             }),
             headers: {

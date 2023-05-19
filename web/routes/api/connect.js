@@ -8,14 +8,12 @@ const router = Router();
 
 const SIGNON_URI = config.pub_domain + "signon/";
 
-
-
 router.get("/", async (req, res) => {
     const { query } = req;
     const { code } = query;
 
     if (code) {
-        const oauthData = await api.Authentication.Twitch.getToken(code, true);
+        const oauthData = await api.Authentication.Twitch.getToken(code, api.Authentication.Twitch.CONNECT_REDIRECT);
 
         if (oauthData.hasOwnProperty("status") && oauthData.status === 400) {
             res.redirect(api.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users", api.Authentication.Twitch.CONNECT_REDIRECT));
@@ -39,7 +37,7 @@ router.get("/", async (req, res) => {
             const user = connectingUsers.find(x => x.identity.id === twitchUser.identity?.id);
             if (user) {
                 user.twitchAuth = true;
-                res.redirect(api.Authentication.Discord.CONNECT_DISCORD_URL);
+                res.redirect(api.Authentication.Discord.getURL("guilds.join identify", api.Authentication.Discord.CONNECT_REDIRECT));
             } else {
                 res.send("Unable to find a connection process with your account: " + twitchUser.display_name);
             }
@@ -57,11 +55,11 @@ router.get("/discord", async (req, res) => {
 
 	if (code) {
 		try {
-			const oauthData = await api.Authentication.Discord.getToken(code, true);
+			const oauthData = await api.Authentication.Discord.getToken(code, api.Authentication.Discord.CONNECT_REDIRECT);
             const user = await api.Authentication.Discord.getUser(oauthData.access_token, oauthData.token_type);
 
             if (user.hasOwnProperty("message") && user.message === "401: Unauthorized")  {
-                res.redirect(api.Authentication.Discord.CONNECT_DISCORD_URL);
+                res.redirect(api.Authentication.Discord.getURL("guilds.join identify", api.Authentication.Discord.CONNECT_REDIRECT));
                 return;
             }
             
@@ -81,7 +79,7 @@ router.get("/discord", async (req, res) => {
             res.json({success: false, error: "An error occurred"});
 		}
 	} else {
-        res.redirect(api.Authentication.Discord.CONNECT_DISCORD_URL);
+        res.redirect(api.Authentication.Discord.getURL("guilds.join identify", api.Authentication.Discord.CONNECT_REDIRECT));
     }
 });
  

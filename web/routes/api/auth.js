@@ -58,7 +58,7 @@ router.get("/invite/:invite", (req, res) => {
 });
 
 router.get("/redirect/discord", (req, res) => {
-    res.redirect(api.Authentication.Discord.DISCORD_URL);
+    res.redirect(api.Authentication.Discord.getURL());
 });
 
 router.get("/redirect/twitch", (req, res) => {
@@ -217,7 +217,7 @@ router.get("/discord", async (req, res) => {
             const user = await api.Authentication.Discord.getUser(oauthData.access_token, oauthData.token_type);
 
             if (user.hasOwnProperty("message") && user.message === "401: Unauthorized")  {
-                res.redirect(api.Authentication.Discord.DISCORD_URL);
+                res.redirect(api.Authentication.Discord.getURL());
                 return;
             }
             
@@ -328,7 +328,7 @@ router.get("/discord", async (req, res) => {
             res.json({success: false, error: "An error occurred"});
 		}
 	} else {
-        res.redirect(api.Authentication.Discord.DISCORD_URL);
+        res.redirect(api.Authentication.Discord.getURL());
     }
 });
  
