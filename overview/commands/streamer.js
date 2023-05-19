@@ -8,7 +8,7 @@ module.exports = {
             try {
                 const stream = (await api.Twitch.getUserByName(args[0]))[0];
                 if (stream.identity?.id && (stream.affiliation === "partner" || stream.follower_count >= 5000)) {
-                    global.client.overview.say("twitchmodsquad", `View the streamer overview for ${stream.display_name} at https://twitch.tv/${stream.login}`);
+                    global.client.overview.say("twitchmodsquad", `View the streamer overview for ${stream.display_name} at https://tms.to/overview/${stream.login}`);
                 } else {
                     global.client.overview.say("twitchmodsquad", `User ${stream.display_name} is not a recognized TMS streamer!`);
                 }
