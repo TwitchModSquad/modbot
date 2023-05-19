@@ -51,7 +51,7 @@ router.get("/invite/:invite", (req, res) => {
             path: '/',
         });
 
-        res.redirect(api.Authentication.Twitch.TWITCH_URL);
+        res.redirect(api.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users"));
     } else {
         res.json({success: false, error: "Invite parameter not provided"});
     }
@@ -62,15 +62,15 @@ router.get("/redirect/discord", (req, res) => {
 });
 
 router.get("/redirect/twitch", (req, res) => {
-    res.redirect(api.Authentication.Twitch.TWITCH_URL);
+    res.redirect(api.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users"));
 });
 
 router.get("/redirect/twitch-streamer", (req, res) => {
-    res.redirect(api.Authentication.Twitch.TWITCH_STREAMER_URL);
+    res.redirect(api.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users moderation:read"));
 });
 
 router.get("/redirect/add-tms-mod", (req, res) => {
-    res.redirect(api.Authentication.Twitch.TWITCH_ADDMOD_URL);
+    res.redirect(api.Authentication.Twitch.getURL("user:read:email channel:manage:moderators"));
 });
 
 router.get("/twitch", async (req, res) => {
@@ -81,7 +81,7 @@ router.get("/twitch", async (req, res) => {
         const oauthData = await api.Authentication.Twitch.getToken(code);
 
         if (oauthData.hasOwnProperty("status") && oauthData.status === 400) {
-            res.redirect(api.Authentication.Twitch.TWITCH_URL);
+            res.redirect(api.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users"));
             return;
         }
 
@@ -172,7 +172,7 @@ router.get("/twitch", async (req, res) => {
             global.api.Logger.warning(err);
         });
     } else {
-        res.redirect(api.Authentication.Twitch.TWITCH_URL);
+        res.redirect(api.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users"));
     }
 });
 
@@ -189,7 +189,7 @@ router.get("/discord", async (req, res) => {
     }
     
     if (session === undefined) {
-        res.redirect(api.Authentication.Twitch.TWITCH_URL);
+        res.redirect(api.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users"));
         return;
     }
 

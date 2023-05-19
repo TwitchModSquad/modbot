@@ -24,7 +24,7 @@ router.get("/:id", (req, res) => {
         });
         
         res.render("pages/database/user/view", {
-            twitch_uri: api.Authentication.Twitch.DATABASE_TWITCH_URL,
+            twitch_uri: api.Authentication.Twitch.getURL("channel:read:editors channel:read:vips moderation:read", api.Authentication.Twitch.DATABASE_REDIRECT),
             domain: config.db_domain,
             user: req.user,
             view: user,

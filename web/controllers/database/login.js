@@ -22,10 +22,10 @@ router.get("/twitch", async (req, res) => {
     const { code } = query;
 
     if (code) {
-        const oauthData = await api.Authentication.Twitch.getToken(code);
+        const oauthData = await api.Authentication.Twitch.getToken(code, api.Authentication.Twitch.DATABASE_REDIRECT);
 
         if (oauthData.hasOwnProperty("status") && oauthData.status === 400) {
-            res.redirect(api.Authentication.Twitch.DATABASE_TWITCH_URL);
+            res.redirect(api.Authentication.Twitch.getURL("channel:read:editors channel:read:vips moderation:read", api.Authentication.Twitch.DATABASE_REDIRECT));
             return;
         }
 
@@ -85,7 +85,7 @@ router.get("/twitch", async (req, res) => {
             api.Logger.warning(err);
         });
     } else {
-        res.redirect(api.Authentication.Twitch.DATABASE_TWITCH_URL);
+        res.redirect(api.Authentication.Twitch.getURL("channel:read:editors channel:read:vips moderation:read", api.Authentication.Twitch.DATABASE_REDIRECT));
     }
 });
 

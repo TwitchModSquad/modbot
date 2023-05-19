@@ -7,11 +7,11 @@ const con = require("../../../../database");
 const config = require("../../../../config.json");
 
 router.get("/", (req, res) => {
-    res.render("pages/database/user/lookup", {twitch_uri: api.Authentication.Twitch.DATABASE_TWITCH_URL, domain: config.db_domain, user: req.user, error: req.query?.error});
+    res.render("pages/database/user/lookup", {twitch_uri: api.Authentication.Twitch.getURL("channel:read:editors channel:read:vips moderation:read", api.Authentication.Twitch.DATABASE_REDIRECT), domain: config.db_domain, user: req.user, error: req.query?.error});
 });
 
 router.get("/:query", (req, res) => {
-    res.render("pages/database/user/lookup", {twitch_uri: api.Authentication.Twitch.DATABASE_TWITCH_URL, domain: config.db_domain, user: req.user, query: req.params.query, error: req.query?.error});
+    res.render("pages/database/user/lookup", {twitch_uri: api.Authentication.Twitch.getURL("channel:read:editors channel:read:vips moderation:read", api.Authentication.Twitch.DATABASE_REDIRECT), domain: config.db_domain, user: req.user, query: req.params.query, error: req.query?.error});
 });
 
 let forceCooldown = [];

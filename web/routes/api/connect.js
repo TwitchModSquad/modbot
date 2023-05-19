@@ -18,7 +18,7 @@ router.get("/", async (req, res) => {
         const oauthData = await api.Authentication.Twitch.getToken(code, true);
 
         if (oauthData.hasOwnProperty("status") && oauthData.status === 400) {
-            res.redirect(api.Authentication.Twitch.CONNECT_TWITCH_URL);
+            res.redirect(api.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users", api.Authentication.Twitch.CONNECT_REDIRECT));
             return;
         }
 
@@ -47,7 +47,7 @@ router.get("/", async (req, res) => {
             global.api.Logger.warning(err);
         });
     } else {
-        res.redirect(api.Authentication.Twitch.CONNECT_TWITCH_URL);
+        res.redirect(api.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users", api.Authentication.Twitch.CONNECT_REDIRECT));
     }
 });
 

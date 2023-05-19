@@ -39,7 +39,7 @@ router.use("/", (req, _, next) => {
 });
 
 router.get("/", (req, res) => {
-    res.render("pages/database/index", {twitch_uri: api.Authentication.Twitch.DATABASE_TWITCH_URL, domain: config.db_domain, user: req.user});
+    res.render("pages/database/index", {twitch_uri: api.Authentication.Twitch.getURL("channel:read:editors channel:read:vips moderation:read", api.Authentication.Twitch.DATABASE_REDIRECT), domain: config.db_domain, user: req.user});
 });
 
 router.use("/auth", login);

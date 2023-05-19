@@ -20,7 +20,7 @@ router.get("/:invite", (req, res) => {
                     path: "/",
                     secure: true
                 });
-                res.render("pages/join/index", {url: api.Authentication.Twitch.TWITCH_URL, invitedBy: await api.getFullIdentity(result[0].initiated_by)});
+                res.render("pages/join/index", {url: api.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users"), invitedBy: await api.getFullIdentity(result[0].initiated_by)});
             } else {
                 res.render("pages/join/expired");
             }
