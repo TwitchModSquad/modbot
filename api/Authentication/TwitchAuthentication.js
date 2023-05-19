@@ -14,6 +14,7 @@ class TwitchAuthentication {
      * Returns the OAuth2 URI given the scopes & redirect URI
      * @param {string} scope 
      * @param {string} redirectURI 
+     * @returns {string}
      */
     getURL(scope, redirectURI = this.TWITCH_REDIRECT) {
         return this.TWITCH_URL
