@@ -2,6 +2,7 @@ const {Router} = require("express");
 const api = require("../../../api/index");
 
 const requireAuthenticated = require("./requireAuthenticated");
+const chat = require("./chat");
 
 const router = Router();
 
@@ -49,5 +50,7 @@ router.get('/:twitchId/punishments', (req, res) => {
         }, sendError);
     }, sendError);
 });
+
+router.use("/chat", chat);
  
 module.exports = router;
