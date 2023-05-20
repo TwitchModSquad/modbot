@@ -2,6 +2,7 @@ const {Router} = require("express");
 const api = require("../../../api/index");
 
 const requireAuthenticated = require("./requireAuthenticated");
+const chat = require("./chat");
 
 const router = Router();
 
@@ -13,6 +14,7 @@ router.get("/", (req, res) => {
  
 router.get('/:twitchId', (req, res) => {
     api.Twitch.getUserById(req.params.twitchId).then(twitchUser => {
+        delete twitchUser.email;
         res.json({success: true, data: twitchUser});
     }).catch(err => {
         if (err === "User not found!") {
@@ -29,6 +31,14 @@ router.get('/:twitchId/punishments', (req, res) => {
     api.Twitch.getUserById(req.params.twitchId).then(twitchUser => {
         twitchUser.getBans().then(bans => {
             twitchUser.getTimeouts().then(timeouts => {
+                bans.forEach(ban => {
+                    delete ban.channel.email;
+                    delete ban.user.email;
+                });
+                timeouts.forEach(timeout => {
+                    delete timeout.channel.email;
+                    delete timeout.user.email;
+                });
                 res.json({
                     success: true,
                     data: {
@@ -40,5 +50,7 @@ router.get('/:twitchId/punishments', (req, res) => {
         }, sendError);
     }, sendError);
 });
+
+router.use("/chat", chat);
  
 module.exports = router;

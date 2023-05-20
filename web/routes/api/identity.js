@@ -13,6 +13,9 @@ router.get("/", (req, res) => {
  
 router.get('/:identityId', (req, res) => {
     api.getFullIdentity(req.params.identityId).then(identity => {
+        identity.twitchAccounts.forEach(user => {
+            delete user.email;
+        });
         res.json({success: true, data: identity});
     }).catch(err => {
         if (err === "Identity was not found!") {

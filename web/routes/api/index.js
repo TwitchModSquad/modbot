@@ -2,7 +2,6 @@ const {Router} = require("express");
 
 const archive = require("./archive");
 const auth = require("./auth");
-const chat = require("./chat");
 const connect = require("./connect");
 const contactUs = require("./contact-us");
 const discord = require("./discord");
@@ -22,7 +21,6 @@ noAuthRouter.use("/auth", auth);
 noAuthRouter.use("/connect", connect);
 
 authRouter.use("/archive", archive);
-authRouter.use("/chat", chat);
 authRouter.use("/discord", discord);
 authRouter.use("/file", file);
 authRouter.use("/identity", identity);
