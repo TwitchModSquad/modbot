@@ -81,6 +81,15 @@ a {
     color: var(--secondary-text-color);
 }
 
+a[target=__blank]::after {
+    display: inline-block;
+    content: '\f08e';
+    font-size: .8em;
+    font-family: "Font Awesome 6 Pro";
+    font-weight: 400;
+    margin-left: .25em;
+}
+
 .small-profile-picture {
     display: inline-block;
     width: 18px;

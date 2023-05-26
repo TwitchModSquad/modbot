@@ -114,3 +114,11 @@ main p {
 .login > a.complete:hover {
     background-color: var(--secondary-tms-color);
 }
+
+.select-streamer {
+    display: flex;
+}
+
+.select-streamer > div {
+    flex-grow: 1;
+}
