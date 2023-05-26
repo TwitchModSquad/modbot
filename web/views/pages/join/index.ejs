@@ -7,25 +7,24 @@
 
     <link rel="stylesheet" href="/assets/css/signon.css">
     <link rel="stylesheet" href="/assets/css/join.css">
+    <link rel="stylesheet" href="/assets/css/signon.css">
 
     <meta content="Twitch Mod Squad : Discord Invite" property="og:title" />
-    <meta content="Here's your invite to Twitch Mod Squad, courtesy of <%= invitedBy.name %>. We're glad to have you! This link will redirect you through authorization methods to Twitch and Discord. This information is used to verify your identity. We don't ever get hands on your password, and these permissions may be revoked at any time in the respective platform's settings." property="og:description" />
+    <meta content="Here's your invite to Twitch Mod Squad! We're glad to have you! This link will redirect you through authorization methods to Twitch and Discord. This information is used to verify your identity. We don't ever get hands on your password, and these permissions may be revoked at any time in the respective platform's settings." property="og:description" />
     <meta content="/assets/images/logos/logo.webp" property="og:image" />
     <meta content="#A970FF" data-react-helmet="true" name="theme-color" />
 </head>
 <body>
-    <main>
+    <main class="login">
         <h1><img class="logo" src="/assets/images/logos/logo.webp" alt="Twitch Mod Squad Logo"> Twitch Mod Squad <span>invite</span></h1>
-        <p>We're glad you're here! We'll redirect you shortly.</p>
-        <h2 class="center">Invited By</h2>
-        <%- include("../../partials/panel/user/identity", {account: invitedBy}) %>
-        <p class="small">You will be prompted to authenticate with both Twitch and Discord services respectively. This is utilized to authenticate your user, automatically add you to the Twitch Mod Squad discord, as well as verify the channels that you mod for.</p>
-        <a href="<%= url %>" class="small center">Not redirecting? Click here.</a>
+        <p><strong>Welcome to Twitch Mod Squad!</strong></p>
+        <p>Click below to authorize your Twitch and Discord account on the respective platforms.</p>
+        <a class="twitch api-endpoint" href="/api/auth/redirect/twitch" data-endpoint-uri="api/auth/redirect/twitch"><i class="fa-brands fa-twitch"></i> Log in via Twitch</a>
+        <p><small>Login is completed officially from Twitch and Discord. TMS never receives your login details. Permissions granted in this process may be revoked at any time in the <a href="https://www.twitch.tv/settings/connections" target="__blank">Connections</a> and Authorized Apps tab.</small></p>
     </main>
 
     <%- include("../../partials/footer") %>
     
     <%- include("../../partials/js") %>
-    <script>setTimeout(function() {window.location = "<%= url %>";}, 3000);</script>
 </body>
 </html>
