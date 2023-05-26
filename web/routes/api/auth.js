@@ -193,24 +193,6 @@ router.get("/discord", async (req, res) => {
         return;
     }
 
-    let invitee = null
-
-    if (cookies?.invite) {
-        try {
-            const invite = await con.pquery("select initiated_by, expiry > now() as active from invite where invite = ?;", [cookies.invite]);
-            if (invite.length > 0) {
-                if (invite[0].active == 1) {
-                    invitee = invite[0].initiated_by;
-                } else {
-                    res.json({success: false, error: "Invite has expired"});
-                    return;
-                }
-            }
-        } catch (err) {
-            global.api.Logger.warning(err);
-        }
-    }
-
 	if (code) {
 		try {
 			const oauthData = await api.Authentication.Discord.getToken(code);
@@ -220,22 +202,29 @@ router.get("/discord", async (req, res) => {
                 res.redirect(api.Authentication.Discord.getURL());
                 return;
             }
-            
-            let dus = new DiscordUser(
-                    user.id,
-                    null,
-                    user.username,
-                    user.discriminator,
-                    user.avatar
-                );
 
-            if (session.identity.discordAccounts.length === 0) {
-                if (invitee === null) {
-                    res.json({success: false, error: "Invalid invite"});
-                    return;
+            con.query("insert into discord__token (user_id, token, scope) values (?, ?, ?);", [
+                user.id,
+                oauthData.refresh_token,
+                oauthData.scope,
+            ], err => {
+                if (err) {
+                    api.Logger.warning(err);
+                } else {
+                    con.query("delete from discord__token where user_id = ? and scope = ? and created < date_sub(now(), interval 10 minute);", [
+                        user.id,
+                        oauthData.scope,
+                    ], err2 => {
+                        if (err2) api.Logger.warning(err2);
+                    });
                 }
+            });
+            
+            let dus = await api.Discord.getUserById(user.id, false, true);
 
-                con.query("insert into invite__uses (invited, invitee) values (?,?) on duplicate key update invitee = ?;", [session.identity.id, invitee, invitee]);
+            if (dus.identity?.id && dus.identity?.id !== session.identity.id) {
+                res.send(`Unable to automatically link account due to identity mismatch. Session identity: ${session.identity.id} Discord identity: ${dus.identity.id}`);
+                return;
             }
 
             if (!session.identity.discordAccounts.find(x => x.id === dus.id)) {
@@ -244,82 +233,10 @@ router.get("/discord", async (req, res) => {
 
             session = await session.post();
 
-            let partnered = false;
-            let affiliate = false;
-            let partneredModerator = false;
-            let affiliateModerator = false;
-
-            for (let ri = 0; ri < session.identity.twitchAccounts.length; ri++) {
-                let twitchAccount = session.identity.twitchAccounts[ri];
-
-                let followers = await twitchAccount.refreshFollowers();
-
-                if (twitchAccount.affiliation === "partner") {
-                    partnered = true;
-                } else if (twitchAccount.affiliation === "affiliate" && followers >= config.follower_requirement) {
-                    affiliate = true;
-                }
-
-                let streamers = await twitchAccount.refreshStreamers();
-
-                for (let si = 0; si < streamers.length; si++) {
-                    let streamer = streamers[si];
-
-                    followers = await streamer.refreshFollowers();
-                    
-                    if (streamer.affiliation === "partner") {
-                        partneredModerator = true;
-                    } else if (streamer.affiliation === "affiliate" && followers >= config.follower_requirement) {
-                        affiliateModerator = true;
-                    }
-                }
-            }
-
-            let resolvedRoles = [];
-
-            if (partnered) {
-                resolvedRoles = [
-                    ...resolvedRoles,
-                    config.partnered.streamer
-                ];
-            }
-            if (affiliate) {
-                resolvedRoles = [
-                    ...resolvedRoles,
-                    config.affiliate.streamer
-                ];
-            }
-            if (partneredModerator) {
-                resolvedRoles = [
-                    ...resolvedRoles,
-                    config.partnered.moderator
-                ];
-            }
-            if (affiliateModerator) {
-                resolvedRoles = [
-                    ...resolvedRoles,
-                    config.affiliate.moderator
-                ];
-            }
-
-            if (resolvedRoles.length > 0) {
-                session.identity.authenticated = true;
-                await session.identity.post();
-
-                global.client.discord.guilds.fetch(config.modsquad_discord).then(guild => {
-                    guild.members.add(dus.id, {accessToken: oauthData.access_token, roles: resolvedRoles}).then(member => {
-                        redirect(req, res);
-                    }).catch((err) => {
-                        global.api.Logger.warning(err);
-                        res.json({success: false, error: "Could not add user to Discord"});
-                    });
-                }).catch((err) => {
-                    global.api.Logger.warning(err);
-                    res.json({success: false, error: "Could not obtain guild"});
-                });
+            if (session.identity.authenticated) {
+                redirect(req, res);
             } else {
-                res.status(401)
-                res.json({success: false, error: "Did not meet join criteria. If you believe this is in error, send this page to @Twijn#8888 on Discord.", session: session});
+                res.redirect("/signon/");
             }
 		} catch (error) {
 			// NOTE: An unauthorized token will not throw an error;
