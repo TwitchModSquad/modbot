@@ -48,16 +48,11 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 footer {
-    color: black;
+    background-color: var(--primary-background-color);
     padding: .7em;
     font-size: .7em;
-    opacity: .6;
     margin-top: auto;
     text-align: center;
-}
-
-footer a {
-    color: black;
 }
 
 code, pre {
