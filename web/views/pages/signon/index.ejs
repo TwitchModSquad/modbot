@@ -27,7 +27,11 @@
                 <a class="discord api-endpoint" href="/api/auth/redirect/discord" data-endpoint-uri="api/auth/redirect/discord"><i class="fa-brands fa-discord"></i> <%= discordAccounts.length === 0 ? "Log in via Discord" : "Add another Discord account" %></a>
             <% } %>
             <% if (twitchAccounts.length > 0 && discordAccounts.length > 0) { %>
+                <% if (identity.authenticated) { %>
                 <a href="/panel/" class="complete"><img src="/assets/images/logos/logo_guy.png" alt="TMS Logo"> Complete Sign On</a>
+                <% } else { %>
+                <a href="/signon/verify" class="complete"><img src="/assets/images/logos/logo_guy.png" alt="TMS Logo"> Continue Verification</a>
+                <% } %>
             <% } %>
         </div>
     </main>
