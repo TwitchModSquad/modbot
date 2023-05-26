@@ -56,7 +56,7 @@ const listener = {
                             global.api.Logger.warning(err);
                         }
 
-                        let streamers = await identity.twitchAccounts[i].getStreamers();
+                        let streamers = (await identity.twitchAccounts[i].getStreamers()).map(x => x.streamer);
                         for (let s = 0; s < streamers.length; s++) {
                             if (refreshToken || crossbanable.indexOf(streamers[s].id) !== -1) {
                                 options = [
