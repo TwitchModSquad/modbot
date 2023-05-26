@@ -248,17 +248,17 @@ class TwitchUser extends User {
 
     /**
      * Returns the streamers of a certain channel.
-     * 
-     * @returns {Promise<TwitchUser[]>}
+     * @param {boolean} includeInactive
+     * @returns {Promise<{streamer: TwitchUser, active: boolean}[]>}
      */
-    getStreamers() {
+    getStreamers(includeInactive = false) {
         return new Promise((resolve, reject) => {
             if (!this.identity?.id) {
                 resolve([]); // not having an identity currently just returns an empty array as it shouldn't particularly be seen as an error
                 return;
             }
 
-            con.query("select tu.id from identity__moderator as im join twitch__user as tu on tu.identity_id = im.modfor_id where im.identity_id = ? and active = true;", [this.identity.id], async (err, res) => {
+            con.query(`select tu.id, im.active from identity__moderator as im join twitch__user as tu on tu.identity_id = im.modfor_id where im.identity_id = ?${includeInactive ? "" : " and active = true"};`, [this.identity.id], async (err, res) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -267,7 +267,10 @@ class TwitchUser extends User {
                     for (let i = 0; i < res.length; i++) {
                         users = [
                             ...users,
-                            await global.api.Twitch.getUserById(res[i].id),
+                            {
+                                streamer: await global.api.Twitch.getUserById(res[i].id),
+                                active: res[i].active,
+                            },
                         ]
                     }
 
@@ -607,7 +610,7 @@ class TwitchUser extends User {
                     inline: false,
                 });
 
-            const streamers = await this.getStreamers();
+            const streamers = (await this.getStreamers()).map(x => x.streamer);
             const mods = await this.getMods();
             const activeCommunities = await this.getActiveCommunities();
             const bans = await this.getBans();
