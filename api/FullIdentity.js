@@ -120,6 +120,40 @@ class FullIdentity extends Identity {
     }
 
     /**
+     * Returns all viable streamers from twitch__role and identity__moderator
+     * @returns {Promise<{streamer: TwitchUser, active: boolean}[]>}
+     */
+    getAllStreamers() {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let streamers = [];
+                for (let i = 0; i < this.twitchAccounts.length; i++) {
+                    const user = this.twitchAccounts[i];
+                    const roles = await user.getRoles();
+                    const identityStreamers = await user.getStreamers(true);
+                    if (!streamers.find(x => x.streamer.id === user.id)) streamers.push({streamer: user, active: false});
+                    identityStreamers.forEach(streamer => {
+                        if (!streamers.find(x => x.streamer.id === streamer.streamer.id)) {
+                            streamers.push(streamer);
+                        }
+                    });
+                    roles.forEach(role => {
+                        if (role.user.id === user.id && role.role === "moderator" && !streamers.find(x => x.streamer.id === role.streamer.id)) {
+                            streamers.push({
+                                streamer: role.streamer,
+                                active: false,
+                            });
+                        }
+                    });
+                }
+                resolve(streamers);
+            } catch(err) {
+                reject(err);
+            }
+        });
+    }
+
+    /**
      * Generated a Discord Embed for the user.
      * 
      * @param {boolean} admin
