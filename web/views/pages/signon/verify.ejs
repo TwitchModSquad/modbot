@@ -11,24 +11,57 @@ function comma(x) {
     <%- include("../../partials/head") %>
 
     <link rel="stylesheet" href="/assets/css/signon.css">
+    <link rel="stylesheet" href="/assets/css/button.css">
+    <link rel="stylesheet" href="/assets/css/panel.css">
 </head>
 <body>
-    <main>
-        <h1><img class="logo" src="/assets/images/logos/logo.webp" alt="Twitch Mod Squad Logo"> Twitch Mod Squad <span>verify</span></h1>
-        <p><strong>Verify your streamers!</strong></p>
-        <p><strong>Note: </strong>All added streamer will be recorded.</p>
-        <form action="POST">
-            <% streamers.forEach(streamer => { let account = streamer.streamer; %>
-                <label class="select-streamer">
-                    <input type="checkbox" name="streamer" id="streamer-<%= streamer.streamer.id %>" <%= streamer.active ? 'checked="checked"' : "" %>/>
-                    <div class="twitch-user"><img src="<%= account.profile_image_url %>" /><div class="user-info"><div class="user-name"><%= account.display_name %></div><div class="user-stats"><%= account.id %> <span class="bullet">&bullet;</span> <%= comma(account.follower_count) %>&nbsp;follower<%= account.follower_count == 1 ? "" : "s"%> <span class="bullet">&bullet;</span> <%= comma(account.view_count) %>&nbsp;view<%= account.view_count == 1 ? "" : "s" %></div></div></div>
-                </label>
-            <% }) %>
-        </form>
-    </main>
+
+    <div class="container container-md">
+        <div class="col-2"></div>
+        
+        <div class="col-4">
+            <section>
+                <h2>Verify Additional Streamers</h2>
+                <p>Add additional streamers below to better represent the communities you mod for.</p>
+                <div class="verify-streamers"></div>
+                <form action="GET" class="verify-streamers">
+                    <input type="text" name="new-streamer" id="new-streamer" placeholder="Twitch Username">
+                    <input type="submit" value="Add Streamer" class="button">
+                </form>
+            </section>
+        </div>
+
+        <div class="col-4">
+            <section>
+                <h2>Verify your Streamers</h2>
+                <p><strong>Note: </strong>All added streamer will be recorded. Selected streamers will be monitored by the TMS bot for bans and timeouts.</p>
+                <form action="POST" class="authorize-streamers">
+                    <h3>Authorized Streamers</h3>
+                    <div class="streamers">
+                    <% streamers.forEach(streamer => { let account = streamer.streamer; %>
+                        <label class="select-streamer">
+                            <input type="checkbox" name="streamer" id="streamer-<%= streamer.streamer.id %>" <%= streamer.active ? 'checked="checked"' : "" %>/>
+                            <div class="twitch-user"><img src="<%= account.profile_image_url %>" /><div class="user-info"><div class="user-name"><%= account.display_name %></div><div class="user-stats"><%= account.id %> <span class="bullet">&bullet;</span> <%= comma(account.follower_count) %>&nbsp;follower<%= account.follower_count == 1 ? "" : "s"%></div></div></div>
+                        </label>
+                    <% }) %>
+                        <% if (streamers.length === 0) { %>
+                            <small>No streamers authorized! Add one below to get started, or press continue if you are not a moderator.</small>
+                        <% } %>
+                    </div>
+                    <div class="login">
+                        <a href="#" class="complete">Continue With Verification</a>
+                        <small>Ensure you have added all streamers prior to continuing!</small>
+                    </div>
+                </form>
+            </section>
+        </div>
+
+        <div class="col-2"></div>
+    </div>
 
     <%- include("../../partials/footer") %>
     
     <%- include("../../partials/js") %>
+    <script src="/assets/js/verify.js"></script>
 </body>
 </html>

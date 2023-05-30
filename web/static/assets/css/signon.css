@@ -32,6 +32,13 @@ h1 span {
     color: var(--secondary-text-color);
 }
 
+h2 {
+    font-weight: 600;
+    font-size: 1.2em;
+    text-align: center;
+    margin: .3em 0;
+}
+
 main {
     background-color: var(--secondary-background-color);
     width: calc(100% - 2.5em);
@@ -43,6 +50,11 @@ main {
 }
 
 main p {
+    text-align: center;
+}
+
+.login small {
+    display: block;
     text-align: center;
 }
 
@@ -121,4 +133,18 @@ main p {
 
 .select-streamer > div {
     flex-grow: 1;
+}
+
+.verify-streamers {
+    display: flex;
+}
+
+.verify-streamers input[type=text] {
+    background-color: var(--primary-text-color);
+    color: var(--primary-background-color);
+    flex-grow: 1;
+    margin-right: 1em;
+    padding: .4em 1em;
+    border-radius: 5px;
+    border: none;
 }
