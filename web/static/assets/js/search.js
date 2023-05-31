@@ -16,7 +16,6 @@ function search(query, data) {
             twitchUserCache[twitchAccount.id] = twitchAccount;
             twitchAccounts += parse.account.twitch(twitchAccount, data.link, data.onclick);
         });
-        console.log(twitchUserCache);
 
         result.discordAccountResults.forEach(discordAccount => {
             discordAccounts += parse.account.discord(discordAccount);
@@ -67,7 +66,6 @@ $(function() {
         if (form.attr("data-onclick")) {
             data.onclick = form.attr("data-onclick");
         }
-        console.log(data);
         return data;
     }
 
