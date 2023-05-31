@@ -21,11 +21,18 @@ function updateCounts() {
 
     $("#small-bomb-header").attr("style", smallBombs > SMALL_BOMB_MAX ? "color: red;" : "color: inherit;");
     $("#big-bomb-header").attr("style", bigBombs > BIG_BOMB_MAX ? "color: red;" : "color: inherit;");
+
+    if (smallBombs === SMALL_BOMB_MAX && bigBombs === BIG_BOMB_MAX) {
+        $("input[type=submit]").attr("disabled", null);
+    } else {
+        $("input[type=submit]").attr("disabled", "disabled");
+    }
 }
 
 function bomb(userObj) {
     let user = twitchUserCache[userObj.attr("data-id")];
     if (user) {
+        if (values.find(x => x.id === user.id)) return;
         let type = "small";
         let max = SMALL_BOMB_MAX;
         values = values.filter(x => x.id !== user.id);
@@ -49,15 +56,17 @@ function bomb(userObj) {
                 updateCounts();
 
                 if (Number(input.val()) === 0) {
-                    div.attr("style", "opacity: .8;");
+                    div.attr("style", "opacity: .6;");
+                    div.attr("title", "Streamer will be removed in 5 seconds unless the vote count is upped.");
                     setTimeout(function() {
-                        if (input.val() === 0) {
+                        if (Number(input.val()) === 0) {
                             values = values.filter(x => x.id !== user.id);
                             updateCounts();
                             div.attr("style", "opacity: 0;");
                             div.slideUp(200);
                         } else {
                             div.attr("style", "opacity: 1;");
+                            div.attr("title", null);
                         }
                     }, 5000);
                 }
@@ -68,6 +77,7 @@ function bomb(userObj) {
             if (input.val() < max) {
                 input.val(Number(input.val()) + 1);
                 values.find(x => x.id === user.id).count = Number(input.val());
+                div.attr("style", "opacity: 1;");
                 updateCounts();
             }
         });

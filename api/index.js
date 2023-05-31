@@ -6,6 +6,7 @@ const SessionService = require("./Session/");
 const GroupService = require("./Group/");
 const Archive = require("./Archive/");
 const Authentication = require("./Authentication/");
+const ModBomb = require("./ModBomb/");
 
 const Logger = require("./Logger");
 const FullIdentity = require("./FullIdentity");
@@ -48,6 +49,12 @@ class API {
      * @type {Authentication}
      */
     Authentication = new Authentication();
+
+    /**
+     * ModBomb API
+     * @type {ModBomb}
+     */
+    ModBomb = new ModBomb();
 
     /**
      * Logger API
@@ -165,6 +172,14 @@ class API {
         });
 
         return result;
+    }
+
+    /**
+     * Initializes all Discord-related functions
+     */
+    initDiscord() {
+        this.Discord.init();
+        this.ModBomb.init();
     }
 }
 

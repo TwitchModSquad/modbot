@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>TMS Panel - Mod Bomb</title>
+
+    <%- include("../../../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/panel.css">
+    <link rel="stylesheet" href="/assets/css/sidebar.css">
+</head>
+<body>
+    <%- include("../../../partials/panel/header") %>
+
+    <div class="sidebar-container">
+        <%- include("../../../partials/panel/sidebar", {page: "mod-bomb", session: session}) %>
+        <main>
+            <section>
+                <h2>An error occurred!</h2>
+                <%= error %>
+            </section>
+
+            <%- include("../../../partials/footer") %>
+        </main>
+    </div>
+    
+    <%- include("../../../partials/js") %>
+
+    <script>
+        const SMALL_BOMB_MAX = 3;
+        const BIG_BOMB_MAX = 3;
+    </script>
+
+    <script src="/assets/js/panel.js"> </script>
+</body>
+</html>

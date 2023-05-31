@@ -3,7 +3,7 @@
 <head>
     <title>TMS Panel - Mod Bomb</title>
 
-    <%- include("../../partials/head") %>
+    <%- include("../../../partials/head") %>
 
     <link rel="stylesheet" href="/assets/css/panel.css">
     <link rel="stylesheet" href="/assets/css/sidebar.css">
@@ -12,10 +12,10 @@
     <link rel="stylesheet" href="/assets/css/modbomb.css">
 </head>
 <body>
-    <%- include("../../partials/panel/header") %>
+    <%- include("../../../partials/panel/header") %>
 
     <div class="sidebar-container">
-        <%- include("../../partials/panel/sidebar", {page: "mod-bomb", session: session}) %>
+        <%- include("../../../partials/panel/sidebar", {page: "mod-bomb", session: session}) %>
         <main>
             <form id="search-form" method="GET" data-discord="false" data-link="#" data-onclick="bomb($(this));return false;">
                 <div class="search-box">
@@ -24,15 +24,15 @@
                 </div>
             </form>
             <section>
-                <h2><i class="fa-solid fa-bomb"></i> Mod Bomb</h2>
+                <h2><i class="fa-solid fa-bomb"></i> <%= month %> Mod Bomb</h2>
                 <form class="container container-md" method="post">
                     <div class="col-6">
-                        <h3 id="small-bomb-header">Small Bomb (<span id="small-bomb-count">0</span>/3)</h3>
+                        <h3 id="small-bomb-header">Small Bomb (<span id="small-bomb-count">0</span>/<%= event.smallBombs %>)</h3>
                         <div id="small-bomb" class="bomb">
                         </div>
                     </div>
                     <div class="col-6">
-                        <h3 id="big-bomb-header">Big Bomb (<span id="big-bomb-count">0</span>/3)</h3>
+                        <h3 id="big-bomb-header">Big Bomb (<span id="big-bomb-count">0</span>/<%= event.bigBombs %>)</h3>
                         <div id="big-bomb" class="bomb">
                         </div>
                     </div>
@@ -43,15 +43,15 @@
                 </form>
             </section>
 
-            <%- include("../../partials/footer") %>
+            <%- include("../../../partials/footer") %>
         </main>
     </div>
     
-    <%- include("../../partials/js") %>
+    <%- include("../../../partials/js") %>
 
     <script>
-        const SMALL_BOMB_MAX = 3;
-        const BIG_BOMB_MAX = 3;
+        const SMALL_BOMB_MAX = <%= event.smallBombs %>;
+        const BIG_BOMB_MAX = <%= event.bigBombs %>;
     </script>
 
     <script src="/assets/js/panel.js"> </script>

@@ -9,6 +9,7 @@
 
 .bomb-user {
     align-items: center;
+    transition: 0.2s opacity;
 }
 
 .bomb-user .twitch-user {
