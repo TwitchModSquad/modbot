@@ -1,4 +1,4 @@
-const API_URI = "https://tms.to/api/";
+const API_URI = "http://localhost:8080/api/";
 const DB_URI = "https://db.tms.to/";
 const DB_API_URI = DB_URI + "api/";
 
@@ -62,10 +62,10 @@ function comma(x) {
 const parse = {
     account: {
         discord(object) {
-            return `<a class="discord-user" href="/panel/user/${object.id}"><img src="${object.avatar_url}" /><div class="user-info"><div class="user-name">${object.name}<span class="discriminator">#${object.discriminator}</span></div><div class="user-stats">${object.id}</div></div></a>`;
+            return `<a class="discord-user" href="/panel/user/${object.id}" data-id="${object.id}"><img src="${object.avatar_url}" /><div class="user-info"><div class="user-name">${object.name}<span class="discriminator">#${object.discriminator}</span></div><div class="user-stats">${object.id}</div></div></a>`;
         },
-        twitch(object, url = "/panel/user/{{id}}") {
-            return `<a class="twitch-user" href="${url.replace("{{id}}", object.id)}"><img src="${object.profile_image_url}" /><div class="user-info"><div class="user-name">${object.display_name}</div><div class="user-stats">${object.id} <span class="bullet">&bullet;</span> ${comma(object.follower_count)}&nbsp;follower${object.follower_count == 1 ? "" : "s"} <span class="bullet">&bullet;</span> ${comma(object.view_count)}&nbsp;view${object.view_count == 1 ? "" : "s"}</div></div></a>`;
+        twitch(object, url = "/panel/user/{{id}}", onclick = null) {
+            return `<a class="twitch-user" href="${url.replace("{{id}}", object.id)}"${onclick ? ` onclick="${onclick}"` : ""} data-id="${object.id}"><img src="${object.profile_image_url}" /><div class="user-info"><div class="user-name">${object.display_name}</div><div class="user-stats">${object.id} <span class="bullet">&bullet;</span> ${comma(object.follower_count)}&nbsp;follower${object.follower_count == 1 ? "" : "s"} <span class="bullet">&bullet;</span> ${comma(object.view_count)}&nbsp;view${object.view_count == 1 ? "" : "s"}</div></div></a>`;
         },
     },
 };

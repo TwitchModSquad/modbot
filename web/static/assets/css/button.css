@@ -1,5 +1,5 @@
 button, .button {
-    background: var(--primary-tms-color);
+    background-color: var(--primary-tms-color);
     color: var(--primary-text-color);
     font-size: 1rem;
     padding: .6em .8em;
@@ -8,6 +8,12 @@ button, .button {
     box-shadow: var(--shadow);
     cursor: pointer;
     text-decoration: none;
+    transition: 0.2s background-color;
+}
+
+button[disabled="disabled"],
+.button[disabled="disabled"] {
+    background-color: var(--primary-background-color);
 }
 
 .button-holder {

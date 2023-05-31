@@ -1,0 +1,33 @@
+.bomb {
+    margin-bottom: 1em;
+}
+
+.bomb-user,
+.bomb-user .buttons {
+    display: flex;
+}
+
+.bomb-user {
+    align-items: center;
+    transition: 0.2s opacity;
+}
+
+.bomb-user .twitch-user {
+    flex-grow: 1;
+}
+
+.bomb-user button:first-child {
+    border-radius: 3px 0 0 3px;
+}
+
+.bomb-user button:last-child {
+    border-radius: 0 3px 3px 0;
+}
+
+.bomb-user input {
+    background-color: var(--primary-text-color);
+    color: var(--primary-background-color);
+    border: none;
+    width: 3em;
+    text-align: center;
+}

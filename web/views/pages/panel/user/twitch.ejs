@@ -15,7 +15,7 @@ login<!DOCTYPE html>
     <%- include("../../../partials/panel/header") %>
 
     <div class="sidebar-container">
-        <%- include("../../../partials/panel/sidebar", {page: "moderator/logs", session: session}) %>
+        <%- include("../../../partials/panel/sidebar", {page: "user/twitch", session: session}) %>
         <main>
             <div class="container container-md">
                 <section class="<%= (locals.identity && locals.identity.discordAccounts.length > 0 ? "col-8" : "col-12") %>">

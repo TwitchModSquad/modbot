@@ -6,6 +6,7 @@ const search = require("./search");
 const user = require("./user");
 const entry = require("./entry");
 const streamerFunctions = require("./streamerfunctions");
+const modbomb = require("./modbomb");
 
 const moderator = require("./moderator/");
 
@@ -47,5 +48,6 @@ router.use("/moderator", moderator);
 router.use("/user", user);
 router.use("/entry", entry);
 router.use("/streamer-functions", streamerFunctions);
+router.use("/mod-bomb", modbomb);
 
 module.exports = router;
