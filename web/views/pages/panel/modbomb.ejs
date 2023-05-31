@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>TMS Panel - Mod Bomb</title>
+
+    <%- include("../../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/panel.css">
+    <link rel="stylesheet" href="/assets/css/sidebar.css">
+    <link rel="stylesheet" href="/assets/css/inputs.css">
+    <link rel="stylesheet" href="/assets/css/button.css">
+    <link rel="stylesheet" href="/assets/css/modbomb.css">
+</head>
+<body>
+    <%- include("../../partials/panel/header") %>
+
+    <div class="sidebar-container">
+        <%- include("../../partials/panel/sidebar", {page: "mod-bomb", session: session}) %>
+        <main>
+            <form id="search-form" method="GET" data-discord="false" data-link="#" data-onclick="bomb($(this));return false;">
+                <div class="search-box">
+                    <input type="search" name="search" id="user-search" placeholder="Type to search through TMS user databases">
+                    <div class="search-box-results"><div class="none">Type at least 2 characters to get search results</div></div>
+                </div>
+            </form>
+            <section>
+                <h2><i class="fa-solid fa-bomb"></i> Mod Bomb</h2>
+                <form class="container container-md" method="post">
+                    <div class="col-6">
+                        <h3 id="small-bomb-header">Small Bomb (<span id="small-bomb-count">0</span>/3)</h3>
+                        <div id="small-bomb" class="bomb">
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <h3 id="big-bomb-header">Big Bomb (<span id="big-bomb-count">0</span>/3)</h3>
+                        <div id="big-bomb" class="bomb">
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <p><small>Use the field above to add streamers!</small></p>
+                        <input type="submit" value="Submit" disabled="disabled" class="button" />
+                    </div>
+                </form>
+            </section>
+
+            <%- include("../../partials/footer") %>
+        </main>
+    </div>
+    
+    <%- include("../../partials/js") %>
+
+    <script>
+        const SMALL_BOMB_MAX = 3;
+        const BIG_BOMB_MAX = 3;
+    </script>
+
+    <script src="/assets/js/panel.js"> </script>
+    <script src="/assets/js/modbomb.js"> </script>
+    <script src="/assets/js/search.js"> </script>
+</body>
+</html>

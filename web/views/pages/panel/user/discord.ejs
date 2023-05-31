@@ -15,7 +15,7 @@
     <%- include("../../../partials/panel/header") %>
 
     <div class="sidebar-container">
-        <%- include("../../../partials/panel/sidebar", {page: "moderator/logs", session: session}) %>
+        <%- include("../../../partials/panel/sidebar", {page: "user/discord", session: session}) %>
         <main>
             <div class="container container-md">
                 <section class="<%= (locals.identity && locals.identity.twitchAccounts.length > 0 ? "col-8" : "col-12") %>">
