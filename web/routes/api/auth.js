@@ -162,7 +162,7 @@ router.get("/twitch", async (req, res) => {
 
             res.cookie("session", session.id, {
                 domain: config.main_domain,
-                maxAge: 14 * 24 * 60 * 60, // 14 days
+                maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days
                 path: "/",
                 secure: true
             });
