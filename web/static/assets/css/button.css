@@ -14,6 +14,7 @@ button, .button {
 button[disabled="disabled"],
 .button[disabled="disabled"] {
     background-color: var(--primary-background-color);
+    cursor: not-allowed;
 }
 
 .button-holder {
