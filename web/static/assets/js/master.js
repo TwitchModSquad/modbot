@@ -1,5 +1,5 @@
-const API_URI = "http://localhost:8080/api/"; // developer api uri
-// const API_URI = "https://tms.to/api/";
+// const API_URI = "http://localhost:8080/api/"; // developer api uri
+const API_URI = "https://tms.to/api/";
 const DB_URI = "https://db.tms.to/";
 const DB_API_URI = DB_URI + "api/";
 
