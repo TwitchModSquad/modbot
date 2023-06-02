@@ -27,17 +27,19 @@
                 <h2><i class="fa-solid fa-bomb"></i> <%= month %> Mod Bomb</h2>
                 <form class="container container-md" method="post">
                     <div class="col-6">
-                        <h3 id="small-bomb-header">Small Bomb (<span id="small-bomb-count">0</span>/<%= event.smallBombs %>)</h3>
+                        <h3 id="small-bomb-header">Small Bomb (<span id="small-bomb-count">0</span>/<%= event.smallBombs %>)<br/><small>Less than 5,000 follower affiliate</small></h3>
                         <div id="small-bomb" class="bomb">
+                            <p id="no-small-bomb" class="none-present">Use the field above to add a Small Bomb streamer!</p>
                         </div>
                     </div>
                     <div class="col-6">
-                        <h3 id="big-bomb-header">Big Bomb (<span id="big-bomb-count">0</span>/<%= event.bigBombs %>)</h3>
+                        <h3 id="big-bomb-header">Big Bomb (<span id="big-bomb-count">0</span>/<%= event.bigBombs %>)<br/><small>Greater than 5,000 follower affiliate or partner</small></h3>
                         <div id="big-bomb" class="bomb">
+                            <p id="no-big-bomb" class="none-present">Use the field above to add a Big Bomb streamer!</p>
                         </div>
                     </div>
                     <div class="col-12">
-                        <p><small>Use the field above to add streamers!</small></p>
+                        <p class="invalid-votes">You must use all bomb points to submit your vote!</p>
                         <input type="submit" value="Submit" disabled="disabled" class="button" />
                     </div>
                 </form>

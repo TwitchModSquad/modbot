@@ -22,10 +22,24 @@ function updateCounts() {
     $("#small-bomb-header").attr("style", smallBombs > SMALL_BOMB_MAX ? "color: red;" : "color: inherit;");
     $("#big-bomb-header").attr("style", bigBombs > BIG_BOMB_MAX ? "color: red;" : "color: inherit;");
 
+    if (smallBombs === 0) {
+        $("#no-small-bomb").slideDown(200);
+    } else {
+        $("#no-small-bomb").slideUp(200);
+    }
+
+    if (bigBombs === 0) {
+        $("#no-big-bomb").slideDown(200);
+    } else {
+        $("#no-big-bomb").slideUp(200);
+    }
+
     if (smallBombs === SMALL_BOMB_MAX && bigBombs === BIG_BOMB_MAX) {
         $("input[type=submit]").attr("disabled", null);
+        $(".invalid-votes").slideUp(200);
     } else {
         $("input[type=submit]").attr("disabled", "disabled");
+        $(".invalid-votes").slideDown(200);
     }
 }
 
