@@ -3,6 +3,7 @@ const router = express.Router();
 const bodyParser = require("body-parser");
 
 const api = require("../../../api/");
+const config = require("../../../config.json");
 
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
@@ -51,7 +52,17 @@ router.post("/", async (req, res) => {
             return;
         }
     }
-    api.ModBomb.current.vote(req.session.identity, votes).then(vote => {
+    api.ModBomb.current.vote(req.session.identity, votes).then(async vote => {
+        try {
+            const guild = await global.client.discord.guilds.fetch(config.modsquad_discord);
+            for (let i = 0; i < req.session.identity.discordAccounts.length; i++) {
+                const discordUser = req.session.identity.discordAccounts[i];
+                const discordMember = await guild.members.fetch(discordUser.id);
+                discordMember.roles.add(config.roles.promotion, "Automatic").catch(api.Logger.warning);
+            }
+        } catch(err) {
+            api.Logger.warning(err);
+        }
         res.render("pages/panel/modbomb/success", {session: req.session});
     }, err => {
         api.Logger.warning(err);
