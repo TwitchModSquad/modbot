@@ -12,6 +12,12 @@
     border-color: #8c0e2e;
 }
 
+.alert.alert-info {
+    color: #88b7ea;
+    background-color: #1e3955;
+    border-color: #14559a;
+}
+
 .alert strong {
     font-weight: 700;
     display: block;
