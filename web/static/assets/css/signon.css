@@ -135,16 +135,17 @@ main p {
     flex-grow: 1;
 }
 
-.verify-streamers {
-    display: flex;
-}
-
 .verify-streamers input[type=text] {
+    display: block;
+    width: calc(100% - 2em);
     background-color: var(--primary-text-color);
     color: var(--primary-background-color);
-    flex-grow: 1;
-    margin-right: 1em;
-    padding: .4em 1em;
+    padding: .6em 1em;
+    margin: .6em 0;
     border-radius: 5px;
     border: none;
+}
+
+input[disabled] {
+    cursor: not-allowed;
 }

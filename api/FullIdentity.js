@@ -131,7 +131,6 @@ class FullIdentity extends Identity {
                     const user = this.twitchAccounts[i];
                     const roles = await user.getRoles();
                     const identityStreamers = await user.getStreamers(true);
-                    if (!streamers.find(x => x.streamer.id === user.id)) streamers.push({streamer: user, active: false});
                     identityStreamers.forEach(streamer => {
                         if (!streamers.find(x => x.streamer.id === streamer.streamer.id)) {
                             streamers.push(streamer);
@@ -145,6 +144,7 @@ class FullIdentity extends Identity {
                             });
                         }
                     });
+                    if (!streamers.find(x => x.streamer.id === user.id)) streamers.push({streamer: user, active: false});
                 }
                 resolve(streamers);
             } catch(err) {

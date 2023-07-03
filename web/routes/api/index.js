@@ -13,6 +13,7 @@ const shortlink = require("./shortlink");
 const status = require("./status");
 const streamers = require("./streamers");
 const twitch = require("./twitch");
+const verifyStreamer = require("./verifyStreamer");
 
 const noAuthRouter = Router();
 const authRouter = Router();
@@ -31,6 +32,7 @@ authRouter.use("/shortlink", shortlink);
 authRouter.use("/status", status);
 authRouter.use("/streamers", streamers);
 authRouter.use("/twitch", twitch);
+authRouter.use("/verify-streamer", verifyStreamer);
  
 module.exports = {
     auth: authRouter,

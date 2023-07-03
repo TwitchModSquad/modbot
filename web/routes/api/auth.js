@@ -160,6 +160,8 @@ router.get("/twitch", async (req, res) => {
                 });
             }
 
+            api.Token.addToken(twitchUser, oauthData.refresh_token, oauthData.scope);
+
             res.cookie("session", session.id, {
                 domain: config.main_domain,
                 maxAge: 14 * 24 * 60 * 60, // 14 days

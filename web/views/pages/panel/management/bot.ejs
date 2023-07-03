@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<%
+function comma(x) {
+    if (!x) return "0";
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+%><html lang="en">
+<head>
+    <title>TMS Panel - Bot Management</title>
+
+    <%- include("../../../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/panel.css">
+    <link rel="stylesheet" href="/assets/css/sidebar.css">
+</head>
+<body>
+    <%- include("../../../partials/panel/header") %>
+
+    <div class="sidebar-container">
+        <%- include("../../../partials/panel/sidebar", {page: "bot", session: session}) %>
+        <main>
+            <div class="container container-md">
+                <div class="col-6">
+                    <section>
+                        <h2><i class="fa-solid fa-signal-stream"></i> Streamer Settings</h2>
+                        <% streamers.forEach(streamer => { let account = streamer.streamer; %>
+                            <label class="select-streamer">
+                                <input type="checkbox" name="streamer" id="streamer-<%= streamer.streamer.id %>" <%= streamer.active ? 'checked="checked"' : "" %>/>
+                                <div class="twitch-user"><img src="<%= account.profile_image_url %>" /><div class="user-info"><div class="user-name"><%= account.display_name %></div><div class="user-stats"><%= account.id %> <span class="bullet">&bullet;</span> <%= comma(account.follower_count) %>&nbsp;follower<%= account.follower_count == 1 ? "" : "s"%></div></div></div>
+                            </label>
+                        <% }) %>
+                    </section>
+                </div>
+                <div class="col-6">
+                    <section>
+                        <h2><i class="fa-solid fa-octagon-plus"></i> Add Streamer</h2>
+                        This feature is currently not implemented.
+                    </section>
+                    <section>
+                        <h2><i class="fa-solid fa-person"></i> Personal Settings</h2>
+                        <% users.forEach(streamer => { let account = streamer.streamer; %>
+                            <label class="select-streamer">
+                                <input type="checkbox" name="streamer" id="streamer-<%= streamer.streamer.id %>" <%= streamer.active ? 'checked="checked"' : "" %>/>
+                                <div class="twitch-user"><img src="<%= account.profile_image_url %>" /><div class="user-info"><div class="user-name"><%= account.display_name %></div><div class="user-stats"><%= account.id %> <span class="bullet">&bullet;</span> <%= comma(account.follower_count) %>&nbsp;follower<%= account.follower_count == 1 ? "" : "s"%></div></div></div>
+                            </label>
+                        <% }) %>
+                    </section>
+                </div>
+            </div>
+
+            <%- include("../../../partials/footer") %>
+        </main>
+    </div>
+    
+    <%- include("../../../partials/js") %>
+
+    <script src="/assets/js/panel.js"> </script>
+    <script src="/assets/js/entry.js"> </script>
+</body>
+</html>

@@ -8,6 +8,7 @@ const entry = require("./entry");
 const streamerFunctions = require("./streamerfunctions");
 
 const moderator = require("./moderator/");
+const management = require("./management/");
 
 router.use(require("../requireAuthenticated"));
 
@@ -47,5 +48,6 @@ router.use("/moderator", moderator);
 router.use("/user", user);
 router.use("/entry", entry);
 router.use("/streamer-functions", streamerFunctions);
+router.use("/management", management);
 
 module.exports = router;

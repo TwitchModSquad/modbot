@@ -6,6 +6,7 @@ const SessionService = require("./Session/");
 const GroupService = require("./Group/");
 const Archive = require("./Archive/");
 const Authentication = require("./Authentication/");
+const TokenManager = require("./Token/");
 
 const Logger = require("./Logger");
 const FullIdentity = require("./FullIdentity");
@@ -54,6 +55,12 @@ class API {
      * @type {Logger}
      */
     Logger = new Logger();
+
+    /**
+     * Token manager
+     * @type {TokenManager}
+     */
+    Token = new TokenManager();
 
     /**
      * Returns the FullIdentity for an ID

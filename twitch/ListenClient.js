@@ -177,6 +177,8 @@ class ListenClient {
         this.initialize();
 
         this.client.connect().catch(api.Logger.severe);
+
+        api.Token.init();
     }
 
     /**

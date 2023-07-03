@@ -12,6 +12,11 @@
     border-color: #8c0e2e;
 }
 
+.alert.alert-danger a {
+    color: #b42e30;
+    text-decoration: underline;
+}
+
 .alert strong {
     font-weight: 700;
     display: block;

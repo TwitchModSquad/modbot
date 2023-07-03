@@ -6,7 +6,7 @@ function comma(x) {
 }
 %><html lang="en">
 <head>
-    <title>TMS Sign On Portal</title>
+    <title>TMS Sign On Portal - Verify</title>
 
     <%- include("../../partials/head") %>
 
@@ -23,11 +23,21 @@ function comma(x) {
             <section>
                 <h2>Verify Additional Streamers</h2>
                 <p>Add additional streamers below to better represent the communities you mod for.</p>
+                <% if (!hasToken) { %>
+                <div class="alert alert-danger">
+                    <strong>You do not have a chat token stored!</strong>
+                    Due to changes Twitch made to the Helix API, we can only reliably verify moderator status by sending a message to your streamers channel and reading the userstate of the message.
+                    <br>
+                    Please authorize TMS to send and receive messages via your account <a href="<%= tokenLink %>">here</a>. This permission is not used outside of this context and may be revoked at any time.
+                </div>
+                <% } %>
                 <div class="verify-streamers"></div>
-                <form action="GET" class="verify-streamers">
-                    <input type="text" name="new-streamer" id="new-streamer" placeholder="Twitch Username">
-                    <input type="submit" value="Add Streamer" class="button">
+                <form action="POST" class="verify-streamers">
+                    <input type="text" name="new-streamer" id="new-streamer" placeholder="Streamer Twitch Username" required="required" minlength="2" maxlength="16" <%= hasToken ? "" : 'disabled="disabled"' %>>
+                    <input type="text" name="message" id="message" placeholder="Message sent to Channel (Default: 'Hello from TMS!')" <%= hasToken ? "" : 'disabled="disabled"' %>>
+                    <input type="submit" value="Add Streamer" class="button" <%= hasToken ? "" : 'disabled="disabled"' %>>
                 </form>
+                <div id="search-user-view"></div>
             </section>
         </div>
 

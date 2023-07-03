@@ -100,3 +100,11 @@ section h3 {
     padding: .2em .4em;
     border-radius: .8em;
 }
+
+.select-streamer {
+    display: flex;
+}
+
+.select-streamer > div {
+    flex-grow: 1;
+}
