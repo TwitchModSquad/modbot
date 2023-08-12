@@ -164,11 +164,11 @@ const formatNumber = num => {
 
 router.get("/", (req, res) => {
     let landingMessages = [
-        `helping ${formatNumber(landingValues.moderators)} moderator${landingValues.moderators === 1 ? "" : "s"}`,
+        `supporting ${formatNumber(landingValues.moderators)} moderator${landingValues.moderators === 1 ? "" : "s"}`,
         `protecting ${formatNumber(landingValues.streamers)} streamer${landingValues.streamers === 1 ? "" : "s"}`,
         `sharing ${formatNumber(landingValues.bans)} ban${landingValues.bans === 1 ? "" : "s"}`,
         `sharing ${formatNumber(landingValues.timeouts)} timeout${landingValues.timeouts === 1 ? "" : "s"}`,
-        `holding ${formatNumber(landingValues.messages)} chat message${landingValues.messages === 1 ? "" : "s"}`,
+        `storing ${formatNumber(landingValues.messages)} chat message${landingValues.messages === 1 ? "" : "s"}`,
     ];
 
     res.render("pages/index", {landingMessages: landingMessages, participatingStreamers: participatingStreamers, featuredStreamers: featuredStreamers, formatNumber: formatNumber})
