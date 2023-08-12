@@ -29,6 +29,19 @@ header img {
     margin: .75em;
 }
 
+.hamburger {
+    display: none;
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    background-color: var(--primary-background-color);
+    color: var(--primary-text-color);
+    padding: 1em;
+    border-radius: 3px;
+    z-index: 100;
+}
+
 nav {
     position: absolute;
     top: 50%;
@@ -76,6 +89,46 @@ nav a:not(.cta):focus::after {
     height: 100%;
 }
 
+@media only screen and (max-width: 800px) {
+    header {
+        height: 4em;
+    }
+
+    header img {
+        width: 2.5em;
+        height: 2.5em;
+    }
+
+    .hamburger {
+        display: inline-block;
+    }
+
+    nav {
+        background-color: var(--primary-background-color);
+        position: fixed;
+        top: 0;
+        left: 0;
+        transform: translateX(-100%);
+        width: 100%;
+        height: 100vh;
+        max-width: 20em;
+        z-index: 10;
+        transition: 0.4s;
+    }
+
+    nav a,
+    nav a.cta {
+        display: block;
+        padding: .8em 1.2em;
+        margin: 0;
+        border-radius: 0;
+    }
+
+    nav.open {
+        transform: translateX(0);
+    }
+}
+
 section.landing {
     position: relative;
     color: var(--primary-background-color);
@@ -90,8 +143,8 @@ section.landing .wrapper {
     left: 50%;
     top: 35%;
     transform: translate(-50%, -50%);
-    width: auto;
-    padding: 1.25em 3em;
+    width: 75%;
+    padding: 1.25em;
     text-shadow: var(--heavy-shadow);
 }
 
@@ -272,6 +325,42 @@ section.transparent h2 {
 @media only screen and (max-width: 1000px) {
     .streamer.small {
         display: none;
+    }
+}
+
+@media only screen and (max-width: 700px) {
+    .streamer {
+        font-size: .8rem;
+    }
+
+    .streamer > img {
+        width: 96px;
+        height: 96px;
+    }
+
+    .streamer.big {
+        font-size: .9rem;
+    }
+
+    .streamer.big > img {
+        width: 128px;
+        height: 128px;
+    }
+}
+
+@media only screen and (max-width: 500px) {
+    .streamers:not(.streamers-large) .streamer {
+        padding: .7em 1.1em;
+    }
+
+    .streamers:not(.streamers-large) .streamer > img {
+        width: 64px;
+        height: 64px;
+    }
+
+    .streamers:not(.streamers-large) .streamer.big > img {
+        width: 96px;
+        height: 96px;
     }
 }
 
