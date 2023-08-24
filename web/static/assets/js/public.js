@@ -20,4 +20,8 @@ const startLandingMessages = function() {
 
 $(function() {
     startLandingMessages();
+    $("a.hamburger").on("click", function() {
+        $("nav").toggleClass("open");
+        return false;
+    });
 });
