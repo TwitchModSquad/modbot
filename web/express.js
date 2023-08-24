@@ -14,6 +14,10 @@ const authenticate = require("./authenticate");
 
 app.set("view engine", "ejs");
 
+app.get("/join", (req, res) => {
+    res.redirect("https://v2.tms.to/auth/login");
+});
+
 app.use(cookieParser());
 app.use(cors());
 
