@@ -1,0 +1,44 @@
+{
+  "name": "modbot",
+  "version": "3.0.0",
+  "description": "Moderation services and tools for Twitch streamers and their moderators & Discord communities",
+  "main": "dist/app.js",
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "build:utils": "npm run clean --workspace=@modbot/utils && npm run build --workspace=@modbot/utils",
+    "lint": "eslint packages/*/src/**/*.{ts,tsx}",
+    "clean": "npm run clean --workspaces",
+    "start:discord": "npm run start --workspace=@modbot/bot-discord",
+    "start:twitch": "npm run start --workspace=@modbot/bot-twitch",
+    "start:web-api": "npm run start --workspace=@modbot/web-api",
+    "start:all": "npm-run-all --parallel start:discord start:twitch start:web-api",
+    "test": "npm run build && npm run start:all"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TwitchModSquad/modbot.git"
+  },
+  "keywords": [
+    "discord-bot",
+    "twitch-bot",
+    "discord",
+    "twitch",
+    "bot"
+  ],
+  "author": "Twijn",
+  "license": "SEE LICENSE IN LICENSE",
+  "bugs": {
+    "url": "https://github.com/TwitchModSquad/modbot/issues"
+  },
+  "homepage": "https://github.com/TwitchModSquad/modbot#readme",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.28.0",
+    "@typescript-eslint/parser": "^8.28.0",
+    "eslint": "^9.23.0",
+    "npm-run-all": "^4.1.5"
+  }
+}

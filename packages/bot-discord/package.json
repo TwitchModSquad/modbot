@@ -1,0 +1,20 @@
+{
+  "name": "@modbot/bot-discord",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "clean": "rimraf dist"
+  },
+  "keywords": [],
+  "author": "Twijn",
+  "license": "SEE LICENSE IN LICENSE",
+  "dependencies": {
+    "discord.js": "^14.18.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.2"
+  }
+}
