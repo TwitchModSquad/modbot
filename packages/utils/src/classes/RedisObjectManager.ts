@@ -1,7 +1,7 @@
-import Redis from "ioredis";
+import redis from "../redis";
 
 export default class RedisObjectManager<T> {
-    protected redis = new Redis(process.env.REDIS_URL);
+    protected redis;
     protected memoryCache: Map<string, T> = new Map();
     protected expiryTable: {expiresAt: number, id: string}[] = [];
 
@@ -11,6 +11,8 @@ export default class RedisObjectManager<T> {
     constructor(prefix: string, expiresIn?: number) {
         this.prefix = prefix;
         this.expiresIn = expiresIn;
+
+        this.redis = redis;
 
         if (this.expiresIn) {
             setInterval(() => {

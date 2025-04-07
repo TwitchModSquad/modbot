@@ -1,14 +1,12 @@
 import {ApiClient} from "@twurple/api";
 import {AccessTokenWithUserId, RefreshingAuthProvider} from "@twurple/auth";
 import crypto from "crypto";
-import Redis from "ioredis";
 import {twitchTokens} from "./managers";
 import logger from "./logger";
+import redis from "./redis";
 
 const BASE_TWITCH_URL = "https://id.twitch.tv/oauth2/authorize?response_type=code" +
     `&client_id=${encodeURIComponent(process.env.TWITCH_CLIENT_ID)}&redirect_uri=${encodeURIComponent(process.env.API_URI + "auth/twitch")}&scope={scope}&state={state}`;
-
-const redis = new Redis(process.env.REDIS_URL);
 
 const scopes = [
     "user:read:email",

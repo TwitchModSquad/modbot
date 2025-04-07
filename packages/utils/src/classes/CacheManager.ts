@@ -1,5 +1,5 @@
-import Redis from "ioredis";
 import logger from "../logger";
+import redis from "../redis";
 
 type ModelType<T> = {
     findByPk(id: number|string): Promise<{raw: () => T}|null>;
@@ -13,7 +13,7 @@ interface CacheManagerOptions<T> {
 }
 
 export default class CacheManager<T extends {id: number|string, cachedDate?: string}> {
-    protected redis = new Redis(process.env.REDIS_URL);
+    protected redis;
 
     protected readonly model: ModelType<T>;
     protected readonly cachePrefix: string;
@@ -27,6 +27,8 @@ export default class CacheManager<T extends {id: number|string, cachedDate?: str
         this.cachePrefix = options.cachePrefix;
         this.cacheTTL = options.cacheTTL;
         this.retrieveFunction = options.retrieveFunction;
+
+        this.redis = redis;
     }
 
     protected getRedisKey(id: number|string): string {
