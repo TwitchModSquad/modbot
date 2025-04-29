@@ -2,8 +2,7 @@ import CacheManager from "../../classes/CacheManager";
 
 import {RawTwitchUser, TwitchUser, TwitchUserBroadcasterType, TwitchUserType} from "../../models";
 import {HelixUser} from "@twurple/api";
-import {logger} from "../../index";
-import api from "../../twitch";
+import {getTwitchClient, logger} from "../../index";
 
 const helixToRawUser = (user: HelixUser): RawTwitchUser => {
     return {
@@ -20,7 +19,10 @@ const helixToRawUser = (user: HelixUser): RawTwitchUser => {
 
 const getUser = (search: string|number, withFunc: "getUserByIdBatched"|"getUserByNameBatched"): Promise<RawTwitchUser> => {
     return new Promise(resolve => {
-        api.users[withFunc](String(search)).then(user => {
+        getTwitchClient().users[withFunc](String(search)).then(user => {
+            if (!user) {
+                return resolve(null);
+            }
             const data: RawTwitchUser = helixToRawUser(user);
 
             TwitchUser.upsert(data).then(apiUser => {

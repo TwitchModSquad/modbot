@@ -73,6 +73,14 @@ DiscordUser.init({
         type: DataTypes.STRING,
         allowNull: true,
     },
+    identity: {
+        type: DataTypes.INTEGER.UNSIGNED,
+        allowNull: true,
+        references: {
+            model: "identities",
+            key: "id",
+        }
+    }
 }, {
     sequelize,
     indexes: [

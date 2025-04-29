@@ -4,14 +4,20 @@ import {twitchUsers} from "@modbot/utils";
 const router = Router();
 
 router.get("/:id", async (req, res) => {
-    const user = await twitchUsers.get(req.params.id);
+    let force = false;
+
+    if (req.query.hasOwnProperty("force")) {
+        force = true;
+    }
+
+    const user = await twitchUsers.get(req.params.id, force);
     if (user) {
         res.json({
             ok: true,
             data: user,
         });
     } else {
-        res.json({
+        res.status(404).json({
             ok: false,
             error: "User not found!",
         });
@@ -19,14 +25,20 @@ router.get("/:id", async (req, res) => {
 });
 
 router.get("/login/:login", async (req, res) => {
-    const user = await twitchUsers.getByName(req.params.login);
+    let force = false;
+
+    if (req.query.hasOwnProperty("force")) {
+        force = true;
+    }
+
+    const user = await twitchUsers.getByName(req.params.login, force);
     if (user) {
         res.json({
             ok: true,
             data: user,
         });
     } else {
-        res.json({
+        res.status(404).json({
             ok: false,
             error: "User not found!",
         });

@@ -14,6 +14,13 @@ export enum TwitchUserBroadcasterType {
     PARTNER = "partner",
 }
 
+export enum ListenSetting {
+    NONE = "none",
+    BANS_ONLY = "bans",
+    BANS_WITH_CACHED_CHAT = "bans_cached",
+    ALL = "all",
+}
+
 export interface RawTwitchUser {
     id: string;
     login: string;
@@ -25,11 +32,14 @@ export interface RawTwitchUser {
 
     follower_count?: number|null;
 
+    listen_setting?: ListenSetting;
+
     type: TwitchUserType;
     broadcaster_type: TwitchUserBroadcasterType;
 
     identity?: number|null;
 
+    rolesLastUpdatedDate?: string;
     createdDate?: string;
     updatedDate?: string;
     cachedDate?: string;
@@ -46,11 +56,14 @@ export class TwitchUser extends Model<InferAttributes<TwitchUser>, InferCreation
 
     declare follower_count?: number|null;
 
+    declare listen_setting?: ListenSetting;
+
     declare type: TwitchUserType;
     declare broadcaster_type: TwitchUserBroadcasterType;
 
     declare identity?: number|null;
 
+    declare rolesLastUpdatedAt?: Date;
     declare createdAt?: Date;
     declare updatedAt?: Date;
 
@@ -63,9 +76,11 @@ export class TwitchUser extends Model<InferAttributes<TwitchUser>, InferCreation
             profile_image_url: this.profile_image_url,
             offline_image_url: this.offline_image_url,
             follower_count: this.follower_count,
+            listen_setting: this.listen_setting,
             type: this.type,
             broadcaster_type: this.broadcaster_type,
             identity: this.identity,
+            rolesLastUpdatedDate: this.rolesLastUpdatedAt ? this.rolesLastUpdatedAt.toISOString() : null,
             createdDate: this.createdAt ? this.createdAt.toISOString() : null,
             updatedDate: this.updatedAt ? this.updatedAt.toISOString() : null,
         };
@@ -86,7 +101,7 @@ TwitchUser.init({
         allowNull: false,
     },
     description: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: true,
     },
     profile_image_url: {
@@ -116,6 +131,20 @@ TwitchUser.init({
     identity: {
         type: DataTypes.INTEGER.UNSIGNED,
         allowNull: true,
+        references: {
+            model: "identities",
+            key: "id",
+        }
+    },
+    listen_setting: {
+        type: DataTypes.ENUM,
+        values: Object.values(ListenSetting),
+        defaultValue: ListenSetting.NONE,
+        allowNull: false,
+    },
+    rolesLastUpdatedAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
     },
 }, {
     sequelize,
@@ -129,6 +158,10 @@ TwitchUser.init({
             fields: ["login"],
             using: "BTREE",
         },
+        {
+            name: "idx_listen_setting",
+            fields: ["listen_setting"],
+        }
     ],
     tableName: "twitch__users",
 });

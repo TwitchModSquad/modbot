@@ -18,7 +18,7 @@ router.get("/:id", async (req, res) => {
             data: user,
         });
     } else {
-        res.json({
+        res.status(404).json({
             ok: false,
             error: "User not found!",
         });
@@ -33,7 +33,7 @@ router.get("/username/:username", async (req, res) => {
             data: user,
         });
     } else {
-        res.json({
+        res.status(404).json({
             ok: false,
             error: "User not found!",
         });

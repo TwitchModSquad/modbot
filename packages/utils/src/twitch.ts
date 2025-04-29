@@ -4,6 +4,7 @@ import crypto from "crypto";
 import {twitchTokens} from "./managers";
 import logger from "./logger";
 import redis from "./redis";
+import {TwitchRole} from "./models";
 
 const BASE_TWITCH_URL = "https://id.twitch.tv/oauth2/authorize?response_type=code" +
     `&client_id=${encodeURIComponent(process.env.TWITCH_CLIENT_ID)}&redirect_uri=${encodeURIComponent(process.env.API_URI + "auth/twitch")}&scope={scope}&state={state}`;
@@ -11,6 +12,7 @@ const BASE_TWITCH_URL = "https://id.twitch.tv/oauth2/authorize?response_type=cod
 const scopes = [
     "user:read:email",
     "moderator:manage:banned_users",
+    "moderator:manage:automod",
     "moderation:read",
     "user:read:moderated_channels",
     "chat:read",
@@ -49,7 +51,9 @@ authProvider.onRefresh((userId, token) => {
     );
 });
 
-const loadTokens = async () => {
+let apiClient: ApiClient;
+
+export const loadClient = async () => {
     logger.info("Loading Twitch tokens...");
     let cursor = "0";
     let count = 0;
@@ -60,14 +64,47 @@ const loadTokens = async () => {
         const tokens = await twitchTokens.getMany(
             result[1].map(token => token.split(":")[2])
         );
+
+        const twitchRoles = await TwitchRole.findAll();
+
+        let hasBotToken = false;
+        for (const token of tokens) {
+            let intents = [
+                `chat:${token.userId}`,
+                `mod:${token.userId}`,
+            ]
+
+            if (token.userId === process.env.TWITCH_USER_ID) {
+                intents = [
+                    "chat",
+                    ...intents,
+                ]
+                hasBotToken = true;
+            }
+
+            for (const role of twitchRoles.filter(x => x.userId === token.userId)) {
+                intents.push(`mod:${role.streamerId}`);
+            }
+
+            await authProvider.addUserForToken(token, intents);
+            logger.debug(`Added token for user ${token.userId} with intents: ${intents.join(", ")}`);
+        }
+
+        if (!hasBotToken) {
+            logger.error("Missing bot token! Authenticate with the bot account and restart the service!");
+        }
+
         count += tokens.length;
-        logger.info(`Loaded ${count} tokens`);
     } while (cursor !== "0");
+    logger.info(`Loaded ${count} tokens`);
 
     logger.info(`Finished loading ${count} Twitch tokens`);
-}
-loadTokens().catch(e => logger.error(e));
 
-export default new ApiClient({
-    authProvider,
-});
+    apiClient = new ApiClient({
+        authProvider,
+    });
+}
+
+export const getTwitchClient = () => {
+    return apiClient;
+}

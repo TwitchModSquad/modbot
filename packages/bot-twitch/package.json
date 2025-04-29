@@ -13,5 +13,10 @@
   "license": "SEE LICENSE IN LICENSE",
   "devDependencies": {
     "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "@twurple/chat": "^7.2.1",
+    "@twurple/eventsub-ws": "^7.2.1",
+    "sequelize": "^6.37.7"
   }
 }

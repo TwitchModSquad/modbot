@@ -1,5 +1,11 @@
 import redis from "../redis";
+import eventManager from "../managers/events/EventManager";
 
+/**
+ * A generic class to manage objects with Redis as the primary storage and an in-memory cache for optimization.
+ *
+ * @template T - The type of objects being managed.
+ */
 export default class RedisObjectManager<T> {
     protected redis;
     protected memoryCache: Map<string, T> = new Map();
@@ -85,10 +91,16 @@ export default class RedisObjectManager<T> {
         } else {
             await this.redis.set(this.getRedisKey(id), JSON.stringify(object));
         }
+        await eventManager.publish(`${this.prefix}:set`, {
+            object, servicePrefix: eventManager.servicePrefix,
+        })
     }
 
     async delete(id: string) {
         this.memoryCache.delete(id);
         await this.redis.del(this.getRedisKey(id));
+        await eventManager.publish(`${this.prefix}:del`, {
+            id, servicePrefix: eventManager.servicePrefix,
+        });
     }
 }
