@@ -8,6 +8,7 @@ import {TwitchRole} from "./twitchrole.model";
 import {TwitchBan} from "./twitchban.model";
 import {TwitchTimeout} from "./twitchtimeout.model";
 
+export * from "./discordchannel.model";
 export * from "./discorduser.model";
 export * from "./identity.model";
 export * from "./twitchuser.model";
