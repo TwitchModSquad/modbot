@@ -10,6 +10,7 @@
     "moduleResolution": "node",
     "sourceMap": false,
     "noImplicitAny": true,
+    "composite": true,
     "declaration": true,
     "removeComments": true,
     "skipLibCheck": true,

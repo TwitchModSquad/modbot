@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "composite": true
+  },
+  "files": [],
+  "references": [
+    { "path": "./packages/utils" },
+    { "path": "./packages/bot-discord" },
+    { "path": "./packages/bot-twitch" },
+    { "path": "./packages/web-api" }
+  ]
+}

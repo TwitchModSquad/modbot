@@ -5,9 +5,9 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "type-check": "npx tsc --build --noEmit",
+    "type-check": "npx tsc --build",
     "start": "node dist/index.js",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist tsconfig.tsbuildinfo"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +20,7 @@
   "dependencies": {
     "cookie-parser": "^1.4.7",
     "express": "^4.21.2",
-    "sequelize": "^6.37.7"
+    "sequelize": "^6.37.7",
+    "@modbot/utils": "*"
   }
 }

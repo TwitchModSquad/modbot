@@ -4,7 +4,7 @@
   "description": "Moderation services and tools for Twitch streamers and their moderators & Discord communities",
   "main": "dist/app.js",
   "scripts": {
-    "build": "npm run build --workspaces",
+    "build": "tsc --build",
     "build:utils": "npm run clean --workspace=@modbot/utils && npm run build --workspace=@modbot/utils",
     "lint": "eslint \"packages/*/src/**/*.ts\"",
     "type-check": "npm run type-check --workspaces",

@@ -5,8 +5,8 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "type-check": "npx tsc --noEmit",
-    "clean": "rimraf dist"
+    "type-check": "npx tsc --build",
+    "clean": "rimraf dist tsconfig.tsbuildinfo"
   },
   "keywords": [],
   "author": "",

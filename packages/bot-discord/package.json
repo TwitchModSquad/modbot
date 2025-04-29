@@ -5,15 +5,16 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "type-check": "npx tsc --noEmit",
+    "type-check": "npx tsc --build",
     "start": "node dist/index.js",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist tsconfig.tsbuildinfo"
   },
   "keywords": [],
   "author": "Twijn",
   "license": "SEE LICENSE IN LICENSE",
   "dependencies": {
-    "discord.js": "^14.18.0"
+    "discord.js": "^14.18.0",
+    "@modbot/utils": "*"
   },
   "devDependencies": {
     "typescript": "^5.8.2"
