@@ -6,7 +6,7 @@
   "scripts": {
     "build": "npm run build --workspaces",
     "build:utils": "npm run clean --workspace=@modbot/utils && npm run build --workspace=@modbot/utils",
-    "lint": "eslint packages/*/src/**/*.{ts,tsx}",
+    "lint": "eslint \"packages/*/src/**/*.ts\"",
     "clean": "npm run clean --workspaces",
     "start:discord": "npm run start --workspace=@modbot/bot-discord",
     "start:twitch": "npm run start --workspace=@modbot/bot-twitch",

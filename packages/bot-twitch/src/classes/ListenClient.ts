@@ -3,12 +3,10 @@ import {
     authProvider, events,
     ListenSetting,
     logger,
-    RawTwitchChat, TwitchBan,
-    twitchChatsCached, TwitchTimeout,
+    TwitchBan, TwitchTimeout,
     twitchUsers
 } from "@modbot/utils";
-import {TwitchChat} from "@modbot/utils/dist/models/twitchchat.model";
-import { banStore, removePunishment, timeoutStore } from "../stores";
+import { banStore, timeoutStore } from "../stores";
 import {chatManager} from "../managers";
 
 export enum ListenClientType {
@@ -79,7 +77,7 @@ export default class ListenClient {
     }
 
     private async handleChatRemove(channel: string, messageId: string, msg: ClearMsg) {
-        await chatManager.deleteMessage(messageId);
+        await chatManager.deleteMessage(msg.targetMessageId);
     }
 
     private async handleBan(channel: string, user: string, msg: ClearChat) {

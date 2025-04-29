@@ -1,6 +1,6 @@
 import sequelize from "./database";
 import {CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model} from "sequelize";
-import {authProvider, logger, getTwitchClient, twitchUsers} from "../index";
+import {logger, getTwitchClient, twitchUsers} from "../index";
 
 export interface RawTwitchBan {
     id: number;

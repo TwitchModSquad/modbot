@@ -1,6 +1,5 @@
 import ListenClient, {ListenClientType} from "../classes/ListenClient";
-import {events, ListenSetting, logger, RawTwitchUser, TwitchRole, twitchTokens, TwitchUser} from "@modbot/utils";
-import {Op} from "sequelize";
+import {events, logger, RawTwitchUser, TwitchRole, twitchTokens, TwitchUser} from "@modbot/utils";
 
 export let listenClients = new Map<string, ListenClient>();
 

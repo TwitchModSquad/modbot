@@ -1,5 +1,5 @@
 import {Router} from "express";
-import {discordUsers, getTwitchURL, logger} from "@modbot/utils";
+import {discordUsers, getTwitchURL} from "@modbot/utils";
 import discordTokenManager from "@modbot/utils/dist/managers/discord/DiscordTokenManager";
 const router = Router();
 

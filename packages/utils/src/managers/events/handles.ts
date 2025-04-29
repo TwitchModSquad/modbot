@@ -5,13 +5,3 @@ export interface IdentifyHandle {
     servicePrefix: string;
     startTime: number;
 }
-
-interface CacheDeleteHandle {
-    id: string|number;
-    servicePrefix: string;
-}
-
-interface CacheSetHandle<T> {
-    object: T;
-    servicePrefix: string;
-}
