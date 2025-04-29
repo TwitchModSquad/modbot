@@ -50,4 +50,6 @@ client.login(discordToken).catch(e => logger.error(e));
 
 registerCommands(slashCommands).catch(e => logger.error(e));
 
+import("./events");
+
 export default client;
