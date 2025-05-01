@@ -1,28 +1,28 @@
 module.exports = {
     apps: [
         {
-            name: 'twitch-bot',
+            name: 'modbot-twitch',
             script: 'npm',
             args: 'run start:twitch',
             env: { NODE_ENV: 'production' }
         },
         {
-            name: 'discord-bot',
+            name: 'modbot-discord',
             script: 'npm',
             args: 'run start:discord',
             env: { NODE_ENV: 'production' }
         },
         {
-            name: 'web-public',
+            name: 'modbot-web-public',
             script: 'npm',
             args: 'run start:web-public',
-            env: { NODE_ENV: 'production', PORT: 3010, }
+            env: { NODE_ENV: 'production', PORT: 3010 }
         },
         {
-            name: 'web-api',
+            name: 'modbot-web-api',
             script: 'npm',
             args: 'run start:web-api',
-            env: { NODE_ENV: 'production', PORT: 3020, }
+            env: { NODE_ENV: 'production', PORT: 3020 }
         }
     ]
 };
