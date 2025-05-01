@@ -1,4 +1,4 @@
-import {RawTwitchChat} from "../../models";
+import {RawTwitchChat} from "../../";
 import Redis from "ioredis";
 import redis from "../../redis";
 

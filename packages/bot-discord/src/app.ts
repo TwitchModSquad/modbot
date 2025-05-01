@@ -1,13 +1,13 @@
-import {Client, Collection, Events, GatewayIntentBits} from "discord.js";
+import {Client, Collection, Events, GatewayIntentBits, MessageFlags} from "discord.js";
 import {logger} from "@modbot/utils";
 
-import {TwineCommand} from "./interfaces";
-import {ReplyManager} from "./classes";
+import {InteractionListener, InteractionListenerType, TwineCommand} from "./interfaces";
+import {ReplyManager, TwineInteraction} from "./classes";
 
 import registerCommands from "./registerCommands";
 
 import rawSlashCommands from "./slashCommands";
-import {rawListeners} from "./listeners";
+import {interactionListeners, rawListeners} from "./listeners";
 
 const slashCommands = new Collection<string, TwineCommand>();
 for (const slashCommand of rawSlashCommands) {
@@ -40,8 +40,36 @@ client.on(Events.InteractionCreate, async interaction => {
             logger.error(error);
             await interaction.reply({
                 content: "An unexpected error occurred while executing this command! Try again later.",
-                ephemeral: true,
+                flags: [MessageFlags.Ephemeral],
             });
+        }
+        return;
+    }
+
+    async function tryListener<T extends TwineInteraction>(listener: InteractionListener<T>, interaction: T) {
+        try {
+            if (listener.matches(interaction)) {
+                await listener.execute(interaction, new ReplyManager<T>(interaction));
+            }
+        } catch (error) {
+            logger.error(error);
+            await interaction.reply({
+                content: "An unexpected error occurred while executing this command! Try again later.",
+                flags: [MessageFlags.Ephemeral],
+            });
+        }
+    }
+
+    for (const listener of interactionListeners) {
+        if (interaction.isButton() &&
+            listener.type === InteractionListenerType.BUTTON) {
+            await tryListener(listener, interaction);
+        } else if (interaction.isStringSelectMenu() &&
+            listener.type === InteractionListenerType.STRING_SELECT_MENU) {
+            await tryListener(listener, interaction);
+        } else if (interaction.isModalSubmit() &&
+            listener.type === InteractionListenerType.MODAL) {
+            await tryListener(listener, interaction);
         }
     }
 });

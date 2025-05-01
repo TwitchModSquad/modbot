@@ -1,4 +1,4 @@
-import RedisObjectManager from "../../classes/RedisObjectManager";
+import {RedisObjectManager} from "../../";
 import {AccessTokenWithUserId} from "@twurple/auth";
 
 class TwitchTokenManager extends RedisObjectManager<AccessTokenWithUserId> {

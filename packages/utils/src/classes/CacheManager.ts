@@ -36,7 +36,7 @@ interface CacheSetOptions<T> {
  *
  * @template T - The type of the object to be cached, extending the base type with `id` and optional `cachedDate` properties.
  */
-export default class CacheManager<T extends {id: number|string, cachedDate?: string}> {
+export class CacheManager<T extends {id: number|string, cachedDate?: string}> {
     protected redis;
 
     protected readonly model: ModelType<T>;

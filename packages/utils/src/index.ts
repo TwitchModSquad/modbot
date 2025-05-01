@@ -9,6 +9,7 @@ import {checkRequired} from "./environment";
 import {connect} from "./models";
 
 export {default as logger} from "./logger";
+export * from "./classes";
 export * from "./enums";
 export * from "./interfaces";
 export * from "./models";

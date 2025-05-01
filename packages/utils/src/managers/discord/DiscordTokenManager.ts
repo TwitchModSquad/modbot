@@ -1,5 +1,4 @@
-import RedisObjectManager from "../../classes/RedisObjectManager";
-import {RawDiscordUser} from "../../models";
+import {RedisObjectManager, RawDiscordUser} from "../../";
 import {discordUsers} from "../index";
 
 const REDIRECT_URI = process.env.API_URI + "auth/discord";

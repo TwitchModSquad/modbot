@@ -6,7 +6,7 @@ import eventManager from "../managers/events/EventManager";
  *
  * @template T - The type of objects being managed.
  */
-export default class RedisObjectManager<T> {
+export class RedisObjectManager<T> {
     protected redis;
     protected memoryCache: Map<string, T> = new Map();
     protected expiryTable: {expiresAt: number, id: string}[] = [];

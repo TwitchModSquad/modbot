@@ -6,6 +6,7 @@ export interface RawDiscordChannel {
     guildId: string;
 
     twitchBanSettings?: string|null;
+    twitchLiveStartSettings?: string|null;
 
     createdDate?: string;
     updatedDate?: string;
@@ -16,6 +17,7 @@ export class DiscordChannel extends Model<InferAttributes<DiscordChannel>, Infer
     declare guildId: string;
 
     declare twitchBanSettings?: string|null;
+    declare twitchLiveStartSettings?: string|null;
 
     declare createdAt?: Date;
     declare updatedAt?: Date;
@@ -24,6 +26,8 @@ export class DiscordChannel extends Model<InferAttributes<DiscordChannel>, Infer
         return {
             id: this.id,
             guildId: this.guildId,
+            twitchBanSettings: this.twitchBanSettings,
+            twitchLiveStartSettings: this.twitchLiveStartSettings,
             createdDate: this.createdAt ? this.createdAt.toISOString() : null,
             updatedDate: this.updatedAt ? this.updatedAt.toISOString() : null,
         };
@@ -43,7 +47,11 @@ DiscordChannel.init({
         type: DataTypes.TEXT,
         allowNull: true,
     },
+    twitchLiveStartSettings: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+    },
 }, {
     sequelize,
-    tableName: "discord__guilds",
+    tableName: "discord__channels",
 });

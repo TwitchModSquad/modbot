@@ -2,7 +2,8 @@ import {ReplyManager, TwineInteraction} from "../../classes";
 
 export enum InteractionListenerType {
     BUTTON,
-    SELECT_MENU,
+    STRING_SELECT_MENU,
+    MODAL,
 }
 
 export interface InteractionListener<T extends TwineInteraction> {
