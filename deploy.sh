@@ -16,6 +16,6 @@ echo "🛠️ Building everything..."
 npm run build:all
 
 echo "🚀 Restarting services with PM2..."
-pm2 restart ecosystem.config.js
+sudo pm2 restart ecosystem.config.js
 
 echo "✅ Deployment complete."
