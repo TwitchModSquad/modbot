@@ -9,11 +9,13 @@
     "lint": "eslint \"packages/*/src/**/*.ts\"",
     "type-check": "npm run type-check --workspaces",
     "clean": "npm run clean --workspaces",
+    "dev:web-public": "npm run dev --workspace=@modbot/web-public",
     "start:discord": "npm run start --workspace=@modbot/bot-discord",
     "start:twitch": "npm run start --workspace=@modbot/bot-twitch",
     "start:web-api": "npm run start --workspace=@modbot/web-api",
-    "start:all": "npm-run-all --parallel start:discord start:twitch start:web-api",
-    "test": "npm run build && npm run start:all"
+    "start:web-public": "npm run start --workspace=@modbot/web-public",
+    "start:all": "npm-run-all --parallel start:discord start:twitch start:web-api dev:web-public",
+    "test": "tsc --build && npm run start:all"
   },
   "repository": {
     "type": "git",

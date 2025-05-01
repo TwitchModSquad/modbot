@@ -1,5 +1,5 @@
 {
-	"name": "web-public",
+	"name": "@modbot/web-public",
 	"private": true,
 	"version": "0.0.0",
 	"type": "module",
@@ -7,6 +7,8 @@
 		"dev": "vite dev",
 		"build": "vite build",
 		"preview": "vite preview",
+		"start": "node build/index.js",
+		"clean": "rimraf build tsconfig.tsbuildinfo",
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
