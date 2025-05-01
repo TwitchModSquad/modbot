@@ -21,4 +21,4 @@ jobs:
 
       - name: Run deploy script on remote server
         run: |
-          ssh -o StrictHostKeyChecking=no ubuntu@web1.vint.twijn.net 'sudo bash -c "cd /srv/modbot && ./deploy.sh"'
+          ssh -o StrictHostKeyChecking=no ubuntu@web1.vint.twijn.net 'sudo -E bash -c "cd /srv/modbot && ./deploy.sh"'
