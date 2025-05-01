@@ -16,13 +16,17 @@ module.exports = {
             name: 'web-public',
             script: 'npm',
             args: 'run start:web-public',
-            env: { NODE_ENV: 'production' }
+            instances: 2,
+            exec_mode: "cluster",
+            env: { NODE_ENV: 'production', PORT: 3010, }
         },
         {
             name: 'web-api',
             script: 'npm',
             args: 'run start:web-api',
-            env: { NODE_ENV: 'production' }
+            instances: 2,
+            exec_mode: "cluster",
+            env: { NODE_ENV: 'production', PORT: 3020, }
         }
     ]
 };
