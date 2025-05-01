@@ -7,6 +7,7 @@
     { "path": "./packages/utils" },
     { "path": "./packages/bot-discord" },
     { "path": "./packages/bot-twitch" },
-    { "path": "./packages/web-api" }
+    { "path": "./packages/web-api" },
+    { "path": "./packages/web-public" }
   ]
 }
