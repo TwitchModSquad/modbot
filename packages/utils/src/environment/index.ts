@@ -13,10 +13,11 @@ const globalEnvVars: string[] = [
 const requiredEnvVars: Record<ServiceType, string[]> = {
     [ServiceType.API]: [
         ...globalEnvVars,
-        "API_PORT"
+        "API_PORT",
     ],
     [ServiceType.DISCORD]: [
         ...globalEnvVars,
+        "DISCORD_GUILD_ID",
     ],
     [ServiceType.TWITCH]: [
         ...globalEnvVars,

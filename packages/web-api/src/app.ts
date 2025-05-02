@@ -17,6 +17,7 @@ import auth from "./auth";
 import discord from "./discord";
 import identity from "./identity";
 import twitch from "./twitch";
+import statsManager from "@modbot/utils/dist/managers/StatsManager";
 
 const PORT = process.env.API_PORT;
 
@@ -75,6 +76,16 @@ app.use(async (req, res, next) => {
 
 app.use("/auth", auth);
 
+let services: IdentifyHandle[] = [];
+
+app.get("/", (req, res) => {
+    res.json({
+        ok: true,
+        services,
+        stats: statsManager.getPublicStats(),
+    });
+});
+
 app.use((req, res, next) => {
     if (!req.identity) {
         res.status(401).json({ok: false, error: "Unauthorized"});
@@ -87,15 +98,6 @@ app.use((req, res, next) => {
     }
 
     next();
-});
-
-let services: IdentifyHandle[] = [];
-
-app.get("/", (req, res) => {
-    res.json({
-        ok: true,
-        services,
-    });
 });
 
 app.use("/discord", discord);

@@ -1,5 +1,5 @@
 import {Client, Collection, Events, GatewayIntentBits, MessageFlags} from "discord.js";
-import {logger} from "@modbot/utils";
+import {logger, PublicStats} from "@modbot/utils";
 
 import {InteractionListener, InteractionListenerType, TwineCommand} from "./interfaces";
 import {ReplyManager, TwineInteraction} from "./classes";
@@ -8,6 +8,7 @@ import registerCommands from "./registerCommands";
 
 import rawSlashCommands from "./slashCommands";
 import {interactionListeners, rawListeners} from "./listeners";
+import eventManager from "@modbot/utils/dist/managers/events/EventManager";
 
 const slashCommands = new Collection<string, TwineCommand>();
 for (const slashCommand of rawSlashCommands) {
@@ -72,6 +73,13 @@ client.on(Events.InteractionCreate, async interaction => {
             await tryListener(listener, interaction);
         }
     }
+});
+
+eventManager.register("stats:request", async (): Promise<Partial<PublicStats>> => {
+    const guild = await client.guilds.fetch(process.env.DISCORD_GUILD_ID);
+    return {
+        discordMembers: guild?.memberCount ?? 0,
+    };
 });
 
 client.login(discordToken).catch(e => logger.error(e));

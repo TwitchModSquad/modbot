@@ -1,5 +1,6 @@
 import {RawTwitchBan, RawTwitchChat} from "../../models";
 import {IdentifyHandle} from "./handles";
+import {PublicStats} from "../../interfaces";
 
 export interface EventMap {
     "identify": {
@@ -13,7 +14,11 @@ export interface EventMap {
     "twitch:ban": {
         data: RawTwitchBan;
         response: void;
-    }
+    };
+    "stats:request": {
+        data: string;
+        response: Partial<PublicStats>;
+    };
 }
 
 export type EventNames = keyof EventMap;

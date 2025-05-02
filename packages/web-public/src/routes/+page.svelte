@@ -1,5 +1,8 @@
 <script>
     import Section from "$lib/snippets/Section.svelte";
+
+    const { data } = $props();
+    const { publicStats } = data;
 </script>
 
 <svelte:head>
@@ -8,7 +11,6 @@
 
 <Section type="transparent" full={true}>
     <h1>The Mod Squad</h1>
-    Hello world!
 </Section>
 
 <Section type="solid">

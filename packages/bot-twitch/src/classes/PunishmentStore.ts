@@ -6,6 +6,8 @@ export default class PunishmentStore<T extends PunishmentFields, M extends Model
 
     private cache: Map<number, M> = new Map();
 
+    private count: number = 0;
+
     private async updateAll() {
         logger.debug(`Loading punishments from ${this.model.tableName}`);
         const punishments = await this.model.findAll({
@@ -19,12 +21,18 @@ export default class PunishmentStore<T extends PunishmentFields, M extends Model
             this.cache.set(punishment.id, punishment);
         }
         logger.info(`Loaded ${punishments.length} punishments from ${this.model.tableName}`);
+
+        this.count = await this.model.count();
     }
 
     constructor(model: ModelStatic<M>) {
         this.model = model;
 
         setTimeout(() => this.updateAll(), 3000);
+    }
+
+    public getCount(): number {
+        return this.count;
     }
 
     public getAll(): M[] {
@@ -42,6 +50,7 @@ export default class PunishmentStore<T extends PunishmentFields, M extends Model
     }
 
     public add(punishment: M): void {
+        this.count++;
         this.cache.set(punishment.id, punishment);
     }
 }

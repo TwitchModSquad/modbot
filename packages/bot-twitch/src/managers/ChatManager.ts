@@ -36,6 +36,12 @@ const CAPS_REGEX = /[A-Z]/g;
 
 class ChatManager {
 
+    private count: number = 0;
+
+    constructor() {
+        TwitchChat.count().then(count => this.count = count);
+    }
+
     private parseStatistics(message: string, emoteOffsets: Map<string, string[]>): MessageStatistics {
         let messageWithoutEmotes = message;
 
@@ -80,7 +86,13 @@ class ChatManager {
         return badges;
     }
 
+    public getCount() {
+        return this.count;
+    }
+
     public async logMessage(message: ChatMessage) {
+        this.count++;
+
         const streamer = await twitchUsers.get(message.streamerId, true);
 
         // Stop now if the streamer isn't subscribed to any chat logging

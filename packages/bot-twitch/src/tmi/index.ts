@@ -1,5 +1,7 @@
 import ListenClient, {ListenClientType} from "../classes/ListenClient";
-import {events, logger, RawTwitchUser, TwitchRole, twitchTokens, TwitchUser} from "@modbot/utils";
+import {events, logger, PublicStats, RawTwitchUser, TwitchRole, twitchTokens, TwitchUser} from "@modbot/utils";
+import {banStore, timeoutStore} from "../stores";
+import {chatManager} from "../managers";
 
 export let listenClients = new Map<string, ListenClient>();
 
@@ -72,6 +74,19 @@ events.register("twitch:join", async (channel: RawTwitchUser) => {
 events.register("twitch:part", (channel: RawTwitchUser) => {
     logger.info(`Parting twitch channel ${channel.display_name}`);
     partChannel(channel);
+});
+
+events.register("stats:request", (): Partial<PublicStats> => {
+    let channelCount: number = 0;
+    for (const [, client] of listenClients) {
+        channelCount += client.channels.length;
+    }
+    return {
+        channels: channelCount,
+        twitchBans: banStore.getCount(),
+        twitchChats: chatManager.getCount(),
+        twitchTimeouts: timeoutStore.getCount(),
+    }
 });
 
 export default async (members: TwitchUser[]) => {
