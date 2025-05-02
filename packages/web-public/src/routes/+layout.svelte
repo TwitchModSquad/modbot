@@ -12,3 +12,9 @@
     </main>
     <Footer />
 </div>
+
+<style>
+    main {
+        margin-top: 5rem;
+    }
+</style>

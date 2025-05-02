@@ -25,7 +25,7 @@
 }
 
 html, body {
-    height: 100%;
+    min-height: 100%;
     margin: 0;
     padding: 0;
 }
@@ -39,6 +39,24 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
     font-family: "Rajdhani", sans-serif;
+    margin: .25em 0 .4em 0;
+    font-weight: 400;
+}
+
+h1 {
+    font-size: 3em;
+}
+
+h2 {
+    font-size: 2em;
+}
+
+h3 {
+    font-size: 1.5em;
+}
+
+h4 {
+    font-size: 1.2em;
 }
 
 .app {
