@@ -3,6 +3,8 @@ import type { Handle } from '@sveltejs/kit';
 import { API_URI } from '$env/static/private';
 import type { PublicStats } from '@modbot/utils';
 
+const POLL_TIME = 6 * 60 * 60 * 1000;
+
 let publicStats: PublicStats;
 
 const update = async () => {
@@ -15,7 +17,7 @@ const update = async () => {
 };
 
 update().catch(e => console.error(e)); // run on server start
-setInterval(update, 120_000); // poll every 2 minutes
+setInterval(update, POLL_TIME); // poll every 2 minutes
 
 export const handle: Handle = async ({ event, resolve }) => {
     event.locals.publicStats = publicStats;

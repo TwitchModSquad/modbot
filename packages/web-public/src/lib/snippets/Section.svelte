@@ -1,9 +1,8 @@
 <script lang="ts">
     export let type: "transparent"|"solid";
-    export let full: boolean = false;
 </script>
 
-<section class={`${type} ${full ? "full" : ""}`}>
+<section class={type}>
     <div class="wrapper">
         <slot />
     </div>
@@ -21,18 +20,15 @@
         margin: 0 auto;
     }
 
-    section.full {
-        height: calc(100vh - 7rem);
-    }
-
     section.solid {
-        background: var(--primary-background-color);
+        background: var(--secondary-background-color);
     }
 
     section.transparent .wrapper {
-        background-color: rgba(0,0,0,0.5);
+        background-color: rgba(10, 10, 10, 0.7);
         backdrop-filter: blur(50px);
         margin: 4em auto;
+        padding: 2em 4em;
         border-radius: .8em;
     }
 </style>

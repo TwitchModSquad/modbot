@@ -1,0 +1,10 @@
+<script>
+    import Section from "$lib/snippets/Section.svelte";
+</script>
+
+<Section type="transparent">
+    <h2>Let's get in touch!</h2>
+    <p>
+        Send us an email at <a href="mailto:hello@modsquad.tools?subject={encodeURIComponent('Modsquad.tools Contact Link')}">hello@modsquad.tools</a>
+    </p>
+</Section>

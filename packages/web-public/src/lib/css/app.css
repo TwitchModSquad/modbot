@@ -11,6 +11,7 @@
     --heavy-shadow: 2px 2px 10px rgba(0,0,0,0.35);
     --light-shadow: 2px 2px 15px rgba(255,255,255,0.4);
 
+    --primary-tms-color-rgb: 119, 44, 232;
     --primary-tms-color: #772ce8;
     --secondary-tms-color: #6c24d7;
     --faded-tms-color: rgba(201, 182, 230, 0.9);
@@ -25,7 +26,6 @@
 }
 
 html, body {
-    min-height: 100%;
     margin: 0;
     padding: 0;
 }
@@ -59,12 +59,25 @@ h4 {
     font-size: 1.2em;
 }
 
-.app {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
+a {
+    display: inline-block;
+    position: relative;
+    color: var(--faded-tms-color);
+    text-decoration: none;
+    word-wrap: break-word;
 }
 
-main {
-    flex-grow: 1;
+a::after {
+    content: "";
+    position: absolute;
+    display: block;
+    width: 0;
+    height: 1px;
+    background: var(--faded-tms-color);
+    transition: width 250ms;
+}
+
+a:hover::after,
+a:focus-visible::after {
+    width: 100%;
 }
