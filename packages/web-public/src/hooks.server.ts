@@ -12,6 +12,7 @@ let publicStats: PublicStats = {
     twitchBans: 0,
     twitchChats: 0,
     twitchTimeouts: 0,
+    members: [],
 };
 
 const update = async () => {

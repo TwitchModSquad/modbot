@@ -11,6 +11,7 @@ class StatsManager {
         twitchBans: 0,
         twitchChats: 0,
         twitchTimeouts: 0,
+        members: [],
     };
 
     private async requestPublicStats(): Promise<void> {

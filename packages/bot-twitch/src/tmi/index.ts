@@ -1,5 +1,5 @@
 import ListenClient, {ListenClientType} from "../classes/ListenClient";
-import {events, logger, PublicStats, RawTwitchUser, TwitchRole, twitchTokens, TwitchUser} from "@modbot/utils";
+import {events, logger, PublicStats, RawTwitchUser, TwitchRole, twitchTokens, TwitchUser, twitchUsers} from "@modbot/utils";
 import {banStore, timeoutStore} from "../stores";
 import {chatManager} from "../managers";
 
@@ -76,13 +76,31 @@ events.register("twitch:part", (channel: RawTwitchUser) => {
     partChannel(channel);
 });
 
-events.register("stats:request", (): Partial<PublicStats> => {
+events.register("stats:request", async (): Promise<Partial<PublicStats>> => {
     let channelCount: number = 0;
+    let members: RawTwitchUser[] = [];
     for (const [, client] of listenClients) {
         channelCount += client.channels.length;
+
+        for (const login of client.channels) {
+            try {
+                const member = await twitchUsers.getByName(login);
+                if (member) {
+                    members.push(member);
+                } else {
+                    logger.error(`Failed to get member data for ${login}: User not found`);
+                }
+            } catch (e) {
+                logger.error(`Failed to get member data for ${login}: ${e.message}`);
+            }
+        }
     }
+    members = members.sort(
+        (a, b) => b.follower_count - a.follower_count)
+    ;
     return {
         channels: channelCount,
+        members,
         twitchBans: banStore.getCount(),
         twitchChats: chatManager.getCount(),
         twitchTimeouts: timeoutStore.getCount(),
