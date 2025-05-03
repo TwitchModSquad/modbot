@@ -22,7 +22,7 @@ const update = async () => {
     }
 };
 
-update().catch(e => console.error(e)); // run on server start
+setTimeout(update, 3000);
 setInterval(update, POLL_TIME); // poll every 5 minutes
 
 export const handle: Handle = async ({ event, resolve }) => {
