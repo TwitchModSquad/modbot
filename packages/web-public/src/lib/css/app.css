@@ -64,7 +64,7 @@ h4 {
     font-size: 1.2em;
 }
 
-a {
+a.link {
     display: inline-block;
     position: relative;
     color: var(--faded-tms-color);
@@ -72,7 +72,7 @@ a {
     word-wrap: break-word;
 }
 
-a::after {
+a.link::after {
     content: "";
     position: absolute;
     display: block;
@@ -82,7 +82,7 @@ a::after {
     transition: width 250ms;
 }
 
-a:hover::after,
-a:focus-visible::after {
+a.link:hover::after,
+a.link:focus-visible::after {
     width: 100%;
 }
