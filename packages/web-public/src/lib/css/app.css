@@ -1,4 +1,7 @@
 :root {
+    --font-heading: "Rajdhani", sans-serif;
+    --font-body: "Inter", sans-serif;
+
     --primary-background-color: #1c1b1e;
     --secondary-background-color: #26262f;
     --tertiary-background-color: #24242a;
@@ -16,10 +19,12 @@
     --secondary-tms-color: #6c24d7;
     --faded-tms-color: rgba(201, 182, 230, 0.9);
 
+    --primary-twitch-color-rgb: 145, 71, 255;
     --primary-twitch-color: #9147ff;
     --secondary-twitch-color: #8239ef;
     --dark-twitch-color: #552996;
 
+    --primary-discord-color-rgb: 88, 101, 242;
     --primary-discord-color: #5865f2;
     --secondary-discord-color: #4f5ceb;
     --dark-discord-color: #2e379c;
@@ -33,12 +38,12 @@ html, body {
 body {
     background: url("https://cdn.modsquad.tools/assets/images/banner.webp") no-repeat fixed;
     background-size: cover;
-    font-family: "Inter", sans-serif;
+    font-family: var(--font-body), sans-serif;
     color: var(--primary-text-color);
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-family: "Rajdhani", sans-serif;
+    font-family: var(--font-heading), sans-serif;
     margin: .25em 0 .4em 0;
     font-weight: 400;
 }
