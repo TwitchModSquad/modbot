@@ -58,6 +58,8 @@ export const loadClient = async () => {
     let cursor = "0";
     let count = 0;
 
+    let hasBotToken = false;
+
     do {
         const result = await redis.scan(cursor, "MATCH", "twitch:token:*", "COUNT", 100);
         cursor = result[0];
@@ -67,7 +69,6 @@ export const loadClient = async () => {
 
         const twitchRoles = await TwitchRole.findAll();
 
-        let hasBotToken = false;
         for (const token of tokens) {
             let intents = [
                 `chat:${token.userId}`,
@@ -90,12 +91,13 @@ export const loadClient = async () => {
             logger.debug(`Added token for user ${token.userId} with intents: ${intents.join(", ")}`);
         }
 
-        if (!hasBotToken) {
-            logger.error("Missing bot token! Authenticate with the bot account and restart the service!");
-        }
-
         count += tokens.length;
     } while (cursor !== "0");
+
+    if (!hasBotToken) {
+        logger.error("Missing bot token! Authenticate with the bot account and restart the service!");
+    }
+
     logger.info(`Loaded ${count} tokens`);
 
     logger.info(`Finished loading ${count} Twitch tokens`);
