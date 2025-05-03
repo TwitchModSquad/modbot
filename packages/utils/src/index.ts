@@ -22,10 +22,11 @@ export * from "./managers";
 import {events, IdentifyHandle} from "./managers";
 import {loadClient} from "./twitch";
 import statsManager from "./managers/StatsManager";
+import {UptimeHeartbeat} from "./classes/UptimeHeartbeat";
 
 export const startTime = Date.now();
 
-export const initialize = async (service: ServiceType) => {
+export const initialize = async (service: ServiceType, heartbeatEnv: string = null) => {
     logger.info(`Initializing utils as '${service}' service`);
 
     // Check required environment variables
@@ -51,4 +52,20 @@ export const initialize = async (service: ServiceType) => {
             startTime,
         };
     });
+
+    // Start uptime heartbeat if env exists
+    if (heartbeatEnv) {
+        const heartbeatUrl = process.env[heartbeatEnv];
+        if (!heartbeatUrl || heartbeatUrl.trim() === "" || heartbeatUrl.trim() === "undefined") {
+            logger.warn(`No heartbeat URL found for service '${service}'`);
+        } else {
+            try {
+                new URL(heartbeatUrl); // Validate URL format
+                logger.warn(service);
+                new UptimeHeartbeat(heartbeatUrl, 55_000);
+            } catch (e) {
+                logger.error(`Invalid heartbeat URL "${heartbeatUrl}" for service "${service}": ${e.message}`);
+            }
+        }
+    }
 }
