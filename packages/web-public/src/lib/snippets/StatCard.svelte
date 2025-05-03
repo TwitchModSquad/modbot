@@ -24,7 +24,7 @@
     }
 
     $effect(() => {
-        const duration = 1250;
+        const duration = 2500;
         const steps = 60;
         let current = 0;
 
@@ -54,9 +54,8 @@
     .statistic {
         display: flex;
         flex-direction: column;
-        padding: .6em;
+        padding: 1em;
         backdrop-filter: blur(40px);
-        border-radius: .8em;
         overflow: hidden;
         box-shadow: var(--shadow);
     }
