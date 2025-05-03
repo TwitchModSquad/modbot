@@ -14,7 +14,7 @@
     }
 
     .wrapper {
-        width: 100%;
+        width: calc(100% - 2em);
         padding: 1em;
         max-width: 60em;
         margin: 0 auto;
@@ -27,8 +27,16 @@
     section.transparent .wrapper {
         background-color: rgba(10, 10, 10, 0.7);
         backdrop-filter: blur(50px);
+        width: calc(100% - 10em);
         margin: 4em auto;
         padding: 2em 4em;
         border-radius: .8em;
+    }
+
+    @media (max-width: 768px) {
+        section.transparent .wrapper {
+            width: calc(100% - 6em);
+            padding: 2em;
+        }
     }
 </style>
