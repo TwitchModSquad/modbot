@@ -11,7 +11,7 @@
     <title>The Mod Squad</title>
 </svelte:head>
 
-<Landing />
+<Landing publicStats={publicStats} />
 
 <Section type="solid">
     <h2>Join the mod squad!</h2>
