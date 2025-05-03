@@ -80,6 +80,7 @@ jobs:
             --arg username "ModBot Release" \
             --arg avatar_url "https://cdn.modsquad.tools/assets/images/logo.webp" \
             --arg content "# 📦 New Release: \`$VERSION\`$COMMITS" \
+            --arg embeds "[]" \
             '{username: $username, avatar_url: $avatar_url, content: $content}')
 
           curl -X POST -H "Content-Type: application/json" \
