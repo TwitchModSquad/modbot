@@ -1,5 +1,37 @@
-<script>
+<script lang="ts">
     import Section from "$lib/snippets/components/Section.svelte";
+    import type {PublicStats, RawTwitchUser} from "@modbot/utils";
+    import {onMount} from "svelte";
+    import TwitchUserList from "$lib/snippets/sections/TwitchUserList.svelte";
+
+    const FEATURED_MEMBER_COUNT = 5;
+
+    const { data } = $props();
+    const { publicStats }: {
+        publicStats: PublicStats,
+    } = data;
+
+    let featuredMembers: RawTwitchUser[] = $state([]);
+
+    onMount(() => {
+        if (publicStats.members.length < 5) {
+            return;
+        }
+
+        for (let i = 0; i < 5; i++) {
+            let member: RawTwitchUser|null = null;
+            while (member === null) {
+                member = publicStats.members[Math.floor(Math.random() * publicStats.members.length)];
+                if (featuredMembers.find(x => x.id === member?.id)) {
+                    member = null;
+                }
+            }
+            featuredMembers = [
+                ...featuredMembers,
+                member,
+            ];
+        }
+    })
 </script>
 
 <svelte:head>
@@ -8,8 +40,6 @@
 </svelte:head>
 
 <Section type="solid">
-    <h2>Join the mod squad!</h2>
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci asperiores beatae, consequuntur eos est fugiat id laboriosam minima minus nemo nulla obcaecati quia quidem, quo quos reprehenderit sed ut voluptate?</p>
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci asperiores beatae, consequuntur eos est fugiat id laboriosam minima minus nemo nulla obcaecati quia quidem, quo quos reprehenderit sed ut voluptate?</p>
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci asperiores beatae, consequuntur eos est fugiat id laboriosam minima minus nemo nulla obcaecati quia quidem, quo quos reprehenderit sed ut voluptate?</p>
+    <h2>Featured Members</h2>
+    <TwitchUserList users={featuredMembers} />
 </Section>
