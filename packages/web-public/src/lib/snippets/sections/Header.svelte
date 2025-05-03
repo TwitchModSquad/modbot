@@ -19,7 +19,7 @@
     <img alt="The Mod Squad Logo" src="https://cdn.modsquad.tools/assets/images/logo.webp">
     <nav>
         <ul>
-            <li><a href="/packages/web-public/static" aria-current={page.url.pathname === "/" ? "page" : undefined}>Home</a></li>
+            <li><a href="/" aria-current={page.url.pathname === "/" ? "page" : undefined}>Home</a></li>
             <li><a href="/members" aria-current={page.url.pathname === "/members" ? "page" : undefined}>Members</a></li>
             <li><a href="/status" aria-current={page.url.pathname === "/status" ? "page" : undefined}>Status</a></li>
         </ul>
