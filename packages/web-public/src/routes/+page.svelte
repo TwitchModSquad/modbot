@@ -1,16 +1,10 @@
 <script>
     import Section from "$lib/snippets/Section.svelte";
-    import Landing from "$lib/snippets/Landing.svelte";
-
-    const { data } = $props();
-    const { publicStats } = data;
 </script>
 
 <svelte:head>
     <title>The Mod Squad</title>
 </svelte:head>
-
-<Landing publicStats={publicStats} />
 
 <Section type="solid">
     <h2>Join the mod squad!</h2>
