@@ -76,13 +76,16 @@
         flex-grow: 1;
         font-size: 1.8em;
         font-weight: 300;
+        text-align: center;
         margin: 0;
     }
 
-    p.value span {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+    @media only screen and (min-width: 768px) {
+        p.value span {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
     }
 </style>

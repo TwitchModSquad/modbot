@@ -63,6 +63,15 @@
         padding: 8em;
     }
 
+    @media (max-width: 1200px) {
+        .landing {
+            grid-template-columns: 1fr;
+            gap: 1em;
+            padding: 8em 2em 2em 2em;
+            height: auto;
+        }
+    }
+
     .container {
         display: flex;
         justify-content: center;
@@ -92,6 +101,21 @@
         margin: 0;
     }
 
+    @media (max-width: 768px) {
+        .landing-text {
+            padding: 1.5em;
+            max-width: 100%;
+        }
+
+        .landing-text p {
+            font-size: 1em;
+        }
+
+        h1 {
+            font-size: 2.5em;
+        }
+    }
+
     .statistics {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -102,5 +126,14 @@
         aspect-ratio: 2/1;
         border-radius: 1em;
         overflow: hidden;
+    }
+
+    @media (max-width: 768px) {
+        .statistics {
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            max-width: 100%;
+            aspect-ratio: unset;
+        }
     }
 </style>
