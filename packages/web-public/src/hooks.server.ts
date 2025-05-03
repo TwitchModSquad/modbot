@@ -3,9 +3,15 @@ import type { Handle } from '@sveltejs/kit';
 import { API_URI } from '$env/static/private';
 import type { PublicStats } from '@modbot/utils';
 
-const POLL_TIME = 6 * 60 * 60 * 1000;
+const POLL_TIME = 5 * 60 * 1000;
 
-let publicStats: PublicStats;
+let publicStats: PublicStats = {
+    discordMembers: 0,
+    twitchBans: 0,
+    twitchChats: 0,
+    twitchTimeouts: 0,
+    channels: 0,
+};
 
 const update = async () => {
     try {
@@ -17,7 +23,7 @@ const update = async () => {
 };
 
 update().catch(e => console.error(e)); // run on server start
-setInterval(update, POLL_TIME); // poll every 2 minutes
+setInterval(update, POLL_TIME); // poll every 5 minutes
 
 export const handle: Handle = async ({ event, resolve }) => {
     event.locals.publicStats = publicStats;
