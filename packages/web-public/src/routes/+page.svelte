@@ -1,7 +1,6 @@
 <script>
     import Section from "$lib/snippets/Section.svelte";
     import Landing from "$lib/snippets/Landing.svelte";
-    import ContactUs from "$lib/snippets/ContactUs.svelte";
 
     const { data } = $props();
     const { publicStats } = data;
@@ -19,5 +18,3 @@
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci asperiores beatae, consequuntur eos est fugiat id laboriosam minima minus nemo nulla obcaecati quia quidem, quo quos reprehenderit sed ut voluptate?</p>
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci asperiores beatae, consequuntur eos est fugiat id laboriosam minima minus nemo nulla obcaecati quia quidem, quo quos reprehenderit sed ut voluptate?</p>
 </Section>
-
-<ContactUs />
