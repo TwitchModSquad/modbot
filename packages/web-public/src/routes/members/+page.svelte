@@ -7,5 +7,5 @@
 </svelte:head>
 
 <Section type="solid">
-    <h2>Members</h2>
+    <h1>Members</h1>
 </Section>
