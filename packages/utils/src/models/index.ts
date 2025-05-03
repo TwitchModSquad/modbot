@@ -1,7 +1,6 @@
 import logger from "../logger";
 
 import sequelize from "./database";
-import {ServiceType} from "../enums";
 import {TwitchUser} from "./twitchuser.model";
 import {TwitchChat} from "./twitchchat.model";
 import {TwitchRole} from "./twitchrole.model";
