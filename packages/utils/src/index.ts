@@ -33,7 +33,7 @@ export const initialize = async (service: ServiceType, heartbeatEnv: string = nu
     checkRequired(service);
 
     // Sequelize connect
-    await connect(service);
+    await connect();
 
     // Start the event manager
     await events.start(service);

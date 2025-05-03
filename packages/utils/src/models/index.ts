@@ -17,7 +17,7 @@ export * from "./twitchtimeout.model";
 export * from "./twitchchat.model";
 export * from "./twitchrole.model";
 
-export const connect = async (service: ServiceType) => {
+export const connect = async () => {
     logger.info(`Attempting to connect to MariaDB @ ${sequelize.config.host}`);
     await sequelize.authenticate();
     logger.info("Connection to MariaDB successful! Synchronizing...");
@@ -94,9 +94,6 @@ export const connect = async (service: ServiceType) => {
         as: "streamer",
     });
 
-    if (service === ServiceType.API) {
-        await sequelize.sync({alter: process.env.NODE_ENV === "development"});
-    }
     logger.info("Synchronization complete!");
 
 }
