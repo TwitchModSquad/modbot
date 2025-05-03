@@ -5,6 +5,7 @@
 
 <svelte:head>
     <title>Privacy Policy | The Mod Squad</title>
+    <meta name="description" content="Privacy policy for tools built for the Discord moderation group, The Mod Squad">
 </svelte:head>
 
 <Section type="solid">

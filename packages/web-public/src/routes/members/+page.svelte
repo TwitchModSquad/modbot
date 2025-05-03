@@ -4,6 +4,7 @@
 
 <svelte:head>
     <title>Members | The Mod Squad</title>
+    <meta name="description" content="List of Twitch streamers and their moderators that are members of The Mod Squad">
 </svelte:head>
 
 <Section type="solid">

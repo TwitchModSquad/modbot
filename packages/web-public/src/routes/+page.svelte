@@ -4,6 +4,7 @@
 
 <svelte:head>
     <title>The Mod Squad</title>
+    <meta name="description" content="A Discord moderation community offering tools to protect and enhance your Twitch and Discord communities.">
 </svelte:head>
 
 <Section type="solid">

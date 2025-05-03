@@ -5,6 +5,7 @@
 
 <svelte:head>
     <title>Service Status | The Mod Squad</title>
+    <meta name="description" content="Service status for The Mod Squad">
 </svelte:head>
 
 <Section type="solid">

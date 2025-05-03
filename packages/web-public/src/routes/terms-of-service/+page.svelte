@@ -5,6 +5,7 @@
 
 <svelte:head>
     <title>Terms of Service | The Mod Squad</title>
+    <meta name="description" content="Terms of service for tools built for the Discord moderation group, The Mod Squad">
 </svelte:head>
 
 <Section type="solid">
