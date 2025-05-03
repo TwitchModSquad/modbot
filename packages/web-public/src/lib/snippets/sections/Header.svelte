@@ -1,6 +1,6 @@
 <script lang="ts">
-    import {page} from "$app/state";
     import {onMount} from "svelte";
+    import MainNavigation from "$lib/snippets/sections/MainNavigation.svelte";
 
     let scrolled = $state(false);
 
@@ -17,13 +17,7 @@
 
 <header class:scrolled={scrolled}>
     <img alt="The Mod Squad Logo" src="https://cdn.modsquad.tools/assets/images/logo.webp">
-    <nav>
-        <ul>
-            <li><a href="/" aria-current={page.url.pathname === "/" ? "page" : undefined}>Home</a></li>
-            <li><a href="/members" aria-current={page.url.pathname === "/members" ? "page" : undefined}>Members</a></li>
-            <li><a href="/status" aria-current={page.url.pathname === "/status" ? "page" : undefined}>Status</a></li>
-        </ul>
-    </nav>
+    <MainNavigation />
 </header>
 
 <style>
@@ -64,53 +58,5 @@
         border-radius: .75em;
         margin-left: 1em;
         z-index: 10;
-    }
-
-    nav {
-        align-items: center;
-        justify-content: right;
-        margin-right: .6em;
-    }
-
-    ul {
-        display: flex;
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-
-    a {
-        position: relative;
-        color: var(--primary-text-color);
-        text-decoration: none;
-        font-size: 1.1em;
-        padding: .6em .8em;
-        margin: 0 .4em;
-        transition: 250ms;
-        text-shadow: var(--shadow);
-    }
-
-    a::after {
-        content: "";
-        width: 0;
-        height: 2px;
-        position: absolute;
-        bottom: 10%;
-        left: 50%;
-        transform: translateX(-50%);
-        background: var(--primary-text-color);
-        opacity: 0;
-        transition: 250ms;
-        box-shadow: var(--shadow);
-    }
-
-    a:hover::after, a:focus::after, a[aria-current=page]::after {
-        width: 100%;
-        opacity: 1;
-    }
-
-    a[aria-current=page]::after {
-        background-color: var(--primary-tms-color);
-        width: 80%;
     }
 </style>
