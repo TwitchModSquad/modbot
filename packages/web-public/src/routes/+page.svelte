@@ -18,7 +18,7 @@
             return;
         }
 
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < FEATURED_MEMBER_COUNT; i++) {
             let member: RawTwitchUser|null = null;
             while (member === null) {
                 member = publicStats.members[Math.floor(Math.random() * publicStats.members.length)];
