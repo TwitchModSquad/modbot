@@ -1,5 +1,6 @@
 <script lang="ts">
     import Section from "$lib/snippets/Section.svelte";
+    import ReturnHome from "$lib/snippets/ReturnHome.svelte";
 </script>
 
 <svelte:head>
@@ -10,6 +11,7 @@
     <h1>
         Privacy Policy
     </h1>
+    <ReturnHome />
     <p>
         The Mod Squad ("we," "us," "our") values your privacy and is committed to protecting your personal information. This Privacy Policy explains how we collect, use, and share information when you use our services, including our Twitch and Discord bot, and our website (collectively, the "Services"). By using our Services, you agree to the collection and use of information in accordance with this policy.
     </p>
@@ -47,4 +49,5 @@
     <p>
         <small>Last updated 5/3/2025</small>
     </p>
+    <ReturnHome />
 </Section>

@@ -1,5 +1,6 @@
 <script lang="ts">
     import Section from "$lib/snippets/Section.svelte";
+    import ReturnHome from "$lib/snippets/ReturnHome.svelte";
 </script>
 
 <svelte:head>
@@ -10,6 +11,7 @@
     <h1>
         Terms of Service
     </h1>
+    <ReturnHome />
     <p>
         Welcome to The Mod Squad! These Terms of Service ("Terms") govern your use of our services, including our Twitch and Discord bot, and our website (collectively, the "Services"). By accessing or using our Services, you agree to be bound by these Terms. If you do not agree to these Terms, please do not use our Services.
     </p>
@@ -76,4 +78,5 @@
     <p>
         <small>Last updated 5/3/2025</small>
     </p>
+    <ReturnHome />
 </Section>
