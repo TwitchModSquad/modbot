@@ -7,8 +7,8 @@
     }
 </script>
 
-<button class="mobile-menu-button" onclick={toggleMobileMenu} aria-label="Toggle menu">
-    <span></span>
+<button class="mobile-menu-button" class:open={mobileMenuOpen} onclick={toggleMobileMenu} aria-label="Toggle menu">
+<span></span>
     <span></span>
     <span></span>
 </button>
@@ -43,9 +43,21 @@
         height: 0.2rem;
         background: var(--primary-text-color);
         border-radius: 10px;
-        transition: all 0.3s linear;
+        transition: all 0.2s ease-in-out;
         position: relative;
-        transform-origin: 1px;
+        transform-origin: center;
+    }
+
+    .mobile-menu-button:global(.open) span:first-child {
+        transform: rotate(45deg) translate(0.5rem, 0.5rem);
+    }
+
+    .mobile-menu-button:global(.open) span:nth-child(2) {
+        opacity: 0;
+    }
+
+    .mobile-menu-button:global(.open) span:last-child {
+        transform: rotate(-45deg) translate(0.5rem, -0.5rem);
     }
 
     nav {
@@ -102,7 +114,6 @@
         }
 
         nav {
-            display: none;
             position: fixed;
             top: 0;
             left: 0;
@@ -111,10 +122,14 @@
             background: var(--primary-background-color);
             padding-top: 5rem;
             margin: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease-in-out;
         }
 
         nav.open {
-            display: block;
+            opacity: 1;
+            pointer-events: all;
         }
 
         ul {
