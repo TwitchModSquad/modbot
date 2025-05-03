@@ -30,9 +30,15 @@ jobs:
             RANGE="${GITHUB_REF_NAME}"
           fi
           echo "RANGE: $RANGE"
-          echo "COMMITS<<EOF" >> $GITHUB_ENV
-          git log $RANGE --pretty=format:'- %s (%an)' >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+
+          # Generate commit log into a variable
+          COMMITS=$(git log $RANGE --pretty=format:'- %s (%an)')
+
+          # Save it as an output
+          COMMITS="${COMMITS//'%'/'%25'}"
+          COMMITS="${COMMITS//$'\n'/'%0A'}"
+          COMMITS="${COMMITS//$'\r'/'%0D'}"
+          echo "commits=$COMMITS" >> $GITHUB_OUTPUT
 
       - name: Post to Discord
         env:
