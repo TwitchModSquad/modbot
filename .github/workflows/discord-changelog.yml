@@ -50,11 +50,12 @@ jobs:
           done < <(git log $RANGE --pretty=format:'%s')
 
           {
-            echo "**Features**"
+            echo '\n\n'
+            echo "## Features"
             echo "$FEATURES"
-            echo "**Fixes**"
+            echo "## Fixes"
             echo "$FIXES"
-            echo "**Chores**"
+            echo "## Chores"
             echo "$CHORES"
             if [ -n "$OTHER" ]; then
               echo "**Other**"
@@ -73,7 +74,7 @@ jobs:
           PAYLOAD=$(jq -n \
             --arg username "ModBot Release" \
             --arg avatar_url "https://cdn.modsquad.tools/assets/images/logo.webp" \
-            --arg content "**📦 New Release: \`$VERSION\`**\n\n$COMMITS" \
+            --arg content "# 📦 New Release: \`$VERSION\`$COMMITS" \
             '{username: $username, avatar_url: $avatar_url, content: $content}')
 
           curl -X POST -H "Content-Type: application/json" \
