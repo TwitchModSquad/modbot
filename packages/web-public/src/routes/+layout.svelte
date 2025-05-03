@@ -1,12 +1,12 @@
 <script lang="ts">
     import("$lib/css/app.css");
 
-    import Header from "$lib/snippets/Header.svelte";
-    import Footer from "$lib/snippets/Footer.svelte";
-    import ContactUs from "$lib/snippets/ContactUs.svelte";
+    import Header from "$lib/snippets/sections/Header.svelte";
+    import Footer from "$lib/snippets/sections/Footer.svelte";
+    import ContactUs from "$lib/snippets/sections/ContactUs.svelte";
     import {page} from "$app/state";
-    import Landing from "$lib/snippets/Landing.svelte";
-    import PageHead from "$lib/snippets/PageHead.svelte";
+    import Landing from "$lib/snippets/sections/Landing.svelte";
+    import PageHead from "$lib/snippets/sections/PageHead.svelte";
 
     const { data, children } = $props();
     const { publicStats } = data;

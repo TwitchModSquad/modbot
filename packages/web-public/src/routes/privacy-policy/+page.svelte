@@ -1,6 +1,6 @@
 <script lang="ts">
-    import Section from "$lib/snippets/Section.svelte";
-    import ReturnHome from "$lib/snippets/ReturnHome.svelte";
+    import Section from "$lib/snippets/components/Section.svelte";
+    import ReturnHome from "$lib/snippets/components/ReturnHome.svelte";
 </script>
 
 <svelte:head>

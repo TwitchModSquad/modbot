@@ -1,5 +1,5 @@
 <script>
-    import Section from "$lib/snippets/Section.svelte";
+    import Section from "$lib/snippets/components/Section.svelte";
 </script>
 
 <Section type="transparent">

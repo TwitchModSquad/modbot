@@ -1,6 +1,6 @@
 <script>
-    import Section from "$lib/snippets/Section.svelte";
-    import Button from "$lib/snippets/Button.svelte";
+    import Section from "$lib/snippets/components/Section.svelte";
+    import Button from "$lib/snippets/components/Button.svelte";
 </script>
 
 <svelte:head>
