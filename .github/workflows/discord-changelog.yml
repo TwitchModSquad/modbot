@@ -22,7 +22,7 @@ jobs:
           echo "Previous tag: $PREV_TAG"
           echo "prev_tag=$PREV_TAG" >> $GITHUB_OUTPUT
 
-      - name: Get grouped commit log (no authors)
+      - name: Get grouped commit log
         run: |
           RANGE="${{ steps.prev_tag.outputs.prev_tag }}..${GITHUB_REF_NAME}"
           if [ -z "${{ steps.prev_tag.outputs.prev_tag }}" ]; then
@@ -36,24 +36,24 @@ jobs:
           CHORES=""
           OTHER=""
 
-          while IFS= read -r LINE; do
-            # Check if commit is a version-related commit (modify version files like package.json, version.txt, etc.)
-            COMMIT_FILES=$(git show --name-only --oneline ${LINE} | tail -n +2)
-            if echo "$COMMIT_FILES" | grep -qE "(package\.json|version\.txt)"; then
-              continue  # Skip version commits
-            fi
+          # GitHub repository info
+          GITHUB_URL="https://github.com/${GITHUB_REPOSITORY}/commit"
 
+          while IFS= read -r LINE; do
+            COMMIT_HASH=$(echo "$LINE" | cut -d ' ' -f 1)  # Extract commit hash
             MSG=$(echo "$LINE" | sed -E 's/^.*: //')  # Remove prefix
+            COMMIT_URL="${GITHUB_URL}/${COMMIT_HASH}"
+
             if [[ "$LINE" == feat:* ]]; then
-              FEATURES="${FEATURES}- ${MSG}"$'\n'
+              FEATURES="${FEATURES}- [${MSG}](${COMMIT_URL})"$'\n'
             elif [[ "$LINE" == fix:* ]]; then
-              FIXES="${FIXES}- ${MSG}"$'\n'
+              FIXES="${FIXES}- [${MSG}](${COMMIT_URL})"$'\n'
             elif [[ "$LINE" == chore:* ]]; then
-              CHORES="${CHORES}- ${MSG}"$'\n'
+              CHORES="${CHORES}- [${MSG}](${COMMIT_URL})"$'\n'
             else
-              OTHER="${OTHER}- ${LINE}"$'\n'
+              OTHER="${OTHER}- [${MSG}](${COMMIT_URL})"$'\n'
             fi
-          done < <(git log $RANGE --pretty=format:'%s')
+          done < <(git log $RANGE --pretty=format:'%H %s')
 
           {
             echo '\n\n'
@@ -68,6 +68,7 @@ jobs:
               echo "$OTHER"
             fi
           } > commit_log.txt
+      
 
       - name: Post to Discord
         env:
