@@ -22,36 +22,60 @@ jobs:
           echo "Previous tag: $PREV_TAG"
           echo "prev_tag=$PREV_TAG" >> $GITHUB_OUTPUT
 
-      - name: Get commit log between tags
-        id: commit_log
+      - name: Get grouped commit log (no authors)
         run: |
           RANGE="${{ steps.prev_tag.outputs.prev_tag }}..${GITHUB_REF_NAME}"
           if [ -z "${{ steps.prev_tag.outputs.prev_tag }}" ]; then
             RANGE="${GITHUB_REF_NAME}"
           fi
-          echo "RANGE: $RANGE"
 
-          # Generate commit log into a variable
-          COMMITS=$(git log $RANGE --pretty=format:'- %s (%an)')
+          echo "Generating grouped commit log for range: $RANGE"
 
-          # Save it as an output
-          COMMITS="${COMMITS//'%'/'%25'}"
-          COMMITS="${COMMITS//$'\n'/'%0A'}"
-          COMMITS="${COMMITS//$'\r'/'%0D'}"
-          echo "commits=$COMMITS" >> $GITHUB_OUTPUT
+          FEATURES=""
+          FIXES=""
+          CHORES=""
+          OTHER=""
+
+          while IFS= read -r LINE; do
+            MSG=$(echo "$LINE" | sed -E 's/^.*: //')  # Remove prefix
+            if [[ "$LINE" == feat:* ]]; then
+              FEATURES="${FEATURES}- ${MSG}"$'\n'
+            elif [[ "$LINE" == fix:* ]]; then
+              FIXES="${FIXES}- ${MSG}"$'\n'
+            elif [[ "$LINE" == chore:* ]]; then
+              CHORES="${CHORES}- ${MSG}"$'\n'
+            else
+              OTHER="${OTHER}- ${LINE}"$'\n'
+            fi
+          done < <(git log $RANGE --pretty=format:'%s')
+
+          {
+            echo "**Features**"
+            echo "$FEATURES"
+            echo "**Fixes**"
+            echo "$FIXES"
+            echo "**Chores**"
+            echo "$CHORES"
+            if [ -n "$OTHER" ]; then
+              echo "**Other**"
+              echo "$OTHER"
+            fi
+          } > commit_log.txt
+      
 
       - name: Post to Discord
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
           VERSION="${GITHUB_REF_NAME#refs/tags/}"
-          COMMITS="${{ steps.commit_log.outputs.commits }}"
+          COMMITS=$(cat commit_log.txt)
+
           PAYLOAD=$(jq -n \
             --arg username "ModBot Release" \
             --arg avatar_url "https://cdn.modsquad.tools/assets/images/logo.webp" \
             --arg content "**📦 New Release: \`$VERSION\`**\n\n$COMMITS" \
             '{username: $username, avatar_url: $avatar_url, content: $content}')
+
           curl -X POST -H "Content-Type: application/json" \
                -d "$PAYLOAD" \
                "$DISCORD_WEBHOOK_URL"
-      
