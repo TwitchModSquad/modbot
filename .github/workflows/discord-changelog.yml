@@ -56,7 +56,6 @@ jobs:
           done < <(git log $RANGE --pretty=format:'%H %s')
 
           {
-            echo '\n\n'
             echo "## Features"
             echo "$FEATURES"
             echo "## Fixes"
