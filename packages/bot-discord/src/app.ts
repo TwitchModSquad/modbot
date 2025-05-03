@@ -76,9 +76,12 @@ client.on(Events.InteractionCreate, async interaction => {
 });
 
 eventManager.register("stats:request", async (): Promise<Partial<PublicStats>> => {
-    const guild = await client.guilds.fetch(process.env.DISCORD_GUILD_ID);
+    await client.guilds.fetch();
+    const discordMembers = client.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0);
+    const modSquadGuild = await client.guilds.fetch(process.env.DISCORD_GUILD_ID);
     return {
-        discordMembers: guild?.memberCount ?? 0,
+        discordMembers,
+        modSquadMembers: modSquadGuild?.memberCount ?? 0,
     };
 });
 

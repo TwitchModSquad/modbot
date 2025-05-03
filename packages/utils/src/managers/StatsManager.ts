@@ -6,10 +6,11 @@ import {logger} from "../index";
 class StatsManager {
     private publicStats: PublicStats = {
         discordMembers: 0,
+        channels: 0,
+        modSquadMembers: 0,
         twitchBans: 0,
         twitchChats: 0,
         twitchTimeouts: 0,
-        channels: 0,
     };
 
     private async requestPublicStats(): Promise<void> {

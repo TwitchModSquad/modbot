@@ -21,12 +21,12 @@
         <div class="statistics">
             <StatCard
                     title="Mod Squad Members"
-                    value={publicStats.discordMembers}
+                    value={publicStats.modSquadMembers}
                     color="rgba(var(--primary-tms-color-rgb),0.65)"
             />
             <StatCard
                     title="Discord Member Reach"
-                    value={0}
+                    value={publicStats.discordMembers}
                     color="rgba(var(--primary-discord-color-rgb),0.65)"
             />
             <StatCard

@@ -6,11 +6,12 @@ import type { PublicStats } from '@modbot/utils';
 const POLL_TIME = 5 * 60 * 1000;
 
 let publicStats: PublicStats = {
+    channels: 0,
     discordMembers: 0,
+    modSquadMembers: 0,
     twitchBans: 0,
     twitchChats: 0,
     twitchTimeouts: 0,
-    channels: 0,
 };
 
 const update = async () => {
