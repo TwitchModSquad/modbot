@@ -44,11 +44,11 @@ jobs:
             MSG=$(echo "$LINE" | sed -E 's/^.*: //')  # Remove prefix
             COMMIT_URL="${GITHUB_URL}/${COMMIT_HASH}"
 
-            if [[ "$LINE" == feat:* ]]; then
+            if [[ "$MSG" == feat:* ]]; then
               FEATURES="${FEATURES}- [${MSG}](${COMMIT_URL})"$'\n'
-            elif [[ "$LINE" == fix:* ]]; then
+            elif [[ "$MSG" == fix:* ]]; then
               FIXES="${FIXES}- [${MSG}](${COMMIT_URL})"$'\n'
-            elif [[ "$LINE" == chore:* ]]; then
+            elif [[ "$MSG" == chore:* ]]; then
               CHORES="${CHORES}- [${MSG}](${COMMIT_URL})"$'\n'
             else
               OTHER="${OTHER}- [${MSG}](${COMMIT_URL})"$'\n'
