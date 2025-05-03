@@ -1,5 +1,6 @@
 <script lang="ts">
     export let href: string | undefined = undefined;
+    export let newTab: boolean = false;
     export let variant: 'primary' | 'discord' | 'twitch' | 'success' | 'error' = 'primary';
     export let onClick: (() => void) | undefined = undefined;
     export let full: boolean = false;
@@ -7,7 +8,7 @@
 </script>
 
 {#if href}
-    <a {href} class="button {variant}" class:disabled class:full>
+    <a {href} class="button {variant}" class:disabled class:full target={newTab ? "_blank" : undefined}>
         <slot/>
     </a>
 {:else}

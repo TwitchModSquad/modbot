@@ -21,7 +21,7 @@
         <ul>
             <li><a href="/" aria-current={page.url.pathname === "/" ? "page" : undefined}>Home</a></li>
             <li><a href="/members" aria-current={page.url.pathname === "/members" ? "page" : undefined}>Members</a></li>
-            <li><a href="https://status.modsquad.tools" aria-current={page.url.pathname === "/status" ? "page" : undefined} target="_blank">Status</a></li>
+            <li><a href="/status" aria-current={page.url.pathname === "/status" ? "page" : undefined}>Status</a></li>
         </ul>
     </nav>
 </header>
