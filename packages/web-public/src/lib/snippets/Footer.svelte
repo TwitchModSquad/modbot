@@ -5,6 +5,11 @@
     <p>
         The Mod Squad is not affiliated with Twitch, Discord, or Amazon.
     </p>
+    <p>
+        <a href="/privacy-policy" class="link">Privacy Policy</a>
+        &bullet;
+        <a href="/terms-of-service" class="link">Terms of Service</a>
+    </p>
 </footer>
 
 <style>
@@ -16,6 +21,6 @@
     }
 
     footer p {
-        margin: .2em 0;
+        margin: .4em 0;
     }
 </style>
