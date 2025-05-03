@@ -32,7 +32,7 @@ class StatsManager {
     public register(service: ServiceType): void {
         if (service === ServiceType.API) {
             setInterval(() => this.requestPublicStats(), 120_000);
-            setTimeout(() => this.requestPublicStats(), 500);
+            setTimeout(() => this.requestPublicStats(), 2000);
         }
     }
 

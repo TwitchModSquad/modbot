@@ -28,7 +28,7 @@ export default class PunishmentStore<T extends PunishmentFields, M extends Model
     constructor(model: ModelStatic<M>) {
         this.model = model;
 
-        setTimeout(() => this.updateAll(), 3000);
+        setTimeout(() => this.updateAll(), 1000);
     }
 
     public getCount(): number {

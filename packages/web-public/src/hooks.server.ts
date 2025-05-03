@@ -23,7 +23,15 @@ const update = async () => {
     }
 };
 
-setTimeout(update, 3000);
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+setTimeout(async () => {
+    while (publicStats.modSquadMembers === 0 || publicStats.discordMembers === 0) {
+        await update();
+        await sleep(1000);
+    }
+}, 3000);
+
 setInterval(update, POLL_TIME); // poll every 5 minutes
 
 export const handle: Handle = async ({ event, resolve }) => {
