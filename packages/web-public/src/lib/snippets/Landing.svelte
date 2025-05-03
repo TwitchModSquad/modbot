@@ -30,23 +30,23 @@
                     color="rgba(var(--primary-discord-color-rgb),0.65)"
             />
             <StatCard
-                    title="Watched Channels"
+                    title="Watched Twitch Channels"
                     value={publicStats.channels}
                     color="rgba(var(--primary-twitch-color-rgb),0.65)"
             />
             <StatCard
-                    title="Twitch Bans"
+                    title="Logged Twitch Bans"
                     value={publicStats.twitchBans}
                     color="rgba(200, 56, 56, 0.65)"
             />
             <StatCard
-                    title="Twitch T/Os"
+                    title="Logged Twitch Timeouts"
                     value={publicStats.twitchTimeouts}
                     color="rgba(255, 220, 50, 0.65)"
                     textColor="var(--primary-background-color)"
             />
             <StatCard
-                    title="Twitch Chats"
+                    title="Logged Twitch Chats"
                     value={publicStats.twitchChats}
                     color="rgba(44, 166, 232, 0.65)"
             />
