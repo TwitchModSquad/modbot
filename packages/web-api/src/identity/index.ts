@@ -3,6 +3,17 @@ import {identities} from "@modbot/utils";
 
 const router = Router();
 
+router.get("/me", async (req, res) => {
+    const {identity, users} = req;
+    res.json({
+        ok: true,
+        data: {
+            identity,
+            users,
+        },
+    });
+});
+
 router.get("/:id", async (req, res) => {
     const id = Number(req.params.id);
 
