@@ -1,60 +1,104 @@
-<header>
+<script lang="ts">
+    import MainNavigation from "$lib/components/sections/MainNavigation.svelte";
 
-</header>
-<aside>
+    import("@modbot/ui/src/css/vars.css");
+    import("@modbot/ui/src/css/master.css");
+    import("$lib/css/app.css");
 
-</aside>
-<div class="content">
-    <main>
-        <slot />
-    </main>
-    <footer>
-        
-    </footer>
+    const { data, children } = $props();
+    const { webUri }: {
+        webUri: string,
+    } = data;
+</script>
+
+<div class="app">
+    <header>
+        <img src="https://cdn.modsquad.tools/assets/images/logo.webp" alt="The Mod Squad logo" />
+        <div>The Mod Squad</div>
+    </header>
+    <aside>
+        <MainNavigation />
+    </aside>
+    <div class="content">
+        <main>
+            {@render children?.()}
+        </main>
+        <footer>
+            <p>Copyright {new Date().getFullYear()} &copy; The Mod Squad</p>
+            <p>
+                <a class="link" href="{webUri}privacy-policy" target="_blank">Privacy Policy</a>
+                &bullet;
+                <a class="link" href="{webUri}terms-of-service" target="_blank">Terms of Service</a>
+            </p>
+        </footer>
+    </div>
 </div>
 
 <style>
-    :global(body) {
+    .app {
         margin: 0;
         min-height: 100vh;
         display: grid;
         grid-template-areas:
             "header header"
-            "sidebar main";
+            "sidebar main"
+            "footer main";
         grid-template-columns: 16em 1fr;
-        grid-template-rows: 4em 1fr;
+        grid-template-rows: 3em 1fr;
     }
 
     header {
         grid-area: header;
-        background: #f8f9fa;
-        padding: 1rem;
-        border-bottom: 1px solid #dee2e6;
+        display: flex;
+        align-items: center;
+        background-color: var(--secondary-background-color);
+        box-shadow: var(--heavy-shadow);
+    }
+
+    header img {
+        width: 2em;
+        height: 2em;
+        margin: 0 .75em;
+        border-radius: 50%;
+    }
+
+    header div {
+        font-size: 1.5em;
+        font-weight: 300;
     }
 
     aside {
         grid-area: sidebar;
-        background: #f8f9fa;
-        border-right: 1px solid #dee2e6;
-        padding: 1rem;
+        background-color: var(--tertiary-background-color);
+        padding: .6rem;
+        box-shadow: var(--shadow);
     }
 
     .content {
         grid-area: main;
         display: flex;
         flex-direction: column;
-        min-height: calc(100vh - 60px);
+        min-height: 100%;
     }
 
     main {
-        flex: 1;
+        grid-area: main;
         padding: 1rem;
+        flex: 1;
     }
 
     footer {
-        padding: 1rem;
-        background: #f8f9fa;
-        border-top: 1px solid #dee2e6;
+        grid-area: footer;
+        padding: .4rem;
+        font-size: .8em;
+        text-align: center;
+        color: var(--secondary-text-color);
+        background-color: var(--tertiary-background-color);
+        box-shadow: var(--shadow);
+    }
+
+    footer p {
+        margin: .2rem 0;
     }
 </style>
 

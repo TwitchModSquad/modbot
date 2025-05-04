@@ -1,0 +1,32 @@
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-body), sans-serif;
+    color: var(--primary-text-color);
+}
+
+a.link {
+    display: inline-block;
+    position: relative;
+    color: var(--faded-tms-color);
+    text-decoration: none;
+    word-wrap: break-word;
+}
+
+a.link::after {
+    content: "";
+    position: absolute;
+    display: block;
+    width: 0;
+    height: 1px;
+    background: var(--faded-tms-color);
+    transition: width 250ms;
+}
+
+a.link:hover::after,
+a.link:focus-visible::after {
+    width: 100%;
+}

@@ -1,5 +1,5 @@
 import type { LayoutServerLoad } from './$types';
-import { API_URI } from "$env/static/private";
+import { API_URI, WEB_URI } from "$env/static/private";
 import type {RawDiscordUser, RawIdentity, RawTwitchUser} from "@modbot/utils";
 import {redirect} from "@sveltejs/kit";
 
@@ -25,6 +25,7 @@ export const load: LayoutServerLoad = async ({ fetch, cookies }) => {
     }
 
     return {
+        apiUri: API_URI, webUri: WEB_URI,
         identity,
         twitchUsers,
         discordUsers,
