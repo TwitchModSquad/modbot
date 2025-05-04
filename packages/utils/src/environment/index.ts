@@ -7,7 +7,7 @@ const globalEnvVars: string[] = [
     "DB_HOST", "DB_PORT", "DB_USER", "DB_PASS", "DB_NAME", "REDIS_URL",
     "TWITCH_CLIENT_ID", "TWITCH_CLIENT_SECRET",
     "DISCORD_MODBOT_TOKEN", "DISCORD_CLIENT_ID", "DISCORD_SECRET_ID",
-    "API_URI", "DOMAIN",
+    "WEB_API", "API_URI", "DASHBOARD_API", "DOMAIN",
 ];
 
 const requiredEnvVars: Record<ServiceType, string[]> = {
