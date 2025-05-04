@@ -8,6 +8,7 @@
     { "path": "./packages/bot-discord" },
     { "path": "./packages/bot-twitch" },
     { "path": "./packages/web-api" },
-    { "path": "./packages/web-public" }
+    { "path": "./packages/web-public" },
+    { "path": "./packages/web-dashboard" }
   ]
 }

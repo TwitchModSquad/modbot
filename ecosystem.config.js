@@ -19,6 +19,12 @@ module.exports = {
             env: { NODE_ENV: 'production', PORT: 3010 }
         },
         {
+            name: 'modbot-web-dashboard',
+            script: 'npm',
+            args: 'run start:web-dashboard',
+            env: { NODE_ENV: 'production', PORT: 3030 }
+        },
+        {
             name: 'modbot-web-api',
             script: 'npm',
             args: 'run start:web-api',
