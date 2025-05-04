@@ -1,6 +1,6 @@
 <script>
     import Section from "$lib/snippets/components/Section.svelte";
-    import Button from "$lib/snippets/components/Button.svelte";
+    import Button from "@modbot/ui/src/components/Button.svelte";
 </script>
 
 <svelte:head>

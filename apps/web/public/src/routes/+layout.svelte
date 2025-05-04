@@ -1,4 +1,5 @@
 <script lang="ts">
+    import("@modbot/ui/src/css/vars.css");
     import("$lib/css/app.css");
 
     import Header from "$lib/snippets/sections/Header.svelte";

@@ -1,7 +1,7 @@
 <script lang="ts">
     import type {PublicStats} from "@modbot/utils";
     import StatCard from "$lib/snippets/components/StatCard.svelte";
-    import Button from "$lib/snippets/components/Button.svelte";
+    import {Button} from "@modbot/ui";
 
     export let publicStats: PublicStats;
     export let apiUri: string;

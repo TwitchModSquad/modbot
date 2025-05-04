@@ -1,5 +1,6 @@
 import adapter from '@sveltejs/adapter-node';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+import path from "path";
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -11,6 +12,9 @@ const config = {
 		adapter: adapter(),
 		env: {
 			dir: "../../.."
+		},
+		alias: {
+			'@modbot/ui': path.resolve('../../../packages/ui')
 		}
 	},
 };

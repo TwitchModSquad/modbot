@@ -8,6 +8,10 @@
     } = data;
 </script>
 
+<svelte:head>
+    <title>Dashboard | The Mod Squad</title>
+</svelte:head>
+
 {#each twitchUsers as user}
     {user.display_name}
 {/each}

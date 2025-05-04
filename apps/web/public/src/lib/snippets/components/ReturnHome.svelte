@@ -1,5 +1,5 @@
 <script>
-    import Button from "$lib/snippets/components/Button.svelte";
+    import {Button} from "@modbot/ui";
 </script>
 
 <Button variant="primary"
