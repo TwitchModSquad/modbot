@@ -9,6 +9,9 @@ git pull origin master
 echo "📦 Installing dependencies..."
 npm ci
 
+echo "🧹 Clean up environment..."
+npm run clean
+
 echo "🗄️ Run Sequelize Migrations..."
 npx sequelize-cli db:migrate
 
