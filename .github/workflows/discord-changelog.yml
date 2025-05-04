@@ -36,20 +36,20 @@ jobs:
           CHORES=""
           OTHER=""
 
-          # GitHub repository info
           GITHUB_URL="https://github.com/${GITHUB_REPOSITORY}/commit"
 
           while IFS= read -r LINE; do
-            COMMIT_HASH=$(echo "$LINE" | cut -d ' ' -f 1)  # Extract commit hash
-            MSG=$(echo "$LINE" | sed -E 's/^.*: //')  # Remove prefix
+            COMMIT_HASH=$(echo "$LINE" | cut -d ' ' -f 1)
+            MSG=$(echo "$LINE" | cut -d ' ' -f 2-)
             COMMIT_URL="${GITHUB_URL}/${COMMIT_HASH}"
+            CLEAN_MSG=$(echo "$MSG" | sed -E 's/^(feat|fix|chore):[[:space:]]*//')
 
             if [[ "$MSG" == feat:* ]]; then
-              FEATURES="${FEATURES}- [${MSG}](${COMMIT_URL})"$'\n'
+              FEATURES="${FEATURES}- [${CLEAN_MSG}](${COMMIT_URL})"$'\n'
             elif [[ "$MSG" == fix:* ]]; then
-              FIXES="${FIXES}- [${MSG}](${COMMIT_URL})"$'\n'
+              FIXES="${FIXES}- [${CLEAN_MSG}](${COMMIT_URL})"$'\n'
             elif [[ "$MSG" == chore:* ]]; then
-              CHORES="${CHORES}- [${MSG}](${COMMIT_URL})"$'\n'
+              CHORES="${CHORES}- [${CLEAN_MSG}](${COMMIT_URL})"$'\n'
             else
               OTHER="${OTHER}- [${MSG}](${COMMIT_URL})"$'\n'
             fi
@@ -67,21 +67,20 @@ jobs:
               echo "$OTHER"
             fi
           } > commit_log.txt
-      
 
       - name: Post to Discord
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
           VERSION="${GITHUB_REF_NAME#refs/tags/}"
-          COMMITS=$(cat commit_log.txt)
 
-          PAYLOAD=$(jq -n \
-            --arg username "ModBot Release" \
-            --arg avatar_url "https://cdn.modsquad.tools/assets/images/logo.webp" \
-            --arg content "# 📦 New Release: \`$VERSION\`$COMMITS" \
-            --arg embeds "[]" \
-            '{username: $username, avatar_url: $avatar_url, content: $content}')
+          PAYLOAD=$(jq -Rs --arg version "$VERSION" '
+            {
+              username: "ModBot Release",
+              avatar_url: "https://cdn.modsquad.tools/assets/images/logo.webp",
+              content: "# 📦 New Release: `" + $version + "`\n" + .
+            }
+          ' commit_log.txt)
 
           curl -X POST -H "Content-Type: application/json" \
                -d "$PAYLOAD" \
