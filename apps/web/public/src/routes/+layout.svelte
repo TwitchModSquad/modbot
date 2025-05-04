@@ -9,13 +9,13 @@
     import PageHead from "$lib/snippets/sections/PageHead.svelte";
 
     const { data, children } = $props();
-    const { publicStats } = data;
+    const { publicStats, apiUri } = data;
 </script>
 
 <div class="app">
     <Header />
     {#if page.url.pathname === "/"}
-        <Landing publicStats={publicStats} />
+        <Landing publicStats={publicStats} apiUri={apiUri} />
     {:else}
         <PageHead />
     {/if}

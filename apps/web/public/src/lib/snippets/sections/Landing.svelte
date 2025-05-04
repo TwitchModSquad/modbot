@@ -4,6 +4,7 @@
     import Button from "$lib/snippets/components/Button.svelte";
 
     export let publicStats: PublicStats;
+    export let apiUri: string;
 </script>
 
 <div class="landing">
@@ -12,8 +13,8 @@
             <h1>The Mod Squad</h1>
             <p>A Discord moderation community offering tools to protect and enhance your Twitch and Discord communities.</p>
             <Button variant="primary"
-                    href="/explore">
-                Join The Mod Squad
+                    href="{apiUri}auth/twitch">
+                Visit The Mod Squad Dashboard
             </Button>
         </div>
     </section>
