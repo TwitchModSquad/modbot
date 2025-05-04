@@ -73,14 +73,18 @@ jobs:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
           VERSION="${GITHUB_REF_NAME#refs/tags/}"
+          COMMIT_LOG=$(cat commit_log.txt)
 
-          PAYLOAD=$(jq -Rs --arg version "$VERSION" '
-            {
-              username: "ModBot Release",
-              avatar_url: "https://cdn.modsquad.tools/assets/images/logo.webp",
-              content: "# 📦 New Release: `" + $version + "`\n" + .
-            }
-          ' commit_log.txt)
+          CONTENT="# 📦 New Release: \`${VERSION}\`\n${COMMIT_LOG}"
+
+          # Escape content for JSON safely
+          ESCAPED_CONTENT=$(printf '%s' "$CONTENT" | jq -Rs '.')
+
+          PAYLOAD=$(jq -n \
+            --arg username "ModBot Release" \
+            --arg avatar_url "https://cdn.modsquad.tools/assets/images/logo.webp" \
+            --arg content "$CONTENT" \
+            '{username: $username, avatar_url: $avatar_url, content: $content}')
 
           curl -X POST -H "Content-Type: application/json" \
                -d "$PAYLOAD" \
