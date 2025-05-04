@@ -14,6 +14,6 @@
 		"moduleResolution": "bundler"
 	},
 	"references": [
-		{ "path": "../utils" }
+		{ "path": "../../../packages/utils"}
 	]
 }

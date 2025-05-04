@@ -10,8 +10,6 @@ export const load: LayoutServerLoad = async ({ fetch, cookies }) => {
         }
     });
 
-
-
     let identity = null;
     let twitchUsers = null;
     let discordUsers = null;

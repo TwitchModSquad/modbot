@@ -11,7 +11,7 @@ import {
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
-const packageJson = JSON.parse(readFileSync(join(__dirname, '../../../../package.json'), 'utf8'));
+const packageJson = JSON.parse(readFileSync(join(__dirname, '../../../../../package.json'), 'utf8'));
 const version = packageJson.version;
 
 export const SUCCESS_COLOR = 0x32a852;

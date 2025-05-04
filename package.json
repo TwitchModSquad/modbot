@@ -7,7 +7,7 @@
     "build": "tsc --build",
     "build:utils": "npm run clean --workspace=@modbot/utils && npm run build --workspace=@modbot/utils",
     "build:all": "npm run build && npm run build --workspace=@modbot/web-public && npm run build --workspace=@modbot/web-dashboard",
-    "lint": "eslint \"packages/*/src/**/*.ts\"",
+    "lint": "eslint \"packages/*/src/**/*.ts\" \"apps/bot/*/src/**/*.ts\" \"apps/web/*/src/**/*.ts\"",
     "type-check": "npm run type-check --workspaces",
     "clean": "npm run clean --workspaces",
     "dev:web-public": "npm run dev --workspace=@modbot/web-public",
@@ -39,6 +39,8 @@
   "homepage": "https://github.com/TwitchModSquad/modbot#readme",
   "private": true,
   "workspaces": [
+    "apps/bot/*",
+    "apps/web/*",
     "packages/*"
   ],
   "devDependencies": {

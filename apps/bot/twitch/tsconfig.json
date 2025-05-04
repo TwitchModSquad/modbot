@@ -18,6 +18,6 @@
     "rootDir": "src"
   },
   "references": [
-    { "path": "../utils" }
+    { "path": "../../../packages/utils"}
   ]
 }
