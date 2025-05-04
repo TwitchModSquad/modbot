@@ -8,7 +8,7 @@
     "build:utils": "npm run clean --workspace=@modbot/utils && npm run build --workspace=@modbot/utils",
     "build:all": "npm run build && npm run build --workspace=@modbot/web-public && npm run build --workspace=@modbot/web-dashboard",
     "lint": "eslint \"packages/*/src/**/*.ts\" \"apps/bot/*/src/**/*.ts\" \"apps/web/*/src/**/*.ts\"",
-    "type-check": "npm run type-check --workspaces",
+    "type-check": "npm run type-check --workspaces --if-present",
     "clean": "npm run clean --workspaces",
     "dev:web-public": "npm run dev --workspace=@modbot/web-public",
     "dev:web-dashboard": "npm run dev --workspace=@modbot/web-dashboard",
