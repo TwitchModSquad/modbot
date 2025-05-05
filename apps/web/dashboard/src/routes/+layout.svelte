@@ -1,12 +1,16 @@
 <script lang="ts">
     import MainNavigation from "$lib/components/sections/MainNavigation.svelte";
+    import UserProfile from "$lib/components/snippets/UserProfile.svelte";
+    import type {RawDiscordUser, RawTwitchUser} from "@modbot/utils";
 
     import("@modbot/ui/src/css/vars.css");
     import("@modbot/ui/src/css/master.css");
     import("$lib/css/app.css");
 
     const { data, children } = $props();
-    const { webUri }: {
+    const { twitchUsers, discordUsers, webUri }: {
+        twitchUsers: RawTwitchUser[],
+        discordUsers: RawDiscordUser[],
         webUri: string,
     } = data;
 </script>
@@ -15,6 +19,10 @@
     <header>
         <img src="https://cdn.modsquad.tools/assets/images/logo.webp" alt="The Mod Squad logo" />
         <div>The Mod Squad</div>
+        <UserProfile
+            twitchUsers={twitchUsers}
+            discordUsers={discordUsers}
+        />
     </header>
     <aside>
         <MainNavigation />
@@ -29,6 +37,8 @@
                 <a class="link" href="{webUri}privacy-policy" target="_blank">Privacy Policy</a>
                 &bullet;
                 <a class="link" href="{webUri}terms-of-service" target="_blank">Terms of Service</a>
+                &bullet;
+                <a class="link" href="https://github.com/TwitchModSquad/modbot" target="_blank">Contribute on GitHub</a>
             </p>
         </footer>
     </div>
@@ -65,6 +75,7 @@
     header div {
         font-size: 1.5em;
         font-weight: 300;
+        flex-grow: 1;
     }
 
     aside {
