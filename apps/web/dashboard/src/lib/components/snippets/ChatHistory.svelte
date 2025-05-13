@@ -4,6 +4,7 @@
     import {browser} from "$app/environment";
     import {arraysAreEqual} from "$lib/utils";
     import {badges} from "$lib/badgeData";
+    import Timestamp from "$lib/components/snippets/Timestamp.svelte";
 
     const { streamers = [], chatters = [] }: {
         streamers: RawTwitchUser[],
@@ -13,80 +14,93 @@
     let lastStreamerIds: string[] = [""];
     let lastChatterIds: string[] = [""];
 
-    let lastResult: ChatHistoryResult = {
+    let result: ChatHistoryResult = $state({
         twitchChats: [],
         users: {},
-    };
+    });
 
-    async function fetchChatHistory(streamers: RawTwitchUser[], chatters: RawTwitchUser[]): Promise<ChatHistoryResult> {
-        if (!browser) return lastResult;
+    $effect(() => {
+        fetchChatHistory(streamers, chatters);
+    });
+
+    async function fetchChatHistory(streamers: RawTwitchUser[], chatters: RawTwitchUser[]): Promise<void> {
+        if (!browser) return;
 
         if (arraysAreEqual<string>(lastStreamerIds, streamers.map(x => x.id)) &&
             arraysAreEqual<string>(lastChatterIds, chatters.map(x => x.id))
-        ) return lastResult;
+        ) return;
 
         lastStreamerIds = streamers.map(x => x.id);
         lastChatterIds = chatters.map(x => x.id);
 
-        const result = await getChatHistory(
-            streamers.map(x => x.id),
-            chatters.map(x => x.id)
+        result = await getChatHistory(
+            lastStreamerIds,
+            lastChatterIds
         );
-
-        lastResult = result;
-
-        return result;
     }
 
-    let chatHistory = $derived(fetchChatHistory(streamers, chatters));
+    async function loadMore(): Promise<void> {
+        if (result.twitchChats.length < 100) return;
+        console.log(result.twitchChats[result.twitchChats.length - 1].createdDate)
+        const newResult = await getChatHistory(
+            lastStreamerIds,
+            lastChatterIds,
+            result.twitchChats[result.twitchChats.length - 1].createdDate
+        );
+        console.log(newResult);
+
+        result = {
+            twitchChats: [
+                ...result.twitchChats,
+                ...newResult.twitchChats,
+            ],
+            users: {
+                ...result.users,
+                ...newResult.users,
+            }
+        }
+    }
 </script>
 
-{#await chatHistory}
-    <p>
-        Loading chat history!
-    </p>
-{:then result}
-    <div class="chat-history">
-        {#each result.twitchChats as chat}
-            {@const streamer = result.users[chat.streamerId]}
-            {@const chatter = result.users[chat.chatterId]}
+<div class="chat-history">
+    {#each result.twitchChats as chat}
+        {@const streamer = result.users[chat.streamerId]}
+        {@const chatter = result.users[chat.chatterId]}
+        {@const timeSent = new Date(chat.createdDate ?? "")}
 
-            <div class="message">
-                <img class="pfp" src={chatter.profile_image_url} alt="Profile picture for {chatter.display_name}">
-                <div class="message-content">
-                    <div class="message-header">
-                        {#if streamers.length !== 1}
-                            <div class="streamer">#{streamer.login}</div>
-                        {/if}
-                        <div class="chatter">
-                            {chatter.display_name}
-                        </div>
-                        {#if chat.badges && chat.badges.length > 0}
-                            <div class="badges">
-                                {#each badges as badge}
-                                    {#if chat.badges.includes(badge.name)}
-                                        <img class="badge" src={badge.url} alt="Badge {badge.name}">
-                                    {/if}
-                                {/each}
-                            </div>
-                        {/if}
+        <div class="message">
+            <img class="pfp" src={chatter.profile_image_url} alt="Profile picture for {chatter.display_name}">
+            <div class="message-content">
+                <div class="message-header">
+                    {#if streamers.length !== 1}
+                        <div class="streamer">#{streamer.login}</div>
+                    {/if}
+                    <div class="chatter">
+                        {chatter.display_name}
                     </div>
-                    <p class="chat-message">{chat.message}</p>
+                    {#if chat.badges && chat.badges.length > 0}
+                        <div class="badges">
+                            {#each badges as badge}
+                                {#if chat.badges.includes(badge.name)}
+                                    <img class="badge" src={badge.url} alt="Badge {badge.name}">
+                                {/if}
+                            {/each}
+                        </div>
+                    {/if}
+                    {#if timeSent instanceof Date && timeSent.toString() !== 'Invalid Date'}
+                        <Timestamp timestamp={timeSent} />
+                    {/if}
                 </div>
+                <p class="chat-message">{chat.message}</p>
             </div>
-        {/each}
-        {#if result.twitchChats.length >= 100}
-            <button type="button" class="load-more">
-                Load more
-            </button>
-        {/if}
-    </div>
-{:catch error}
-    <p>
-        An error occurred!
-        {error.message}
-    </p>
-{/await}
+        </div>
+    {/each}
+    {#if result.twitchChats.length >= 100}
+        <button type="button" class="load-more" onclick={loadMore}>
+            Load more
+        </button>
+    {/if}
+</div>
 
 <style>
     .message {
@@ -133,6 +147,14 @@
     .chat-message {
         font-size: .95em;
         margin: 0;
+    }
+
+    :global(.timestamp) {
+        font-family: monospace;
+        flex-grow: 1;
+        text-align: right;
+        font-size: .8em;
+        color: var(--secondary-text-color);
     }
 
     .load-more {
