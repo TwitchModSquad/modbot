@@ -43,39 +43,66 @@
     let chatHistory = $derived(fetchChatHistory(streamers, chatters));
 </script>
 
-<table class="chat-history">
-    <thead>
-        <tr>
-            <th>Streamer</th>
-            <th>Chatter</th>
-            <th>Message</th>
-        </tr>
-    </thead>
-    <tbody>
-        {#await chatHistory}
-            <tr>
-                <td colspan="3">
-                    Loading chat history...
-                </td>
-            </tr>
-        {:then result}
-            {#each result.twitchChats as chat}
-                {@const streamer = result.users[chat.streamerId]}
-                {@const chatter = result.users[chat.chatterId]}
+{#await chatHistory}
+    <p>
+        Loading chat history!
+    </p>
+{:then result}
+    <div class="chat-history">
+        {#each result.twitchChats as chat}
+            {@const streamer = result.users[chat.streamerId]}
+            {@const chatter = result.users[chat.chatterId]}
 
-                <tr>
-                    <td>{streamer.display_name}</td>
-                    <td>{chatter.display_name}</td>
-                    <td>{chat.message}</td>
-                </tr>
-            {/each}
-        {:catch error}
-            <tr>
-                <td colspan="3">
-                    An error occurred!
-                    {error.message}
-                </td>
-            </tr>
-        {/await}
-    </tbody>
-</table>
+            <div class="message">
+                <img src={chatter.profile_image_url} alt="Profile picture for {chatter.display_name}">
+                <div class="message-content">
+                    <div class="chatter">{chatter.display_name}</div>
+                    {#if streamers.length !== 1}
+                        <div class="streamer">{streamer.display_name}</div>
+                    {/if}
+                    <p class="chat-message">{chat.message}</p>
+                </div>
+            </div>
+        {/each}
+    </div>
+{:catch error}
+    <p>
+        An error occurred!
+        {error.message}
+    </p>
+{/await}
+
+<style>
+    .message {
+        display: flex;
+        margin: .5em 0;
+    }
+
+    .message img {
+        width: 2.5em;
+        height: 2.5em;
+        border-radius: 50%;
+        margin-right: 1rem;
+    }
+
+    .message-content {
+        flex-grow: 1;
+    }
+
+    .chatter {
+        font-size: 1.1em;
+        font-weight: 600;
+        margin-bottom: .1em;
+        color: white;
+    }
+
+    .streamer {
+        font-size: .9em;
+        color: var(--secondary-text-color);
+    }
+
+    .chat-message {
+        font-size: .95em;
+        margin: 0;
+    }
+</style>
