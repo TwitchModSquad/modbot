@@ -8,7 +8,7 @@
 		"build": "vite build",
 		"preview": "vite preview",
 		"start": "node build/index.js",
-		"clean": "rimraf build tsconfig.tsbuildinfo",
+		"clean": "rimraf build tsconfig.tsbuildinfo .svelte-kit",
 		"prepare": "svelte-kit sync || echo ''",
 		"type-check": "svelte-kit sync && svelte-check --tsconfig tsconfig.json",
 		"type-check:watch": "svelte-kit sync && svelte-check --tsconfig tsconfig.json --watch"

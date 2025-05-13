@@ -1,6 +1,6 @@
 // src/hooks.server.ts
 import type { Handle } from '@sveltejs/kit';
-import { API_URI } from '$env/static/private';
+import { PUBLIC_API_URI } from '$env/static/public';
 import type { PublicStats } from '@modbot/utils';
 
 const POLL_TIME = 5 * 60 * 1000;
@@ -17,7 +17,7 @@ let publicStats: PublicStats = {
 
 const update = async () => {
     try {
-        const response = await fetch(API_URI);
+        const response = await fetch(PUBLIC_API_URI);
         publicStats = (await response.json()).stats;
     } catch (err) {
         console.error('Failed to update publicStats:', err);

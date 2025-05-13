@@ -101,6 +101,7 @@
         max-width: calc(100% - 4em);
         padding: .8em 1.2em;
         border-radius: .5em;
+        box-shadow: var(--heavy-shadow);
     }
 
     .heading {
