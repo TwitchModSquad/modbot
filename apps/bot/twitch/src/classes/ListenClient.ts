@@ -71,6 +71,8 @@ export default class ListenClient {
             id: message.id,
             streamerId: message.channelId,
             chatterId: message.userInfo.userId,
+            badges: message.userInfo.badges,
+            emotes: message.emoteOffsets,
             message: message.text,
             color: message.userInfo.color,
         });
