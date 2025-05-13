@@ -1,5 +1,6 @@
 import express from "express";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 
 import {
     discordUsers,
@@ -24,6 +25,13 @@ const PORT = process.env.API_PORT;
 const app = express();
 
 app.use(cookieParser());
+
+app.use(cors({
+    origin: (origin, callback) => {
+        callback(null, origin); // reflect the request origin
+    },
+    credentials: true,
+}));
 
 export interface CachedSession {
     twitchUserIds: string[];
