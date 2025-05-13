@@ -8,6 +8,12 @@ export type ChatHistoryResult = {
     }
 }
 
+export async function getTwitchUsers(ids: string[]): Promise<{[id: string]: RawTwitchUser}> {
+    return await get(`twitch/users?${ids.map(x => `user_id=${encodeURIComponent(x)}`).join("&")}`) as {
+        [id: string]: RawTwitchUser,
+    }
+}
+
 export async function getChatHistory(streamerIds: string[] = [], chatterIds: string[] = [], cursor: string = "", limit: number = 100): Promise<ChatHistoryResult> {
     const streamerQuery = streamerIds
         .map(id => `streamer_id=${encodeURIComponent(id)}`)

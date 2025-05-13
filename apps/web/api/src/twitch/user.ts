@@ -1,7 +1,32 @@
 import {Router} from "express";
-import {twitchUsers} from "@modbot/utils";
+import {RawTwitchUser, twitchUsers} from "@modbot/utils";
 
 const router = Router();
+
+router.get("/", async (req, res) => {
+    let userIds = (Array.isArray(req.query.user_id)
+        ? req.query.user_id
+        : [req.query.user_id]).filter(x => typeof x === "string");
+
+    const result = new Map<string, RawTwitchUser>();
+    for (const id of userIds) {
+        const user = await twitchUsers.get(id);
+        if (user) {
+            result.set(user.id, user);
+        } else {
+            res.status(404).json({
+                ok: false,
+                error: `User with ID ${id} was not found!`,
+            });
+            return;
+        }
+    }
+
+    res.json({
+        ok: true,
+        data: Object.fromEntries(result),
+    });
+});
 
 router.get("/:id", async (req, res) => {
     let force = false;

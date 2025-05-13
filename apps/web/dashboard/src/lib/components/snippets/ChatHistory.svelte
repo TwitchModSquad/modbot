@@ -1,12 +1,12 @@
 <script lang="ts">
     import {type ChatHistoryResult, getChatHistory} from "$lib/api";
-    import type {User} from "$lib/interfaces/UserTypes";
     import {browser} from "$app/environment";
     import {arraysAreEqual} from "$lib/utils";
+    import type {RawTwitchUser} from "@modbot/utils";
 
-    const { streamers = $bindable([]), chatters = $bindable([]) }: {
-        streamers: User[],
-        chatters: User[],
+    const { streamers = [], chatters = [] }: {
+        streamers: RawTwitchUser[],
+        chatters: RawTwitchUser[],
     } = $props();
 
     let lastStreamerIds: string[] = [""];
@@ -17,22 +17,19 @@
         users: {},
     };
 
-    async function fetchChatHistory(streamers: User[], chatters: User[]): Promise<ChatHistoryResult> {
+    async function fetchChatHistory(streamers: RawTwitchUser[], chatters: RawTwitchUser[]): Promise<ChatHistoryResult> {
         if (!browser) return lastResult;
 
-        const selectedStreamers = streamers.filter(x => x.selected);
-        const selectedChatters = chatters.filter(x => x.selected);
-
-        if (arraysAreEqual<string>(lastStreamerIds, selectedStreamers.map(x => x.id)) &&
-            arraysAreEqual<string>(lastChatterIds, selectedChatters.map(x => x.id))
+        if (arraysAreEqual<string>(lastStreamerIds, streamers.map(x => x.id)) &&
+            arraysAreEqual<string>(lastChatterIds, chatters.map(x => x.id))
         ) return lastResult;
 
-        lastStreamerIds = selectedStreamers.map(x => x.id);
-        lastChatterIds = selectedChatters.map(x => x.id);
+        lastStreamerIds = streamers.map(x => x.id);
+        lastChatterIds = chatters.map(x => x.id);
 
         const result = await getChatHistory(
-            selectedStreamers.map(x => x.id),
-            selectedChatters.map(x => x.id)
+            streamers.map(x => x.id),
+            chatters.map(x => x.id)
         );
 
         lastResult = result;
