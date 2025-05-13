@@ -32,6 +32,10 @@
         transition: all 0.2s ease;
     }
 
+    .button :global(i) {
+        margin-right: .5em;
+    }
+
     .primary {
         background-color: var(--primary-tms-color);
         color: white;
