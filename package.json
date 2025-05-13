@@ -1,6 +1,6 @@
 {
   "name": "modbot",
-  "version": "3.1.1",
+  "version": "3.0.0-beta.0",
   "description": "Moderation services and tools for Twitch streamers and their moderators & Discord communities",
   "main": "dist/app.js",
   "scripts": {
@@ -19,7 +19,8 @@
     "start:web-public": "npm run start --workspace=@modbot/web-public",
     "start:web-dashboard": "npm run start --workspace=@modbot/web-dashboard",
     "start:all": "npm-run-all --parallel start:discord start:twitch start:web-api dev:web-public dev:web-dashboard",
-    "test": "tsc --build && npm run start:all"
+    "test": "tsc --build && npm run start:all",
+    "bump-version": "npm version prerelease --preid=beta"
   },
   "repository": {
     "type": "git",
