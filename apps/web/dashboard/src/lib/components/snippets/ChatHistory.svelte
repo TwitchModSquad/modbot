@@ -72,9 +72,7 @@
             <img class="pfp" src={chatter.profile_image_url} alt="Profile picture for {chatter.display_name}">
             <div class="message-content">
                 <div class="message-header">
-                    {#if streamers.length !== 1}
-                        <div class="streamer">#{streamer.login}</div>
-                    {/if}
+                    <div class="streamer">#{streamer.login}</div>
                     <div class="chatter">
                         {chatter.display_name}
                     </div>
