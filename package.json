@@ -1,6 +1,6 @@
 {
   "name": "modbot",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "Moderation services and tools for Twitch streamers and their moderators & Discord communities",
   "main": "dist/app.js",
   "scripts": {
