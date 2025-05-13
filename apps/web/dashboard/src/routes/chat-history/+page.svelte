@@ -5,9 +5,12 @@
     import type {RawTwitchUser} from "@modbot/utils";
     import {onMount} from "svelte";
     import {getTwitchUsers} from "$lib/api";
+    import {Button} from "@modbot/ui";
 
     let streamers: User[] = $state([]);
     let chatters: User[] = $state([]);
+
+    let refresh = $state({});
 
     let selectedStreamers = $derived(
         streamers.filter(x => x.selected).map(x => x as RawTwitchUser)
@@ -85,11 +88,23 @@
 
 <div class="container">
     <aside class="filters">
+        <h2>Filters</h2>
         <UserSelector userType="twitch" label="Filter by Streamer" bind:users={streamers} />
         <UserSelector userType="twitch" label="Filter by Chatter" bind:users={chatters} />
     </aside>
     <div class="chat-history">
-        <ChatHistory streamers={selectedStreamers} chatters={selectedChatters} />
+        <div class="header">
+            <h2>Refined Chat History</h2>
+            <Button variant="primary" onClick={() => {
+                refresh = {};
+            }}>
+                <i class="fa-solid fa-arrows-rotate"></i>
+                Refresh
+            </Button>
+        </div>
+        {#key refresh}
+            <ChatHistory streamers={selectedStreamers} chatters={selectedChatters} />
+        {/key}
     </div>
 </div>
 
@@ -98,5 +113,11 @@
         display: grid;
         grid-template-columns: 1fr 3fr;
         gap: 1rem;
+    }
+
+    .chat-history .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     }
 </style>
