@@ -71,15 +71,24 @@
         }, 750);
     }
 
-    const clear = () => {
-        users = [];
-        query = "";
+    const setAllSelectedTo = (selected: boolean) => {
+        users = users.map(x => {
+            return {
+                ...x,
+                selected,
+            };
+        });
     }
 </script>
 
-<label for={id} id="search-label">
-    {label} <button type="button" onclick={clear}>Unselect all</button>
-</label>
+<div class="search-header">
+    <label for={id} id="search-label">
+        {label}
+    </label>
+    <button type="button" onclick={() => setAllSelectedTo(true)}>Select all</button>
+    <button type="button" onclick={() => setAllSelectedTo(false)}>Unselect all</button>
+</div>
+
 <div class="user-selector">
     <input type="search" id={id} onkeyup={updateOptions}
            bind:value={query} onfocus={function(){ this.value = "" }}
@@ -115,7 +124,7 @@
 </div>
 
 <style>
-    #search-label {
+    .search-header {
         display: flex;
         align-items: center;
         justify-content: space-between;

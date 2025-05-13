@@ -6,9 +6,20 @@
     import {badges} from "$lib/badgeData";
     import Timestamp from "$lib/components/snippets/Timestamp.svelte";
 
-    const { streamers = [], chatters = [] }: {
+    let {
+        streamers = [],
+        chatters = [],
+        addChatter = user => {
+            chatters = [...chatters, user];
+        },
+        addStreamer = user => {
+            streamers = [...streamers, user];
+        },
+    }: {
         streamers: RawTwitchUser[],
         chatters: RawTwitchUser[],
+        addChatter?: null | ((user: RawTwitchUser) => void),
+        addStreamer?: null | ((user: RawTwitchUser) => void),
     } = $props();
 
     let lastStreamerIds: string[] = [""];
@@ -41,13 +52,11 @@
 
     async function loadMore(): Promise<void> {
         if (result.twitchChats.length < 100) return;
-        console.log(result.twitchChats[result.twitchChats.length - 1].createdDate)
         const newResult = await getChatHistory(
             lastStreamerIds,
             lastChatterIds,
             result.twitchChats[result.twitchChats.length - 1].createdDate
         );
-        console.log(newResult);
 
         result = {
             twitchChats: [
@@ -72,10 +81,16 @@
             <img class="pfp" src={chatter.profile_image_url} alt="Profile picture for {chatter.display_name}">
             <div class="message-content">
                 <div class="message-header">
-                    <div class="streamer">#{streamer.login}</div>
-                    <div class="chatter">
-                        {chatter.display_name}
-                    </div>
+                    {#if addStreamer}
+                        <button type="button" class="streamer" onclick={() => addStreamer(streamer)}>#{streamer.login}</button>
+                    {:else}
+                        <div class="streamer">#{streamer.login}</div>
+                    {/if}
+                    {#if addChatter}
+                        <button type="button" class="chatter" onclick={() => addChatter(chatter)}>{chatter.display_name}</button>
+                    {:else}
+                        <div class="chatter">{chatter.display_name}</div>
+                    {/if}
                     {#if chat.badges && chat.badges.length > 0}
                         <div class="badges">
                             {#each badges as badge}
@@ -124,10 +139,24 @@
         margin-bottom: .25em;
     }
 
+    .streamer {
+        font-size: .9em;
+        color: var(--secondary-text-color);
+    }
+
     .chatter {
+        color: var(--primary-text-color);
         font-size: 1.1em;
-        font-weight: 600;
-        color: white;
+        font-weight: 300;
+    }
+
+    button.chatter,
+    button.streamer {
+        background-color: transparent;
+        cursor: pointer;
+        padding: 0;
+        margin: 0;
+        border: none;
     }
 
     .badge {
@@ -135,11 +164,6 @@
         height: 1em;
         margin-left: .25em;
         border-radius: .2em;
-    }
-
-    .streamer {
-        font-size: .9em;
-        color: var(--secondary-text-color);
     }
 
     .chat-message {

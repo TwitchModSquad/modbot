@@ -103,7 +103,40 @@
             </Button>
         </div>
         {#key refresh}
-            <ChatHistory streamers={selectedStreamers} chatters={selectedChatters} />
+            <ChatHistory streamers={selectedStreamers} chatters={selectedChatters}
+                         addChatter={(user) => {
+                            const foundChatter = chatters.find(x => x.id === user.id);
+
+                            if (foundChatter) {
+                                foundChatter.selected = !foundChatter.selected;
+                                return;
+                            }
+
+                            chatters = [
+                                ...chatters,
+                                {
+                                    ...user,
+                                    selected: false,
+                                },
+                            ];
+                         }}
+                         addStreamer={(user) => {
+                            const foundStreamer = streamers.find(x => x.id === user.id);
+
+                            if (foundStreamer) {
+                                foundStreamer.selected = !foundStreamer.selected;
+                                return;
+                            }
+
+                            streamers = [
+                                ...streamers,
+                                {
+                                    ...user,
+                                    selected: false,
+                                },
+                            ];
+                         }}
+                    />
         {/key}
     </div>
 </div>
