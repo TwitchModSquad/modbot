@@ -12,13 +12,14 @@ import {
     sessions,
     twitchUsers
 } from "@modbot/utils";
+import statsManager from "@modbot/utils/dist/managers/StatsManager";
 
 import auth from "./auth";
 
 import discord from "./discord";
 import identity from "./identity";
 import twitch from "./twitch";
-import statsManager from "@modbot/utils/dist/managers/StatsManager";
+import userSearch from "./user-search";
 
 const PORT = process.env.API_PORT;
 
@@ -118,6 +119,7 @@ app.use((req, res, next) => {
 app.use("/discord", discord);
 app.use("/identity", identity);
 app.use("/twitch", twitch);
+app.use("/user-search", userSearch);
 
 const updateServices = async () => {
     services = await events.requestAll("identify", events.servicePrefix);
