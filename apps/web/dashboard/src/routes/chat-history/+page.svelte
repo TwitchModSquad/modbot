@@ -148,6 +148,12 @@
         gap: 1rem;
     }
 
+    @media (max-width: 1150px) {
+        .container {
+            grid-template-columns: 1fr;
+        }
+    }
+
     .chat-history .header {
         display: flex;
         align-items: center;
