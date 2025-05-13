@@ -11,3 +11,10 @@ export function getAvatarUrl(user: RawDiscordUser, size: number = 64): string {
         }
     }
 }
+
+export function arraysAreEqual<T>(a: T[], b: T[]): boolean {
+    if (a.length !== b.length) return false;
+    const sortedA = [...a].sort();
+    const sortedB = [...b].sort();
+    return sortedA.every((val, idx) => val === sortedB[idx]);
+}

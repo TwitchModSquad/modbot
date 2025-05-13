@@ -1,32 +1,11 @@
 <script lang="ts">
-    import {browser} from '$app/environment';
-    import {type ChatHistoryResult, getChatHistory} from "$lib/api";
     import type {User} from "$lib/interfaces/UserTypes"
     import UserSelector from "$lib/components/snippets/UserSelector.svelte";
     import ChatHistory from "$lib/components/snippets/ChatHistory.svelte";
 
-    const emptyResult: ChatHistoryResult = {
-        twitchChats: [],
-        users: {},
-    }
-
-    let lastQuery: string|null = null;
-    async function fetchChatHistory(streamers: User[], chatters: User[]): Promise<ChatHistoryResult> {
-        if (!browser) return emptyResult;
-        
-        const selectedStreamers = streamers.filter(x => x.selected);
-        const selectedChatters = chatters.filter(x => x.selected);
-
-        return await getChatHistory(
-            selectedStreamers.map(x => x.id),
-            selectedChatters.map(x => x.id)
-        );
-    }
-
     let streamers: User[] = $state([]);
     let chatters: User[] = $state([]);
 
-    let chatHistory = $derived(fetchChatHistory(streamers, chatters));
 </script>
 
 <svelte:head>
@@ -44,11 +23,7 @@
         <UserSelector userType="twitch" label="Filter by Chatter" bind:users={chatters} />
     </aside>
     <div class="chat-history">
-        {#await chatHistory}
-            <p>Waiting...</p>
-        {:then result}
-            <ChatHistory historyResult={result} />
-        {/await}
+        <ChatHistory bind:streamers bind:chatters />
     </div>
 </div>
 
