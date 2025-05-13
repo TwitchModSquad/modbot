@@ -4,9 +4,10 @@
   "description": "Moderation services and tools for Twitch streamers and their moderators & Discord communities",
   "main": "dist/app.js",
   "scripts": {
+    "prepare": "npm run prepare --workspace=@modbot/web-public && npm run prepare --workspace=@modbot/web-dashboard",
     "build": "tsc --build",
     "build:utils": "npm run clean --workspace=@modbot/utils && npm run build --workspace=@modbot/utils",
-    "build:all": "npm run build && npm run build --workspace=@modbot/web-public && npm run build --workspace=@modbot/web-dashboard",
+    "build:all": "npm run prepare && npm run build && npm run build --workspace=@modbot/web-public && npm run build --workspace=@modbot/web-dashboard",
     "lint": "eslint \"packages/*/src/**/*.ts\" \"apps/bot/*/src/**/*.ts\" \"apps/web/*/src/**/*.ts\"",
     "type-check": "npm run type-check --workspaces --if-present",
     "clean": "npm run clean --workspaces",
