@@ -72,8 +72,11 @@ router.get("/", async (req, res) => {
     }
 
     res.json({
-        ok: true, twitchChats,
-        users: Object.fromEntries(users),
+        ok: true,
+        data: {
+            twitchChats,
+            users: Object.fromEntries(users),
+        },
     });
 });
 
