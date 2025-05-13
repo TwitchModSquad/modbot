@@ -3,7 +3,8 @@ name: Notify Discord on Version Tag Push
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*.*.*'
+      - 'v*.*.*-*'
 
 jobs:
   notify-discord:

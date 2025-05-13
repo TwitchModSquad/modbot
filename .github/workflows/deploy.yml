@@ -3,7 +3,8 @@ name: Deploy to Production
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*.*.*'
+      - 'v*.*.*-*'
   workflow_dispatch:
 
 jobs:
