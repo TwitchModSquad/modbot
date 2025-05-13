@@ -121,6 +121,10 @@ app.use("/identity", identity);
 app.use("/twitch", twitch);
 app.use("/user-search", userSearch);
 
+app.use((req, res) => {
+    res.status(404).json({ok: false, error: "Not found"});
+});
+
 const updateServices = async () => {
     services = await events.requestAll("identify", events.servicePrefix);
 }
