@@ -1,8 +1,9 @@
 <script lang="ts">
+    import type {RawTwitchUser} from "@modbot/utils";
     import {type ChatHistoryResult, getChatHistory} from "$lib/api";
     import {browser} from "$app/environment";
     import {arraysAreEqual} from "$lib/utils";
-    import type {RawTwitchUser} from "@modbot/utils";
+    import {badges} from "$lib/badgeData";
 
     const { streamers = [], chatters = [] }: {
         streamers: RawTwitchUser[],
@@ -51,16 +52,34 @@
             {@const chatter = result.users[chat.chatterId]}
 
             <div class="message">
-                <img src={chatter.profile_image_url} alt="Profile picture for {chatter.display_name}">
+                <img class="pfp" src={chatter.profile_image_url} alt="Profile picture for {chatter.display_name}">
                 <div class="message-content">
-                    <div class="chatter">{chatter.display_name}</div>
-                    {#if streamers.length !== 1}
-                        <div class="streamer">{streamer.display_name}</div>
-                    {/if}
+                    <div class="message-header">
+                        {#if streamers.length !== 1}
+                            <div class="streamer">#{streamer.login}</div>
+                        {/if}
+                        <div class="chatter">
+                            {chatter.display_name}
+                        </div>
+                        {#if chat.badges && chat.badges.length > 0}
+                            <div class="badges">
+                                {#each badges as badge}
+                                    {#if chat.badges.includes(badge.name)}
+                                        <img class="badge" src={badge.url} alt="Badge {badge.name}">
+                                    {/if}
+                                {/each}
+                            </div>
+                        {/if}
+                    </div>
                     <p class="chat-message">{chat.message}</p>
                 </div>
             </div>
         {/each}
+        {#if result.twitchChats.length >= 100}
+            <button type="button" class="load-more">
+                Load more
+            </button>
+        {/if}
     </div>
 {:catch error}
     <p>
@@ -72,10 +91,10 @@
 <style>
     .message {
         display: flex;
-        margin: .5em 0;
+        margin: .75em 0;
     }
 
-    .message img {
+    img.pfp {
         width: 2.5em;
         height: 2.5em;
         border-radius: 50%;
@@ -86,11 +105,24 @@
         flex-grow: 1;
     }
 
+    .message-header {
+        display: flex;
+        align-items: center;
+        gap: .4em;
+        margin-bottom: .25em;
+    }
+
     .chatter {
         font-size: 1.1em;
         font-weight: 600;
-        margin-bottom: .1em;
         color: white;
+    }
+
+    .badge {
+        width: 1em;
+        height: 1em;
+        margin-left: .25em;
+        border-radius: .2em;
     }
 
     .streamer {
@@ -101,5 +133,20 @@
     .chat-message {
         font-size: .95em;
         margin: 0;
+    }
+
+    .load-more {
+        display: block;
+        background-color: transparent;
+        color: var(--secondary-text-color);
+        border: none;
+        padding: .6em .8em;
+        margin: .6em auto;
+        cursor: pointer;
+    }
+
+    .load-more:hover,
+    .load-more:focus-visible {
+        text-decoration: underline;
     }
 </style>
