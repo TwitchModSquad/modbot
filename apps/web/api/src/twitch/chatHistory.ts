@@ -74,7 +74,7 @@ router.get("/", async (req, res) => {
     res.json({
         ok: true,
         data: {
-            twitchChats,
+            twitchChats: twitchChats.map(x => x.raw()),
             users: Object.fromEntries(users),
         },
     });
