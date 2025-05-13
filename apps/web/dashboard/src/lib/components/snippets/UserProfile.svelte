@@ -94,7 +94,7 @@
 
     .profile {
         background-color: var(--secondary-background-color);
-        position: fixed;
+        position: absolute;
         top: 4em;
         right: 1em;
         width: 16em;
