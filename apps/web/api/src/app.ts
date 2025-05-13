@@ -41,7 +41,14 @@ export interface CachedSession {
 const cachedSessions = new Map<string, CachedSession>();
 
 app.use(async (req, res, next) => {
-    const sessionId = req?.cookies?.v3_session;
+    let sessionId = req?.cookies?.v3_session;
+
+    if (req.headers.authorization) {
+        const authHeader = req.headers.authorization;
+        if (authHeader.startsWith("Bearer ")) {
+            sessionId = authHeader.substring(7);
+        }
+    }
 
     req.flushCache = function() {
         if (!sessionId) return;
