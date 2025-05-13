@@ -197,17 +197,6 @@
     }
 
     input[type="checkbox"] {
-        appearance: none;
-        width: 1.4em;
-        height: 1.4em;
-        margin-right: 0.8em;
-        background-color: var(--primary-background-color);
-        border-radius: 0.3em;
-        cursor: pointer;
-        box-shadow: var(--heavy-shadow);
-    }
-
-    input[type="checkbox"]:checked {
-        background-color: var(--primary-tms-color);
+        margin-right: .8em;
     }
 </style>
