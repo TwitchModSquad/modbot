@@ -7,7 +7,7 @@ import redis from "./redis";
 import {TwitchRole} from "./models";
 
 const BASE_TWITCH_URL = "https://id.twitch.tv/oauth2/authorize?response_type=code" +
-    `&client_id=${encodeURIComponent(process.env.TWITCH_CLIENT_ID)}&redirect_uri=${encodeURIComponent(process.env.API_URI + "auth/twitch")}&scope={scope}&state={state}`;
+    `&client_id=${encodeURIComponent(process.env.TWITCH_CLIENT_ID)}&redirect_uri=${encodeURIComponent(process.env.PUBLIC_API_URI + "auth/twitch")}&scope={scope}&state={state}`;
 
 const scopes = [
     "user:read:email",
@@ -38,7 +38,7 @@ export const verifyState = async (state: string): Promise<boolean> => {
 export const authProvider = new RefreshingAuthProvider({
     clientId: process.env.TWITCH_CLIENT_ID,
     clientSecret: process.env.TWITCH_CLIENT_SECRET,
-    redirectUri: process.env.API_URI + "auth/twitch",
+    redirectUri: process.env.PUBLIC_API_URI + "auth/twitch",
 });
 
 authProvider.onRefresh((userId, token) => {

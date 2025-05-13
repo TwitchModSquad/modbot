@@ -13,10 +13,10 @@ router.get("/", async (req, res) => {
     }
 
     const successRedirect = () => {
-        if (cookies?.v3_redirect && cookies.v3_redirect.startsWith(process.env.DASHBOARD_URI)) {
+        if (cookies?.v3_redirect && cookies.v3_redirect.startsWith(process.env.PUBLIC_DASHBOARD_URI)) {
             res.redirect(cookies.v3_redirect);
         } else {
-            res.redirect(process.env.DASHBOARD_URI);
+            res.redirect(process.env.PUBLIC_DASHBOARD_URI);
         }
     }
 

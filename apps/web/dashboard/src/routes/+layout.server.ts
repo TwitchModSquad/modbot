@@ -1,10 +1,10 @@
 import type { LayoutServerLoad } from './$types';
-import { API_URI, WEB_URI } from "$env/static/private";
+import { PUBLIC_API_URI, PUBLIC_WEB_URI } from "$env/static/public";
 import type {RawDiscordUser, RawIdentity, RawTwitchUser} from "@modbot/utils";
 import {redirect} from "@sveltejs/kit";
 
 export const load: LayoutServerLoad = async ({ fetch, cookies }) => {
-    const res = await fetch(`${API_URI}identity/me`, {
+    const res = await fetch(`${PUBLIC_API_URI}identity/me`, {
         headers: {
             Cookie: cookies.getAll().map(c => `${c.name}=${c.value}`).join('; ')
         }
@@ -21,11 +21,11 @@ export const load: LayoutServerLoad = async ({ fetch, cookies }) => {
     }
 
     if (!identity || !twitchUsers || !discordUsers) {
-        throw redirect(303, `${API_URI}auth/twitch`);
+        throw redirect(303, `${PUBLIC_API_URI}auth/twitch`);
     }
 
     return {
-        apiUri: API_URI, webUri: WEB_URI,
+        apiUri: PUBLIC_API_URI, webUri: PUBLIC_WEB_URI,
         identity,
         twitchUsers,
         discordUsers,

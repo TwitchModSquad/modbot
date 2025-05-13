@@ -1,7 +1,7 @@
 import {RedisObjectManager, RawDiscordUser} from "../../";
 import {discordUsers} from "../index";
 
-const REDIRECT_URI = process.env.API_URI + "auth/discord";
+const REDIRECT_URI = process.env.PUBLIC_API_URI + "auth/discord";
 
 export interface DiscordToken {
     access_token: string;
