@@ -10,7 +10,7 @@
 
         if (selectedUsers.length > 0) {
             const user = selectedUsers[0];
-            goto(`/user/${'username' in user ? "discord" : "twitch"}/${user.id}`);
+            goto(`/records/user/${'username' in user ? "discord" : "twitch"}/${user.id}`);
         }
     });
 </script>

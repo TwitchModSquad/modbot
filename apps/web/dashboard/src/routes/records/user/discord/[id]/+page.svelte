@@ -13,7 +13,7 @@
             user = await getDiscordUser(page.params.id);
         } catch (err) {
             console.error(err);
-            await goto("/user/search?error=not-found");
+            await goto("/records/user/search?error=not-found");
         }
     });
 
@@ -23,7 +23,7 @@
     <title>User Search | Dashboard | The Mod Squad</title>
 </svelte:head>
 
-<a class="return link" href="/user/search"><i class="fa-regular fa-arrow-left"></i> Return to Search</a>
+<a class="return link" href="/records/user/search"><i class="fa-regular fa-arrow-left"></i> Return to Search</a>
 <h1>Discord User : {user?.globalName ?? user?.username ?? "Loading"}</h1>
 
 {#if user}

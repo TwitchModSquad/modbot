@@ -24,18 +24,18 @@
                 {
                     icon: "fa-solid fa-comments",
                     label: "Chat History",
-                    href: "/chat-history",
-                },
-                {
-                    icon: "fa-solid fa-user-magnifying-glass",
-                    label: "User Search",
-                    startsWith: "/user",
-                    href: "/user/search",
+                    href: "/records/chat-history",
                 },
                 {
                     icon: "fa-solid fa-ban",
                     label: "Twitch Punishments",
-                    href: "/twitch-punishments",
+                    href: "/records/twitch-punishments",
+                },
+                {
+                    icon: "fa-solid fa-user-magnifying-glass",
+                    label: "User Search",
+                    startsWith: "/records/user",
+                    href: "/records/user/search",
                 },
             ]
         }

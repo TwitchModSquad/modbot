@@ -10,7 +10,7 @@
 <a class="linked-user"
    class:linked-user-twitch={'display_name' in user}
    class:linked-user-discord={'username' in user}
-   href="/user/{'display_name' in user ? 'twitch' : 'discord'}/{user.id}">
+   href="/records/user/{'display_name' in user ? 'twitch' : 'discord'}/{user.id}">
     {#if 'display_name' in user}
         <img src={user.profile_image_url} alt="Profile picture for {user.display_name}">
         {user.display_name}
