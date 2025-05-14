@@ -28,4 +28,7 @@
     --primary-discord-color: #5865f2;
     --secondary-discord-color: #4f5ceb;
     --dark-discord-color: #2e379c;
+
+    --red: 200, 60, 60;
+    --blue: 60, 100, 200;
 }

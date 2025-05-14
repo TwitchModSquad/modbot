@@ -77,8 +77,10 @@ export const punishmentRoute =
 
         res.json({
             ok: true,
-            punishments: punishments.map(x => x.raw()),
-            users: Object.fromEntries(users),
+            data: {
+                punishments: punishments.map(x => x.raw()),
+                users: Object.fromEntries(users),
+            },
         });
     });
 

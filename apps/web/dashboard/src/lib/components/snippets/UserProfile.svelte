@@ -1,9 +1,10 @@
 <script lang="ts">
-    import type {RawDiscordUser, RawIdentity, RawTwitchUser} from "@modbot/utils";
+    import {type RawDiscordUser, type RawTwitchUser} from "@modbot/utils";
     import {getAvatarUrl} from "$lib/utils";
     import Timestamp from "$lib/components/snippets/Timestamp.svelte";
     import {onMount} from "svelte";
     import {getIdentity, type IdentityResult} from "$lib/api/identity";
+    import SmallUser from "$lib/components/snippets/SmallUser.svelte";
 
     const {
         user,
@@ -30,19 +31,40 @@
     {:else}
         <img src={user.profile_image_url} alt="Profile picture for {user.display_name}">
     {/if}
-    <h2>
-        {#if 'username' in user}
-            {user.globalName ?? user.username}<span class="discriminator">{user.discriminator === "0" ? "" : "#" + user.discriminator}</span>
-        {:else}
-            {user.display_name}
+    <div class="identifier">
+        <h3>
+            {#if 'username' in user}
+                {user.globalName ?? user.username}<span class="discriminator">{user.discriminator === "0" ? "" : "#" + user.discriminator}</span>
+            {:else}
+                {user.display_name}
+            {/if}
+        </h3>
+        {#if identity && ["moderator", "admin"].includes(identity.identity.role)}
+            <div class="tms-role"
+                 class:tms-role-moderator={identity.identity.role === "moderator"}
+                 class:tms-role-admin={identity.identity.role === "admin"}>
+                Mod Squad {identity.identity.role === "moderator" ? "Moderator" : "Admin"}
+            </div>
         {/if}
-    </h2>
-    <small class="id">{user.id}</small>
+        <div class="id">{user.id}</div>
+        {#if 'display_name' in user}
+            <a class="link" href="/chat-history?chatter_id={user.id}">View full chat history</a>
+        {/if}
+    </div>
     <table>
         <tbody>
+            {#if 'follower_count' in user && typeof user.follower_count === "number"}
+                <tr>
+                    <th>Follower Count</th>
+                    <td>
+                        {user.follower_count.toLocaleString()}
+                        follower{user.follower_count === 1 ? "" : "s"}
+                    </td>
+                </tr>
+            {/if}
             {#if user.createdDate}
                 <tr>
-                    <th>Logged by TMS</th>
+                    <th>First Logged</th>
                     <td>
                         <Timestamp timestamp={new Date(user.createdDate)} />
                     </td>
@@ -50,7 +72,7 @@
             {/if}
             {#if user.updatedDate}
                 <tr>
-                    <th>Updated by TMS</th>
+                    <th>Last Updated</th>
                     <td>
                         <Timestamp timestamp={new Date(user.updatedDate)} />
                     </td>
@@ -62,10 +84,7 @@
                         <th>Linked Twitch Users</th>
                         <td>
                             {#each identity.users.twitch as twitchUser}
-                                <a class="linked-user linked-user-twitch" href="/user/twitch/{twitchUser.id}">
-                                    <img src={twitchUser.profile_image_url} alt="Profile picture for {twitchUser.display_name}">
-                                    {twitchUser.display_name}
-                                </a>
+                                <SmallUser user={twitchUser} />
                             {/each}
                         </td>
                     </tr>
@@ -75,10 +94,7 @@
                         <th>Linked Discord Users</th>
                         <td>
                             {#each identity.users.discord as discordUser}
-                                <a class="linked-user linked-user-discord" href="/user/discord/{discordUser.id}">
-                                    <img src={getAvatarUrl(discordUser)} alt="Profile picture for {discordUser.username}">
-                                    {discordUser.globalName ?? discordUser.username}
-                                </a>
+                                <SmallUser user={discordUser} />
                             {/each}
                         </td>
                     </tr>
@@ -93,7 +109,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: .4rem;
+        gap: .8rem;
 
         background-color: var(--secondary-background-color);
         padding: 1em;
@@ -106,11 +122,29 @@
         border-radius: 50%;
     }
 
-    h2 {
+    .identifier {
+        text-align: center;
+    }
+
+    h3 {
         font-family: var(--font-body) sans-serif;
         font-size: 1.2em;
         font-weight: 600;
         margin: 0;
+    }
+
+    .tms-role {
+        margin: .25em 0;
+    }
+
+    .tms-role-moderator {
+        color: #49cd49;
+        text-shadow: 0 0 5px #4fd64f;
+    }
+
+    .tms-role-admin {
+        color: #cd4949;
+        text-shadow: 0 0 5px #d64f4f;
     }
 
     .id {
@@ -120,48 +154,23 @@
 
     table {
         width: 100%;
-        background-color: rgba(0,0,0,0.1);
-        border: 1px solid rgba(0,0,0,0.2);
-        border-radius: .5em;
-        border-collapse: collapse;
-        box-shadow: var(--shadow);
-        overflow: hidden;
-    }
-
-    tr:nth-child(even) {
-        background-color: rgba(0,0,0,0.1);
+        border-spacing: 0 .5em;
     }
 
     th, td {
-        padding: .5em;
+        background-color: rgba(0,0,0,0.15);
+        padding: .6em;
     }
 
     th {
         font-size: 1rem;
         text-align: left;
-        font-weight: 400;
+        font-weight: 500;
+        border-radius: .35em 0 0 .35em;
     }
 
-    .linked-user {
-        display: inline-flex;
-        align-items: center;
-        padding: .2em .4em;
-        border-radius: .25em;
-        color: var(--primary-text-color);
-        text-decoration: none;
-    }
-
-    .linked-user-twitch {
-        background-color: var(--secondary-twitch-color);
-    }
-
-    .linked-user-discord {
-        background-color: var(--secondary-discord-color);
-    }
-
-    .linked-user img {
-        width: 1.25em;
-        height: 1.25em;
-        margin-right: .5rem;
+    td {
+        text-align: right;
+        border-radius: 0 .35em .35em 0;
     }
 </style>

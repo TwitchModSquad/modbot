@@ -9,6 +9,9 @@
     let {
         streamers = [],
         chatters = [],
+        cursor = "",
+        limit = 100,
+        small = false,
         addChatter = user => {
             chatters = [...chatters, user];
         },
@@ -18,6 +21,9 @@
     }: {
         streamers: RawTwitchUser[],
         chatters: RawTwitchUser[],
+        cursor?: string,
+        limit?: number,
+        small?: boolean,
         addChatter?: null | ((user: RawTwitchUser) => void),
         addStreamer?: null | ((user: RawTwitchUser) => void),
     } = $props();
@@ -46,16 +52,18 @@
 
         result = await getChatHistory(
             lastStreamerIds,
-            lastChatterIds
+            lastChatterIds,
+            cursor,
+            limit
         );
     }
 
     async function loadMore(): Promise<void> {
-        if (result.twitchChats.length < 100) return;
         const newResult = await getChatHistory(
             lastStreamerIds,
             lastChatterIds,
-            result.twitchChats[result.twitchChats.length - 1].createdDate
+            result.twitchChats[result.twitchChats.length - 1].createdDate,
+            limit
         );
 
         result = {
@@ -71,7 +79,10 @@
     }
 </script>
 
-<div class="chat-history">
+<div class="chat-history" class:small={small}>
+    {#if result.twitchChats.length === 0}
+        <p class="none">No chat messages were found with this filter!</p>
+    {/if}
     {#each result.twitchChats as chat}
         {@const streamer = result.users[chat.streamerId]}
         {@const chatter = result.users[chat.chatterId]}
@@ -81,10 +92,12 @@
             <img class="pfp" src={chatter.profile_image_url} alt="Profile picture for {chatter.display_name}">
             <div class="message-content">
                 <div class="message-header">
-                    {#if addStreamer}
-                        <button type="button" class="streamer" onclick={() => addStreamer(streamer)}>#{streamer.login}</button>
-                    {:else}
-                        <div class="streamer">#{streamer.login}</div>
+                    {#if streamers.length !== 1 || !small}
+                        {#if addStreamer}
+                            <button type="button" class="streamer" onclick={() => addStreamer(streamer)}>#{streamer.login}</button>
+                        {:else}
+                            <div class="streamer">#{streamer.login}</div>
+                        {/if}
                     {/if}
                     {#if addChatter}
                         <button type="button" class="chatter" onclick={() => addChatter(chatter)}>{chatter.display_name}</button>
@@ -101,14 +114,16 @@
                         </div>
                     {/if}
                     {#if timeSent instanceof Date && timeSent.toString() !== 'Invalid Date'}
-                        <Timestamp timestamp={timeSent} />
+                        <div class="timestamp">
+                            <Timestamp timestamp={timeSent} />
+                        </div>
                     {/if}
                 </div>
                 <p class="chat-message">{chat.message}</p>
             </div>
         </div>
     {/each}
-    {#if result.twitchChats.length >= 100}
+    {#if result.twitchChats.length >= limit}
         <button type="button" class="load-more" onclick={loadMore}>
             Load more
         </button>
@@ -116,6 +131,16 @@
 </div>
 
 <style>
+    .small {
+        font-size: .9em;
+    }
+
+    .none {
+        font-size: .9em;
+        color: var(--secondary-text-color);
+        margin: 0;
+    }
+
     .message {
         display: flex;
         margin: .75em 0;
@@ -125,7 +150,7 @@
         width: 2.5em;
         height: 2.5em;
         border-radius: 50%;
-        margin-right: 1rem;
+        margin-right: 1em;
     }
 
     .message-content {
@@ -171,7 +196,7 @@
         margin: 0;
     }
 
-    :global(.timestamp) {
+    .timestamp {
         font-family: monospace;
         flex-grow: 1;
         text-align: right;
@@ -184,8 +209,8 @@
         background-color: transparent;
         color: var(--secondary-text-color);
         border: none;
-        padding: .6em .8em;
-        margin: .6em auto;
+        padding: .4em .6em;
+        margin: .4em auto;
         cursor: pointer;
     }
 

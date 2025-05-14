@@ -6,7 +6,6 @@
     let users: User[] = $state([]);
 
     $effect(() => {
-        console.log(users);
         const selectedUsers = users.filter(x => x.selected);
 
         if (selectedUsers.length > 0) {

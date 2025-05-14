@@ -41,12 +41,6 @@
 
     .container {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        grid-template-areas:
-            "profile";
-    }
-
-    :global(.user-profile) {
-        grid-area: profile;
+        grid-template-columns: repeat(3, 1fr);
     }
 </style>
