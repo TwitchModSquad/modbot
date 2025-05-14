@@ -50,20 +50,20 @@ function parseStreamerChatterQuery(streamerIds: string[], chatterIds: string[], 
     return query;
 }
 
-export async function getChatHistory(streamerIds: string[] = [], chatterIds: string[] = [], cursor: string|null = "", limit: number = 100): Promise<ChatHistoryResult> {
+export async function getChatHistory(streamerIds: string[] = [], chatterIds: string[] = [], cursor: string = "", limit: number = 100): Promise<ChatHistoryResult> {
     const query = parseStreamerChatterQuery(streamerIds, chatterIds, cursor, limit);
     return await get(`twitch/chat-history${query === "" ? "" : "?" + query}`) as ChatHistoryResult;
 }
 
-async function getPunishments<T>(type: "ban"|"timeout", streamerIds: string[] = [], chatterIds: string[] = [], cursor: string|null = "", limit: number = 100): Promise<PunishmentResult<T>> {
+async function getPunishments<T>(type: "ban"|"timeout", streamerIds: string[] = [], chatterIds: string[] = [], cursor: string = "", limit: number = 100): Promise<PunishmentResult<T>> {
     const query = parseStreamerChatterQuery(streamerIds, chatterIds, cursor, limit);
     return await get(`twitch/${type}${query === "" ? "" : "?" + query}`) as PunishmentResult<T>;
 }
 
-export async function getTwitchBans(streamerIds: string[] = [], chatterIds: string[] = [], cursor: string|null = "", limit: number = 100): Promise<PunishmentResult<RawTwitchBan>> {
+export async function getTwitchBans(streamerIds: string[] = [], chatterIds: string[] = [], cursor: string = "", limit: number = 100): Promise<PunishmentResult<RawTwitchBan>> {
     return await getPunishments("ban", streamerIds, chatterIds, cursor, limit);
 }
 
-export async function getTwitchTimeouts(streamerIds: string[] = [], chatterIds: string[] = [], cursor: string|null = "", limit: number = 100): Promise<PunishmentResult<RawTwitchTimeout>> {
+export async function getTwitchTimeouts(streamerIds: string[] = [], chatterIds: string[] = [], cursor: string = "", limit: number = 100): Promise<PunishmentResult<RawTwitchTimeout>> {
     return await getPunishments("timeout", streamerIds, chatterIds, cursor, limit);
 }

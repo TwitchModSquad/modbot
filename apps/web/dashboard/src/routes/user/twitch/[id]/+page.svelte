@@ -2,18 +2,15 @@
     import {onMount} from "svelte";
     import {page} from "$app/state";
     import {goto} from "$app/navigation";
-    import type {RawTwitchBan, RawTwitchTimeout, RawTwitchUser} from "@modbot/utils";
+    import type {RawTwitchUser} from "@modbot/utils";
     import UserProfile from "$lib/components/snippets/UserProfile.svelte";
-    import {getTwitchBans, getTwitchTimeouts, getTwitchUser, type PunishmentResult} from "$lib/api";
+    import {getTwitchUser} from "$lib/api";
     import PunishmentList from "$lib/components/snippets/PunishmentList.svelte";
     import ChatHistory from "$lib/components/snippets/ChatHistory.svelte";
     import UserSelector from "$lib/components/snippets/UserSelector.svelte";
     import type {User} from "$lib/interfaces/UserTypes";
 
     let user: RawTwitchUser | null = $state(null);
-
-    let bans: PunishmentResult<RawTwitchBan>|null = $state(null);
-    let timeouts: PunishmentResult<RawTwitchTimeout>|null = $state(null);
 
     let streamers: User[] = $state([]);
 
@@ -24,9 +21,6 @@
     onMount(async () => {
         try {
             user = await getTwitchUser(page.params.id);
-
-            bans = await getTwitchBans([], [user.id]);
-            timeouts = await getTwitchTimeouts([], [user.id]);
         } catch (err) {
             console.error(err);
             await goto("/user/search?error=not-found");
@@ -50,18 +44,20 @@
                 <h2>User Profile</h2>
                 <UserProfile user={user} />
             </section>
-            <article class="punishments">
-                {#if bans}
-                    <h2>Bans</h2>
+            <div>
+                {#if 'display_name' in user}
+                    <article class="punishments punishments-ban">
+                        <h2>Bans</h2>
 
-                    <PunishmentList bind:result={bans} />
-                {/if}
-                {#if timeouts}
-                    <h2>Timeouts</h2>
+                        <PunishmentList type="ban" chatters={[user]} limit={10} />
+                    </article>
+                    <article class="punishments punishments-ban">
+                        <h2>Timeouts</h2>
 
-                    <PunishmentList bind:result={timeouts} />
+                        <PunishmentList type="timeout" chatters={[user]} limit={10} />
+                    </article>
                 {/if}
-            </article>
+            </div>
         </div>
         <section class="chat-history">
             <h2>Chat History</h2>

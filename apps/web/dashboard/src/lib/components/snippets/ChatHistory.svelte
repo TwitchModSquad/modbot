@@ -153,7 +153,7 @@
             </IntersectionObserver>
         {/if}
         <button type="button" class="load-more" onclick={loadMore}>
-            Load more
+            Load more chat messages
         </button>
     {/if}
 </div>
