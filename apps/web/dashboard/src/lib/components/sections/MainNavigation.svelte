@@ -32,6 +32,11 @@
                     startsWith: "/user",
                     href: "/user/search",
                 },
+                {
+                    icon: "fa-solid fa-ban",
+                    label: "Twitch Punishments",
+                    href: "/twitch-punishments",
+                },
             ]
         }
     ];
