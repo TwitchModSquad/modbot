@@ -5,6 +5,7 @@
     import {arraysAreEqual} from "$lib/utils";
     import {badges} from "$lib/badgeData";
     import Timestamp from "$lib/components/snippets/Timestamp.svelte";
+    import IntersectionObserver from "$lib/components/snippets/IntersectionObserver.svelte";
 
     let {
         streamers = [],
@@ -12,6 +13,7 @@
         cursor = "",
         limit = 100,
         small = false,
+        autoLoad = false,
         addChatter = user => {
             chatters = [...chatters, user];
         },
@@ -24,6 +26,7 @@
         cursor?: string,
         limit?: number,
         small?: boolean,
+        autoLoad?: boolean,
         addChatter?: null | ((user: RawTwitchUser) => void),
         addStreamer?: null | ((user: RawTwitchUser) => void),
     } = $props();
@@ -62,7 +65,14 @@
         showLoadMore = result.twitchChats.length >= limit;
     }
 
+    let loadingMore = $state(false);
     async function loadMore(): Promise<void> {
+        if (loadingMore || !result || result.twitchChats.length < limit) {
+            return;
+        }
+
+        loadingMore = true;
+
         const newResult = await getChatHistory(
             lastStreamerIds,
             lastChatterIds,
@@ -85,6 +95,8 @@
                 ...newResult.users,
             }
         }
+
+        loadingMore = false;
     }
 </script>
 
@@ -133,6 +145,13 @@
         </div>
     {/each}
     {#if showLoadMore}
+        {#if autoLoad}
+            <IntersectionObserver let:intersecting once={false} top={200}>
+                {#if intersecting && result !== null}
+                    {loadMore()}
+                {/if}
+            </IntersectionObserver>
+        {/if}
         <button type="button" class="load-more" onclick={loadMore}>
             Load more
         </button>

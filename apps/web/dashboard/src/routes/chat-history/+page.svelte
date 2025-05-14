@@ -103,7 +103,9 @@
             </Button>
         </div>
         {#key refresh}
-            <ChatHistory streamers={selectedStreamers} chatters={selectedChatters}
+            <ChatHistory streamers={selectedStreamers}
+                         chatters={selectedChatters}
+                         autoLoad={true}
                          addChatter={(user) => {
                             const foundChatter = chatters.find(x => x.id === user.id);
 
