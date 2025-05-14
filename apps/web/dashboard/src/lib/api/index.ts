@@ -31,5 +31,7 @@ export async function get(uri: string): Promise<unknown> {
     }
 }
 
+export * from "./discord";
+export * from "./identity";
 export * from "./twitch";
 export * from "./userSearch";

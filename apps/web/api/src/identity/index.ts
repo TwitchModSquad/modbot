@@ -1,5 +1,5 @@
 import {Router} from "express";
-import {identities} from "@modbot/utils";
+import {DiscordUser, identities, TwitchUser} from "@modbot/utils";
 
 const router = Router();
 
@@ -34,9 +34,27 @@ router.get("/:id", async (req, res) => {
         return error("Identity not found!");
     }
 
+    const twitchUsers = await TwitchUser.findAll({
+        where: {
+            identity: identity.id,
+        },
+    });
+
+    const discordUsers = await DiscordUser.findAll({
+        where: {
+            identity: identity.id,
+        },
+    });
+
     res.json({
         ok: true,
-        data: identity,
+        data: {
+            identity,
+            users: {
+                twitch: twitchUsers.map(x => x.raw()),
+                discord: discordUsers.map(x => x.raw()),
+            },
+        },
     });
 });
 

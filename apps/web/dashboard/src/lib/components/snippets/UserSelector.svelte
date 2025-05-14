@@ -10,6 +10,7 @@
     export let userType: UserType = "both";
     export let label: string = "User Selector";
     export let users: User[] = [];
+    export let singular: boolean = false;
 
     let query: string = "";
     const refreshOptions = async () => {
@@ -85,11 +86,13 @@
     <label for={id} id="search-label">
         {label}
     </label>
-    <button type="button" onclick={() => setAllSelectedTo(true)}>Select all</button>
-    <button type="button" onclick={() => setAllSelectedTo(false)}>Unselect all</button>
+    {#if !singular}
+        <button type="button" onclick={() => setAllSelectedTo(true)}>Select all</button>
+        <button type="button" onclick={() => setAllSelectedTo(false)}>Unselect all</button>
+    {/if}
 </div>
 
-<div class="user-selector">
+<div class="user-selector" class:singular={singular}>
     <input type="search" id={id} onkeyup={updateOptions}
            bind:value={query} onfocus={function(){ this.value = "" }}
            placeholder="Type to search for users">
@@ -207,5 +210,9 @@
 
     input[type="checkbox"] {
         margin-right: .8em;
+    }
+
+    .singular input[type="checkbox"] {
+        display: none;
     }
 </style>

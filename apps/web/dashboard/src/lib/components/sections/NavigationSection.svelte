@@ -18,7 +18,7 @@
         <ul transition:slide>
             {#each links as link}
                 <li>
-                    <a href={link.href} aria-current={page.url.pathname === link.href ? "page" : undefined}>
+                    <a href={link.href} aria-current={(link.startsWith ? page.url.pathname.startsWith(link.startsWith) : page.url.pathname === link.href) ? "page" : undefined}>
                         {#if link.icon}
                             <span class="icon"><i class={link.icon}></i></span>
                         {/if}

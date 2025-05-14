@@ -29,6 +29,7 @@
                 {
                     icon: "fa-solid fa-user-magnifying-glass",
                     label: "User Search",
+                    startsWith: "/user",
                     href: "/user/search",
                 },
             ]
