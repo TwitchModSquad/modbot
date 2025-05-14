@@ -134,7 +134,7 @@
                 </div>
                 {#if punishment.startDate}
                     <h4>Chat History</h4>
-                    <IntersectionObserver let:intersecting once={true} top={100}>
+                    <IntersectionObserver let:intersecting once={true} top={300}>
                         {#if intersecting}
                             <ChatHistory
                                     streamers={[streamer]}
@@ -149,7 +149,7 @@
             </section>
         {/each}
         {#if showLoadMore}
-            <IntersectionObserver let:intersecting once={false} top={100}>
+            <IntersectionObserver let:intersecting once={false} top={500}>
                 {#if intersecting && result !== null}
                     {loadMore()}
                 {/if}

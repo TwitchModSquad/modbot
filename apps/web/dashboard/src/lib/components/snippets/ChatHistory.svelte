@@ -146,7 +146,7 @@
     {/each}
     {#if showLoadMore}
         {#if autoLoad}
-            <IntersectionObserver let:intersecting once={false} top={200}>
+            <IntersectionObserver let:intersecting once={false} top={500}>
                 {#if intersecting && result !== null}
                     {loadMore()}
                 {/if}

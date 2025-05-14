@@ -16,7 +16,7 @@
     </section>
     <section>
         <h2>Timeouts</h2>
-        <PunishmentList type="timeout" limit={5} />
+        <PunishmentList type="timeout" limit={50} />
     </section>
 </div>
 
