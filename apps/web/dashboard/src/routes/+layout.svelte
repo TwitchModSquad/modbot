@@ -1,6 +1,6 @@
 <script lang="ts">
     import MainNavigation from "$lib/components/sections/MainNavigation.svelte";
-    import UserProfile from "$lib/components/snippets/UserProfile.svelte";
+    import IdentityProfile from "$lib/components/snippets/IdentityProfile.svelte";
     import type {RawDiscordUser, RawTwitchUser} from "@modbot/utils";
 
     import("@modbot/ui/src/css/vars.css");
@@ -19,7 +19,7 @@
     <header>
         <img src="https://cdn.modsquad.tools/assets/images/logo.webp" alt="The Mod Squad logo" />
         <div>The Mod Squad</div>
-        <UserProfile
+        <IdentityProfile
             twitchUsers={twitchUsers}
             discordUsers={discordUsers}
         />
@@ -51,8 +51,7 @@
         display: grid;
         grid-template-areas:
             "header header"
-            "sidebar main"
-            "footer main";
+            "sidebar main";
         grid-template-columns: 16em 1fr;
         grid-template-rows: 3em 1fr;
     }
@@ -99,7 +98,6 @@
     }
 
     footer {
-        grid-area: footer;
         padding: .4rem;
         font-size: .8em;
         text-align: center;
