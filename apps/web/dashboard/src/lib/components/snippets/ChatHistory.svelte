@@ -40,6 +40,8 @@
         fetchChatHistory(streamers, chatters);
     });
 
+    let showLoadMore: boolean = $state(true);
+
     async function fetchChatHistory(streamers: RawTwitchUser[], chatters: RawTwitchUser[]): Promise<void> {
         if (!browser) return;
 
@@ -56,6 +58,8 @@
             cursor,
             limit
         );
+
+        showLoadMore = result.twitchChats.length >= limit;
     }
 
     async function loadMore(): Promise<void> {
@@ -65,6 +69,11 @@
             result.twitchChats[result.twitchChats.length - 1].createdDate,
             limit
         );
+
+        if (newResult.twitchChats.length === 0) {
+            showLoadMore = false;
+            return;
+        }
 
         result = {
             twitchChats: [
@@ -123,7 +132,7 @@
             </div>
         </div>
     {/each}
-    {#if result.twitchChats.length >= limit}
+    {#if showLoadMore}
         <button type="button" class="load-more" onclick={loadMore}>
             Load more
         </button>
