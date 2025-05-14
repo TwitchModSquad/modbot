@@ -148,7 +148,7 @@
         {#if autoLoad}
             <IntersectionObserver let:intersecting once={false} top={500}>
                 {#if intersecting && result !== null}
-                    {loadMore()}
+                    {@const _ = loadMore()}
                 {/if}
             </IntersectionObserver>
         {/if}
