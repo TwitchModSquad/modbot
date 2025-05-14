@@ -18,6 +18,10 @@
 
 </script>
 
+<svelte:head>
+    <title>Twitch Punishments | Dashboard | The Mod Squad</title>
+</svelte:head>
+
 <h1>Twitch Punishments</h1>
 <p>View a list of the most recent Twitch punishments recorded by The Mod Squad</p>
 
