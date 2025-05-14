@@ -76,7 +76,8 @@ jobs:
           VERSION="${GITHUB_REF_NAME#refs/tags/}"
           COMMIT_LOG=$(cat commit_log.txt)
 
-          CONTENT="# 📦 New Release: \`${VERSION}\`$'\n'${COMMIT_LOG}"
+          CONTENT="# 📦 New Release: \`${VERSION}\`
+          ${COMMIT_LOG}"
 
           # Escape content for JSON safely
           ESCAPED_CONTENT=$(printf '%s' "$CONTENT" | jq -Rs '.')
