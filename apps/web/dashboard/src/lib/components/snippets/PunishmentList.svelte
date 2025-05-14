@@ -33,6 +33,17 @@
                         {#if punishment.startDate}
                             &bullet; <Timestamp timestamp={new Date(punishment.startDate)} />
                         {/if}
+                        {#if 'duration' in punishment}
+                            &bullet;
+                            {@const seconds = punishment.duration % 60}
+                            {#if punishment.duration >= 60}
+                                {@const minutes = Math.floor(punishment.duration / 60)}
+                                {minutes.toLocaleString()} minute{minutes === 1 ? "" : "s"}
+                            {/if}
+                            {#if seconds > 0}
+                                {seconds} second{seconds === 1 ? "" : "s"}
+                            {/if}
+                        {/if}
                     </div>
                     {#if punishment.endDate}
                         {@const date = new Date(punishment.endDate)}
