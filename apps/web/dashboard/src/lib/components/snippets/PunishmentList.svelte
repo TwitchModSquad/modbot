@@ -3,6 +3,7 @@
     import type {PunishmentResult} from "$lib/api";
     import Timestamp from "$lib/components/snippets/Timestamp.svelte";
     import ChatHistory from "$lib/components/snippets/ChatHistory.svelte";
+    import IntersectionObserver from "$lib/components/snippets/IntersectionObserver.svelte";
 
     const { result = $bindable() }: {
         result: PunishmentResult<RawTwitchTimeout|RawTwitchBan>;
@@ -55,13 +56,17 @@
             </div>
             {#if punishment.startDate}
                 <h4>Chat History</h4>
-                <ChatHistory
-                        streamers={[streamer]}
-                        chatters={[chatter]}
-                        cursor={punishment.startDate}
-                        limit={3}
-                        small={true}
-                />
+                <IntersectionObserver let:intersecting once={true} top={100}>
+                    {#if intersecting}
+                        <ChatHistory
+                                streamers={[streamer]}
+                                chatters={[chatter]}
+                                cursor={punishment.startDate}
+                                limit={3}
+                                small={true}
+                        />
+                    {/if}
+                </IntersectionObserver>
             {/if}
         </section>
     {/each}
