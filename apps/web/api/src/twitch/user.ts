@@ -1,5 +1,5 @@
 import {Router} from "express";
-import {RawTwitchUser, twitchUsers} from "@modbot/utils";
+import {RawTwitchUser, RoleType, TwitchRole, twitchUsers} from "@modbot/utils";
 
 const router = Router();
 
@@ -47,6 +47,58 @@ router.get("/:id", async (req, res) => {
             error: "User not found!",
         });
     }
+});
+
+router.get("/:id/moderators", async (req, res) => {
+    const roles = await TwitchRole.findAll({
+        where: {
+            type: RoleType.MODERATOR,
+            streamerId: req.params.id,
+        },
+    });
+
+    const users = new Map<string, RawTwitchUser>();
+    users.set(req.params.id, await twitchUsers.get(req.params.id));
+    for (const role of roles) {
+        const user = await twitchUsers.get(role.userId);
+        if (user) {
+            users.set(user.id, user);
+        }
+    }
+
+    res.json({
+        ok: true,
+        data: {
+            roles: roles.map(x => x.raw()),
+            users: Object.fromEntries(users),
+        },
+    });
+});
+
+router.get("/:id/streamers", async (req, res) => {
+    const roles = await TwitchRole.findAll({
+        where: {
+            type: RoleType.MODERATOR,
+            userId: req.params.id,
+        },
+    });
+
+    const users = new Map<string, RawTwitchUser>();
+    users.set(req.params.id, await twitchUsers.get(req.params.id));
+    for (const role of roles) {
+        const user = await twitchUsers.get(role.streamerId);
+        if (user) {
+            users.set(user.id, user);
+        }
+    }
+
+    res.json({
+        ok: true,
+        data: {
+            roles: roles.map(x => x.raw()),
+            users: Object.fromEntries(users),
+        },
+    });
 });
 
 router.get("/login/:login", async (req, res) => {

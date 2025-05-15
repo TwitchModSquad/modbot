@@ -6,6 +6,17 @@ export enum RoleType {
     EDITOR = "editor",
 }
 
+export interface RawTwitchRole {
+    userId: string;
+    streamerId: string;
+    type: RoleType;
+    confirmed: boolean;
+
+    createdDate?: string;
+    updatedDate?: string;
+    deletedDate?: string;
+}
+
 export class TwitchRole extends Model<InferAttributes<TwitchRole>, InferCreationAttributes<TwitchRole>> {
     declare userId: string;
     declare streamerId: string;
@@ -15,6 +26,18 @@ export class TwitchRole extends Model<InferAttributes<TwitchRole>, InferCreation
     declare createdAt?: Date;
     declare updatedAt?: Date;
     declare deletedAt?: Date;
+
+    raw(): RawTwitchRole {
+        return {
+            userId: this.userId,
+            streamerId: this.streamerId,
+            type: this.type,
+            confirmed: this.confirmed,
+            createdDate: this.createdAt ? this.createdAt.toISOString() : null,
+            updatedDate: this.updatedAt ? this.updatedAt.toISOString() : null,
+        };
+    }
+
 }
 
 TwitchRole.init({
