@@ -57,7 +57,7 @@
     }
 
     .error {
-        background-color: #f14668;
+        background-color: rgb(var(--red));
         color: white;
     }
 
@@ -76,6 +76,6 @@
     }
 
     .full {
-        width: 100%;
+        width: calc(100% - 2em);
     }
 </style>

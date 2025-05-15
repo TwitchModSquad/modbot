@@ -3,6 +3,8 @@
     import type {RawDiscordUser, RawTwitchUser} from "@modbot/utils";
     import {onMount} from "svelte";
     import {getAvatarUrl} from "$lib/utils";
+    import {Button} from "@modbot/ui";
+    import {PUBLIC_API_URI} from "$env/static/public";
 
     const { discordUsers, twitchUsers }: {
         discordUsers: RawDiscordUser[],
@@ -40,7 +42,13 @@
 
 {#if profileOpen}
     <section class="profile" transition:scale bind:this={profileMenu}>
-    <div class="heading">Twitch Users</div>
+        <Button variant="error"
+                href="{PUBLIC_API_URI}auth/logout"
+                full={true}>
+            <i class="fa-solid fa-arrow-left-from-bracket"></i>
+            Log out
+        </Button>
+        <div class="heading">Twitch Users</div>
         {#each twitchUsers as user}
             <div class="user">
                 <img src={user.profile_image_url} alt="Profile picture for {user.display_name}" />
@@ -109,6 +117,7 @@
         font-weight: 500;
         text-transform: uppercase;
         text-align: center;
+        margin: .5em 0;
     }
 
     .user {
