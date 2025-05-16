@@ -48,7 +48,7 @@
         {/if}
         <div class="id">{user.id}</div>
         {#if 'display_name' in user}
-            <a class="link" href="/chat-history?chatter_id={user.id}">View full chat history</a>
+            <a class="link" href="/records/chat-history?chatter_id={user.id}">View full chat history</a>
         {/if}
     </div>
     <table>
