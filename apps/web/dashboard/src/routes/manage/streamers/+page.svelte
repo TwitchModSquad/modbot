@@ -41,7 +41,7 @@
                         ...newResult.roles,
                     ],
                     users: {
-                        ...result.users,
+                        ...result.users as { [id: string]: RawTwitchUser},
                         ...newResult.users,
                     },
                 }
