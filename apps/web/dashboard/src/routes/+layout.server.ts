@@ -4,8 +4,9 @@ import type {RawDiscordUser, RawIdentity, RawTwitchRole, RawTwitchUser} from "@m
 import {redirect} from "@sveltejs/kit";
 
 export const load: LayoutServerLoad = async ({ fetch, cookies, url }) => {
+    console.log(cookies.getAll());
     const sessionCookie = cookies.getAll().find(x => x.name === 'v3_session');
-
+    console.log(sessionCookie);
     if (!sessionCookie) {
         throw redirect(303, `${PUBLIC_API_URI}auth/twitch`);
     }
