@@ -110,6 +110,7 @@
         padding: .8em 1.2em;
         border-radius: .5em;
         box-shadow: var(--heavy-shadow);
+        z-index: 15;
     }
 
     .heading {
