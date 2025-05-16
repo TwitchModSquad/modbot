@@ -89,6 +89,10 @@ export class CacheManager<T extends {id: number|string, cachedDate?: string}> {
             where: { id },
         });
 
+        // Remove any cached object in this service memory or in Redis
+        // to ensure a new one is retrieved from the Database
+        await this.delete(id, false);
+
         const newModel = await this.get(id);
         await this.set(newModel);
         return newModel;
@@ -162,14 +166,17 @@ export class CacheManager<T extends {id: number|string, cachedDate?: string}> {
      * Deletes an item from the memory cache and Redis cache by its ID. Optionally publishes an event upon deletion.
      *
      * @param {number|string} id The unique identifier of the item to be deleted.
+     * @param {boolean} publish Whether to publish to Redis or not
      * @return {Promise<void>} A promise that resolves when the deletion process is complete.
      */
-    public async delete(id: number|string): Promise<void> {
+    public async delete(id: number|string, publish: boolean = true): Promise<void> {
         this.memoryCache.delete(id);
         await this.redis.del(this.getRedisKey(id));
-        await eventManager.publish(this.cachePrefix + ":del", {
-            id,
-            servicePrefix: eventManager.servicePrefix,
-        });
+        if (publish) {
+            await eventManager.publish(this.cachePrefix + ":del", {
+                id,
+                servicePrefix: eventManager.servicePrefix,
+            });
+        }
     }
 }

@@ -1,4 +1,4 @@
-import {RawTwitchBan, RawTwitchChat} from "../../models";
+import {RawTwitchBan, RawTwitchChat, RawTwitchUser} from "../../models";
 import {IdentifyHandle} from "./handles";
 import {PublicStats} from "../../interfaces";
 
@@ -15,6 +15,14 @@ export interface EventMap {
         data: RawTwitchBan;
         response: void;
     };
+    "twitch:join": {
+        data: RawTwitchUser;
+        response: void;
+    },
+    "twitch:part": {
+        data: RawTwitchUser;
+        response: void;
+    },
     "stats:request": {
         data: string;
         response: Partial<PublicStats>;

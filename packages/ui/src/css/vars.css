@@ -2,6 +2,7 @@
     --font-heading: "Rajdhani", sans-serif;
     --font-body: "Inter", sans-serif;
 
+    --primary-background-color-rgb: 28, 27, 30;
     --primary-background-color: #1c1b1e;
     --secondary-background-color: #26262f;
     --tertiary-background-color: #1a191b;
@@ -31,4 +32,5 @@
 
     --red: 200, 60, 60;
     --blue: 60, 100, 200;
+    --green: 70, 175, 50;
 }

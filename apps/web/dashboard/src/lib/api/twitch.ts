@@ -1,5 +1,5 @@
-import type {RawTwitchBan, RawTwitchChat, RawTwitchTimeout, RawTwitchUser} from "@modbot/utils";
-import { get } from ".";
+import type {RawTwitchBan, RawTwitchChat, RawTwitchRole, RawTwitchTimeout, RawTwitchUser} from "@modbot/utils";
+import {get, patch} from ".";
 
 type CondensedUsers = {
     users: {
@@ -13,6 +13,10 @@ export type ChatHistoryResult = {
 
 export type PunishmentResult<T> = {
     punishments: T[],
+} & CondensedUsers;
+
+export type RoleResult = {
+    roles: RawTwitchRole[],
 } & CondensedUsers;
 
 export async function getTwitchUser(id: string): Promise<RawTwitchUser> {
@@ -66,4 +70,20 @@ export async function getTwitchBans(streamerIds: string[] = [], chatterIds: stri
 
 export async function getTwitchTimeouts(streamerIds: string[] = [], chatterIds: string[] = [], cursor: string = "", limit: number = 100): Promise<PunishmentResult<RawTwitchTimeout>> {
     return await getPunishments("timeout", streamerIds, chatterIds, cursor, limit);
+}
+
+async function getRole(type: "streamers"|"moderators", userId: string): Promise<RoleResult> {
+    return await get(`twitch/user/${userId}/${type}`) as RoleResult;
+}
+
+export async function getStreamers(userId: string): Promise<RoleResult> {
+    return await getRole("streamers", userId);
+}
+
+// async function getModerators(userId: string): Promise<RoleResult> {
+//     return await getRole("moderators", userId);
+// }
+
+export async function patchListenSettings(body: Map<string, string>): Promise<number> {
+    return await patch("twitch/streamer-settings", Object.fromEntries(body)) as number;
 }

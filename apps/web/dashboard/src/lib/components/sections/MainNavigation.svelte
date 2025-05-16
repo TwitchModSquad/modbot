@@ -19,6 +19,16 @@
             ]
         },
         {
+            name: "Manage",
+            links: [
+                {
+                    icon: "fa-brands fa-twitch",
+                    label: "Twitch Streamers",
+                    href: "/manage/streamers",
+                },
+            ]
+        },
+        {
             name: "Records",
             links: [
                 {
@@ -38,7 +48,7 @@
                     href: "/records/user/search",
                 },
             ]
-        }
+        },
     ];
 
     let expandedSections: string[] = $state(
