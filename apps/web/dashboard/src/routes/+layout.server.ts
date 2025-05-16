@@ -4,9 +4,8 @@ import type {RawDiscordUser, RawIdentity, RawTwitchRole, RawTwitchUser} from "@m
 import {redirect} from "@sveltejs/kit";
 
 export const load: LayoutServerLoad = async ({ fetch, cookies, url }) => {
-    console.log(cookies.getAll());
     const sessionCookie = cookies.getAll().find(x => x.name === 'v3_session');
-    console.log(sessionCookie);
+
     if (!sessionCookie) {
         throw redirect(303, `${PUBLIC_API_URI}auth/twitch`);
     }
@@ -15,7 +14,7 @@ export const load: LayoutServerLoad = async ({ fetch, cookies, url }) => {
 
     const res = await fetch(`${PUBLIC_API_URI}identity/me`, {
         headers: {
-            authorization: sessionId,
+            authorization: `Bearer ${sessionId}`,
         },
     });
 
@@ -37,7 +36,7 @@ export const load: LayoutServerLoad = async ({ fetch, cookies, url }) => {
         for (const user of twitchUsers) {
             const roleRes = await fetch(`${PUBLIC_API_URI}twitch/user/${user.id}/streamers`, {
                 headers: {
-                    authorization: sessionId,
+                    authorization: `Bearer ${sessionId}`,
                 },
             });
 
