@@ -1,7 +1,8 @@
 <script lang="ts">
     import MainNavigation from "$lib/components/sections/MainNavigation.svelte";
-    import IdentityProfile from "$lib/components/snippets/IdentityProfile.svelte";
+    import IdentityProfile from "./IdentityProfile.svelte";
     import type {RawDiscordUser, RawTwitchUser} from "@modbot/utils";
+    import Notifications from "./Notifications.svelte";
 
     import("@modbot/ui/src/css/vars.css");
     import("@modbot/ui/src/css/master.css");
@@ -43,6 +44,8 @@
         </footer>
     </div>
 </div>
+
+<Notifications />
 
 <style>
     .app {

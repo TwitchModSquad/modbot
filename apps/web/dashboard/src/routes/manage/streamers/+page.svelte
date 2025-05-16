@@ -3,6 +3,7 @@
     import {onMount} from "svelte";
     import {Alert, Button, SelectMenu} from "@modbot/ui";
     import {type RawTwitchUser} from "@modbot/utils";
+    import {type NotificationMessage, notifications} from "$lib/stores";
 
     const { data } = $props();
     const { twitchUsers } = data;
@@ -83,6 +84,8 @@
     ];
 
     const submit = async () => {
+        notifications.show("Saving streamer settings...", "info", 1000);
+
         const data = new Map<string, string>();
 
         for (const user of users) {
@@ -100,6 +103,8 @@
                     }),
                 }
             }
+
+            notifications.show("Streamer settings saved!", "success", 3000);
         }
     }
 </script>
