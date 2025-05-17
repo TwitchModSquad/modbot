@@ -13,8 +13,9 @@
   "author": "Twijn",
   "license": "SEE LICENSE IN LICENSE",
   "dependencies": {
+    "@modbot/utils": "*",
     "discord.js": "^14.18.0",
-    "@modbot/utils": "*"
+    "sequelize": "^6.37.7"
   },
   "devDependencies": {
     "typescript": "^5.8.2"

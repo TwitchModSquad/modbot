@@ -1,10 +1,13 @@
 import {DiscordChannel, ListenSetting, ModelStore, RawDiscordChannel, RawTwitchUser, twitchUsers} from "@modbot/utils";
-import {GuildTextBasedChannel} from "discord.js";
+import {GuildTextBasedChannel, TextBasedChannel} from "discord.js";
+import client from "../app";
 
-export type Events = {
+export type ChannelEvents = {
     twitchBanSettings?: RawTwitchUser[]|"*";
     twitchLiveStartSettings?: RawTwitchUser[]|"*";
-}
+};
+
+export type Events = ChannelEvents;
 
 class DiscordChannelManager extends ModelStore<RawDiscordChannel> {
 
@@ -43,6 +46,21 @@ class DiscordChannelManager extends ModelStore<RawDiscordChannel> {
             await this.set(rawChannel);
             return rawChannel;
         }
+    }
+
+    public async getChannelsFor(event: keyof ChannelEvents, userId: string): Promise<TextBasedChannel[]> {
+        let channels: TextBasedChannel[] = [];
+
+        for (const discordChannel of this.getAll()) {
+            if (discordChannel[event] === "*" || discordChannel[event].split(",").includes(userId)) {
+                const channel = await client.channels.fetch(discordChannel.id);
+                if (channel.isTextBased()) {
+                    channels.push(channel as TextBasedChannel);
+                }
+            }
+        }
+
+        return channels;
     }
 
     public async getUsers(setting: string, throwIfMissing: boolean = false): Promise<RawTwitchUser[] | "*" | null> {
