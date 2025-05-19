@@ -2,6 +2,7 @@ import {TwineCommandWithSubcommands} from "../../interfaces";
 import {PermissionsBitField, SlashCommandBuilder, InteractionContextType} from "discord.js";
 import BindSubcommand from "./bind";
 import ListSubcommand from "./list";
+import UnbindSubcommand from "./unbind";
 
 export default class EventCommand extends TwineCommandWithSubcommands {
 
@@ -14,6 +15,7 @@ export default class EventCommand extends TwineCommandWithSubcommands {
             [
                 new BindSubcommand(),
                 new ListSubcommand(),
+                new UnbindSubcommand(),
             ]);
     }
 
