@@ -20,6 +20,15 @@ import discord from "./discord";
 import identity from "./identity";
 import twitch from "./twitch";
 import userSearch from "./user-search";
+import io from "@pm2/io";
+
+const requestMeter = io.meter({
+    name: "requests/second",
+});
+
+const totalRequests = io.counter({
+    name: "total requests",
+});
 
 const PORT = process.env.API_PORT;
 
@@ -113,6 +122,12 @@ app.use((req, res, next) => {
         return;
     }
 
+    next();
+});
+
+app.use((req, res, next) => {
+    requestMeter.mark();
+    totalRequests.inc();
     next();
 });
 
