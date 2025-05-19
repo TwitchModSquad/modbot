@@ -2,14 +2,12 @@ module.exports = {
     apps: [
         {
             name: 'modbot-twitch',
-            script: 'npm',
-            args: 'run start:twitch',
+            script: './apps/bot/twitch/dist/index.js',
             env: { NODE_ENV: 'production' }
         },
         {
             name: 'modbot-discord',
-            script: 'npm',
-            args: 'run start:discord',
+            script: './apps/bot/discord/dist/index.js',
             env: { NODE_ENV: 'production' }
         },
         {
@@ -26,14 +24,12 @@ module.exports = {
         },
         {
             name: 'modbot-web-api',
-            script: 'npm',
-            args: 'run start:web-api',
+            script: './apps/web/api/dist/index.js',
             env: { NODE_ENV: 'production', PORT: 3020 }
         },
         {
             name: 'modbot-jobs',
-            script: 'npm',
-            args: 'run start:jobs',
+            script: './jobs/index.js',
             env: { NODE_ENV: 'production' }
         }
     ]
