@@ -20,6 +20,7 @@ export * from "./twitch";
 export {default as redis} from "./redis";
 export * from "./redis";
 export * from "./managers";
+export * from "./utils";
 
 import {events, IdentifyHandle} from "./managers";
 import {loadClient} from "./twitch";

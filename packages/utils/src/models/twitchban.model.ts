@@ -1,6 +1,68 @@
 import sequelize from "./database";
-import {CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model} from "sequelize";
-import {logger, getTwitchClient, twitchUsers} from "../index";
+import {CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model, Op} from "sequelize";
+import {logger, getTwitchClient, twitchUsers, codeBlock, formatChatMessage, TwitchChat} from "../index";
+import {EmbedBuilder} from "discord.js";
+
+export const createBanEmbed = async (ban: RawTwitchBan): Promise<EmbedBuilder> => {
+    const streamer = await twitchUsers.get(ban.streamerId);
+    const chatter = await twitchUsers.get(ban.chatterId);
+
+    const embed = new EmbedBuilder()
+        .setColor(0xC83C3C)
+        .setAuthor({
+            iconURL: streamer.profile_image_url,
+            name: streamer.display_name,
+        })
+        .setThumbnail(chatter.profile_image_url)
+        .setTitle(`${chatter.display_name} was banned!`)
+        .setDescription(`User \`${chatter.display_name}\` was banned from channel \`#${streamer.login}\`!`)
+        .setFooter({
+            text: "The Mod Squad",
+            iconURL: "https://cdn.modsquad.tools/assets/images/logo.webp",
+        });
+
+    if (ban.moderatorId) {
+        const moderator = await twitchUsers.get(ban.moderatorId);
+        embed.addFields({
+            name: "Moderator",
+            value: codeBlock(moderator.display_name),
+            inline: true,
+        });
+    }
+
+    if (ban.reason) {
+        embed.addFields({
+            name: "Reason",
+            value: codeBlock(ban.reason),
+            inline: true,
+        });
+    }
+
+    const chatHistory = await TwitchChat.findAll({
+        where: {
+            streamerId: ban.streamerId,
+            chatterId: ban.chatterId,
+            createdAt: {
+                [Op.lt]: new Date(ban.startDate),
+            }
+        },
+        order: [
+            ["createdAt", "DESC"],
+        ]
+    });
+
+    let chatHistoryText = chatHistory.length > 0 ?
+        chatHistory.map(x => formatChatMessage(x, chatter)).join("\n") :
+        "There are no logs in this channel from this user!";
+
+    embed.addFields({
+        name: "Chat History",
+        value: codeBlock(chatHistoryText),
+        inline: false,
+    });
+
+    return embed;
+}
 
 export interface RawTwitchBan {
     id: number;

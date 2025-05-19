@@ -9,6 +9,11 @@ export type ChannelEvents = {
 
 export type Events = ChannelEvents;
 
+export type CombinedChannel = {
+    db: RawDiscordChannel;
+    discord: GuildTextBasedChannel;
+}
+
 class DiscordChannelManager extends ModelStore<RawDiscordChannel> {
 
     constructor() {
@@ -48,14 +53,17 @@ class DiscordChannelManager extends ModelStore<RawDiscordChannel> {
         }
     }
 
-    public async getChannelsFor(event: keyof ChannelEvents, userId: string): Promise<TextBasedChannel[]> {
-        let channels: TextBasedChannel[] = [];
+    public async getChannelsFor(event: keyof ChannelEvents, userId: string): Promise<CombinedChannel[]> {
+        let channels: CombinedChannel[] = [];
 
         for (const discordChannel of this.getAll()) {
             if (discordChannel[event] === "*" || discordChannel[event].split(",").includes(userId)) {
                 const channel = await client.channels.fetch(discordChannel.id);
                 if (channel.isTextBased()) {
-                    channels.push(channel as TextBasedChannel);
+                    channels.push({
+                        db: discordChannel,
+                        discord: channel as GuildTextBasedChannel,
+                    });
                 }
             }
         }
@@ -63,8 +71,24 @@ class DiscordChannelManager extends ModelStore<RawDiscordChannel> {
         return channels;
     }
 
+    public async getChannelsInGuild(guildId: string): Promise<CombinedChannel[]> {
+        let channels: CombinedChannel[] = [];
+
+        for (const discordChannel of this.getAll().filter(x => x.guildId === guildId)) {
+            const channel = await client.channels.fetch(discordChannel.id);
+            if (channel.isTextBased()) {
+                channels.push({
+                    db: discordChannel,
+                    discord: channel as GuildTextBasedChannel,
+                });
+            }
+        }
+
+        return channels;
+    }
+
     public async getUsers(setting: string, throwIfMissing: boolean = false): Promise<RawTwitchUser[] | "*" | null> {
-        if (!setting) {
+        if (!setting || setting.length === 0) {
             return null;
         }
 
