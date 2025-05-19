@@ -6,6 +6,7 @@ import {TwitchChat} from "./twitchchat.model";
 import {TwitchRole} from "./twitchrole.model";
 import {TwitchBan} from "./twitchban.model";
 import {TwitchTimeout} from "./twitchtimeout.model";
+import {TwitchChatActivity} from "./twitchchatactivity.model";
 
 export * from "./discordchannel.model";
 export * from "./discorduser.model";
@@ -15,6 +16,7 @@ export * from "./twitchban.model";
 export * from "./twitchtimeout.model";
 export * from "./twitchchat.model";
 export * from "./twitchrole.model";
+export * from "./twitchchatactivity.model";
 
 export const connect = async () => {
     logger.info(`Attempting to connect to MariaDB @ ${sequelize.config.host}`);
@@ -30,6 +32,19 @@ export const connect = async () => {
 
     TwitchUser.hasMany(TwitchChat, { foreignKey: "chatterId" });
     TwitchChat.belongsTo(TwitchUser, {
+        foreignKey: "chatterId",
+        as: "chatter",
+    });
+
+    // Twitch chat activity references
+    TwitchUser.hasMany(TwitchChatActivity, { foreignKey: "streamerId" });
+    TwitchChatActivity.belongsTo(TwitchUser, {
+        foreignKey: "streamerId",
+        as: "streamer",
+    });
+
+    TwitchUser.hasMany(TwitchChatActivity, { foreignKey: "chatterId" });
+    TwitchChatActivity.belongsTo(TwitchUser, {
         foreignKey: "chatterId",
         as: "chatter",
     });
