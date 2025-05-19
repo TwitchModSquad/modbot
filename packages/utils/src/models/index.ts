@@ -8,6 +8,7 @@ import {TwitchBan} from "./twitchban.model";
 import {TwitchTimeout} from "./twitchtimeout.model";
 import {TwitchChatActivity} from "./twitchchatactivity.model";
 
+export {default as sequelize} from "./database";
 export * from "./discordchannel.model";
 export * from "./discorduser.model";
 export * from "./identity.model";

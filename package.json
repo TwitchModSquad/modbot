@@ -13,6 +13,7 @@
     "clean": "npm run clean --workspaces",
     "dev:web-public": "npm run dev --workspace=@modbot/web-public",
     "dev:web-dashboard": "npm run dev --workspace=@modbot/web-dashboard",
+    "start:jobs": "node jobs",
     "start:discord": "npm run start --workspace=@modbot/bot-discord",
     "start:twitch": "npm run start --workspace=@modbot/bot-twitch",
     "start:web-api": "npm run start --workspace=@modbot/web-api",
@@ -54,6 +55,8 @@
     "sequelize-cli": "^6.6.2"
   },
   "dependencies": {
-    "pg-hstore": "^2.3.4"
+    "node-cron": "^4.0.5",
+    "pg-hstore": "^2.3.4",
+    "tx2": "^1.0.5"
   }
 }
