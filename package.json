@@ -55,8 +55,8 @@
     "sequelize-cli": "^6.6.2"
   },
   "dependencies": {
+    "@pm2/io": "^6.1.0",
     "node-cron": "^4.0.5",
-    "pg-hstore": "^2.3.4",
-    "tx2": "^1.0.5"
+    "pg-hstore": "^2.3.4"
   }
 }

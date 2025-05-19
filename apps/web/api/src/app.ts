@@ -23,10 +23,12 @@ import userSearch from "./user-search";
 import io from "@pm2/io";
 
 const requestMeter = io.meter({
+    id: "requests/second",
     name: "requests/second",
 });
 
 const totalRequests = io.counter({
+    id: "total requests",
     name: "total requests",
 });
 
