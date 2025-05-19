@@ -1,5 +1,5 @@
 import {DiscordChannel, ListenSetting, ModelStore, RawDiscordChannel, RawTwitchUser, twitchUsers} from "@modbot/utils";
-import {GuildTextBasedChannel, TextBasedChannel} from "discord.js";
+import {GuildTextBasedChannel} from "discord.js";
 import client from "../app";
 
 export type ChannelEvents = {
