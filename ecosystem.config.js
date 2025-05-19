@@ -29,6 +29,12 @@ module.exports = {
             script: 'npm',
             args: 'run start:web-api',
             env: { NODE_ENV: 'production', PORT: 3020 }
+        },
+        {
+            name: 'modbot-jobs',
+            script: 'npm',
+            args: 'run start:jobs',
+            env: { NODE_ENV: 'production' }
         }
     ]
 };
