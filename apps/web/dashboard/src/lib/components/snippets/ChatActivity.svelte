@@ -64,6 +64,9 @@
                     <td>{log.count.toLocaleString()} message{log.count === 1 ? "" : "s"}</td>
                 </tr>
             {/each}
+            <tr>
+                <th class="note" colspan="3">Note: Chat activity is updated daily.</th>
+            </tr>
             {#if showLoadMore}
                 <tr>
                     <td colspan="3">
@@ -88,6 +91,12 @@
     th {
         font-weight: 500;
         opacity: .9;
+    }
+
+    .note {
+        font-size: .8em;
+        font-weight: 300;
+        padding: .2em;
     }
 
     th, td {
