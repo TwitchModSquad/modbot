@@ -18,6 +18,7 @@ export * from "./twitchtimeout.model";
 export * from "./twitchchat.model";
 export * from "./twitchrole.model";
 export * from "./twitchchatactivity.model";
+export * from "./twitchlive.model";
 
 export const connect = async () => {
     logger.info(`Attempting to connect to MariaDB @ ${sequelize.config.host}`);
