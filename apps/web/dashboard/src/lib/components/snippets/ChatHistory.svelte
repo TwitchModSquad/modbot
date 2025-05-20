@@ -109,7 +109,7 @@
         {@const chatter = result.users[chat.chatterId]}
         {@const timeSent = new Date(chat.createdDate ?? "")}
 
-        <div class="message">
+        <div class="message" class:deleted={chat.deleted}>
             <img class="pfp" src={chatter.profile_image_url} alt="Profile picture for {chatter.display_name}">
             <div class="message-content">
                 <div class="message-header">
@@ -172,6 +172,14 @@
     .message {
         display: flex;
         margin: .75em 0;
+    }
+
+    .deleted {
+        text-decoration: line-through;
+    }
+
+    .deleted:hover {
+        text-decoration: none;
     }
 
     img.pfp {
