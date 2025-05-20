@@ -1,10 +1,10 @@
 <script lang="ts">
     import type {PublicStats} from "@modbot/utils";
+    import {PUBLIC_DASHBOARD_URI} from "$env/static/public";
     import StatCard from "$lib/snippets/components/StatCard.svelte";
     import {Button} from "@modbot/ui";
 
     export let publicStats: PublicStats;
-    export let apiUri: string;
 </script>
 
 <div class="landing">
@@ -13,7 +13,7 @@
             <h1>The Mod Squad</h1>
             <p>A Discord moderation community offering tools to protect and enhance your Twitch and Discord communities.</p>
             <Button variant="primary"
-                    href="{apiUri}auth/twitch">
+                    href="{PUBLIC_DASHBOARD_URI}">
                 Visit The Mod Squad Dashboard
             </Button>
         </div>
