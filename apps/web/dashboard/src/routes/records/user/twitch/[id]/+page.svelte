@@ -3,6 +3,7 @@
     import {page} from "$app/state";
     import {goto} from "$app/navigation";
     import type {RawTwitchUser} from "@modbot/utils";
+    import {Button} from "@modbot/ui";
     import UserProfile from "$lib/components/snippets/UserProfile.svelte";
     import {getTwitchUser} from "$lib/api";
     import PunishmentList from "$lib/components/snippets/PunishmentList.svelte";
@@ -69,6 +70,13 @@
             <h2>Chat History</h2>
 
             <UserSelector label="Streamers" bind:users={streamers} />
+
+            <Button variant="primary"
+                    href="/records/chat-history?chatter_id={user.id}{streamers.filter(x => x.selected).map(x => `&streamer_id=${x.id}`).join('')}"
+                    full={true}>
+                <i class="fa-solid fa-gallery-thumbnails"></i> View all logs with this search
+            </Button>
+
             <ChatHistory streamers={selectedStreamers}
                          chatters={[user]}
                          limit={30}
