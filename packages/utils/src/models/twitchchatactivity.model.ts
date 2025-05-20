@@ -1,11 +1,27 @@
 import sequelize from "./database";
 import {DataTypes, InferAttributes, InferCreationAttributes, Model} from "sequelize";
 
-export class TwitchChatActivity extends Model<InferAttributes<TwitchChatActivity>, InferCreationAttributes<TwitchChatActivity>> {
+export interface RawTwitchChatActivity {
+    chatterId: string;
+    streamerId: string;
+    lastMessageTimestamp?: string;
+    count: number;
+}
+
+export class TwitchChatActivity extends Model<InferAttributes<TwitchChatActivity>, InferCreationAttributes<TwitchChatActivity>> implements RawTwitchChatActivity {
     declare chatterId: string;
     declare streamerId: string;
     declare lastMessageDate: Date;
     declare count: number;
+
+    raw(): RawTwitchChatActivity {
+        return {
+            chatterId: this.chatterId,
+            streamerId: this.streamerId,
+            lastMessageTimestamp: this.lastMessageDate.toISOString(),
+            count: this.count,
+        };
+    }
 }
 
 TwitchChatActivity.init({

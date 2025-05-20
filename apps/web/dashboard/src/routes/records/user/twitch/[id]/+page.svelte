@@ -9,6 +9,7 @@
     import ChatHistory from "$lib/components/snippets/ChatHistory.svelte";
     import UserSelector from "$lib/components/snippets/UserSelector.svelte";
     import type {User} from "$lib/interfaces/UserTypes";
+    import ChatActivity from "$lib/components/snippets/ChatActivity.svelte";
 
     let user: RawTwitchUser | null = $state(null);
 
@@ -46,6 +47,11 @@
             </section>
             <div>
                 {#if 'display_name' in user}
+                    <article class="activity">
+                        <h2>Chat Activity</h2>
+
+                        <ChatActivity mode="chatter" user={user} limit={10} />
+                    </article>
                     <article class="punishments punishments-ban">
                         <h2>Bans</h2>
 

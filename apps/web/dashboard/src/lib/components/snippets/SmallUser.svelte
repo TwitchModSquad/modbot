@@ -27,15 +27,25 @@
         padding: .2em .4em;
         border-radius: .25em;
         color: var(--primary-text-color);
+        border: .1em solid transparent;
         text-decoration: none;
+        box-shadow: var(--shadow), 2px 2px 10px rgba(255,255,255,0.1) inset;
+        transition: 250ms;
+    }
+
+    .linked-user:hover,
+    .linked-user:focus-visible {
+        box-shadow: var(--heavy-shadow);
     }
 
     .linked-user-twitch {
-        background-color: var(--secondary-twitch-color);
+        background-color: rgba(var(--primary-twitch-color-rgb), 0.3);
+        border-color: rgba(var(--primary-twitch-color-rgb), 0.5);
     }
 
     .linked-user-discord {
-        background-color: var(--secondary-discord-color);
+        background-color: rgba(var(--primary-discord-color-rgb), 0.3);
+        border-color: rgba(var(--primary-discord-color-rgb), 0.5);
     }
 
     .linked-user img {
