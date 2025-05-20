@@ -3,4 +3,5 @@ export enum ServiceType {
     TWITCH = "twitch",
     API = "api",
     FRONT_END = "frontend",
+    JOBS = "jobs",
 }

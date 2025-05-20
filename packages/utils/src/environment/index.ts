@@ -25,6 +25,9 @@ const requiredEnvVars: Record<ServiceType, string[]> = {
     [ServiceType.FRONT_END]: [
         ...globalEnvVars,
     ],
+    [ServiceType.JOBS]: [
+        ...globalEnvVars,
+    ],
 };
 
 export const checkRequired = (service: ServiceType): void => {
