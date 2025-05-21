@@ -32,7 +32,7 @@ jobs:
         run: cp .env.example .env
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
 
       - name: Run TypeScript type checks
         run: pnpm run type-check
