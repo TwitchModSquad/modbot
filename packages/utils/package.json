@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "lint": "eslint \"src/**/*.ts\"",
-    "type-check": "npx tsc --build",
+    "type-check": "tsc --build",
     "clean": "rimraf dist tsconfig.tsbuildinfo"
   },
   "keywords": [],
