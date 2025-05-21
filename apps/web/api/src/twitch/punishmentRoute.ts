@@ -4,9 +4,9 @@ import {Model, ModelStatic, Op, WhereOptions} from "sequelize";
 
 export const punishmentRoute =
     <T extends PunishmentFields, M extends Model<T> & {raw: () => R}, R>
-    (model: ModelStatic<M>) => {
+    (model: ModelStatic<M>): Router => {
 
-    const router = Router();
+    const router: Router = Router();
 
     router.get("/", async (req, res) => {
         let where: WhereOptions<PunishmentFields> = {};

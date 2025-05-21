@@ -7,6 +7,8 @@
   "type": "module",
   "main": "src/index.ts",
   "scripts": {
+    "build": "tsc --build",
+    "lint": "eslint \"src/**/*.ts\"",
     "clean": "rimraf dist tsconfig.tsbuildinfo"
   },
   "dependencies": {

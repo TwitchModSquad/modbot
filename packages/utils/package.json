@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
+    "lint": "eslint \"src/**/*.ts\"",
     "type-check": "npx tsc --build",
     "clean": "rimraf dist tsconfig.tsbuildinfo"
   },
@@ -18,6 +19,7 @@
   "dependencies": {
     "@twurple/api": "^7.2.1",
     "@twurple/auth": "^7.2.1",
+    "discord.js": "^14.19.3",
     "dotenv": "^16.4.7",
     "ioredis": "^5.6.0",
     "mariadb": "^3.4.0",

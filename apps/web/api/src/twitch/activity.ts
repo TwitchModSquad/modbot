@@ -2,7 +2,7 @@ import {Router} from "express";
 import {WhereOptions} from "sequelize";
 import {RawTwitchUser, TwitchChatActivity, twitchUsers} from "@modbot/utils";
 
-const router = Router();
+const router: Router = Router();
 
 router.get("/", async (req, res) => {
     const streamerId = req?.query?.streamer_id;

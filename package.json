@@ -3,24 +3,13 @@
   "version": "3.0.0-beta.10",
   "description": "Moderation services and tools for Twitch streamers and their moderators & Discord communities",
   "main": "dist/app.js",
+  "packageManager": "pnpm@10.11.0",
   "scripts": {
-    "prepare": "npm run prepare --workspace=@modbot/web-public && npm run prepare --workspace=@modbot/web-dashboard",
-    "build": "tsc --build",
-    "build:utils": "npm run clean --workspace=@modbot/utils && npm run build --workspace=@modbot/utils",
-    "build:all": "npm run prepare && npm run build && npm run build --workspace=@modbot/web-public && npm run build --workspace=@modbot/web-dashboard",
-    "lint": "eslint \"packages/*/src/**/*.ts\" \"apps/bot/*/src/**/*.ts\" \"apps/web/*/src/**/*.ts\"",
-    "type-check": "npm run type-check --workspaces --if-present",
-    "clean": "npm run clean --workspaces",
-    "dev:web-public": "npm run dev --workspace=@modbot/web-public",
-    "dev:web-dashboard": "npm run dev --workspace=@modbot/web-dashboard",
-    "start:jobs": "node jobs",
-    "start:discord": "npm run start --workspace=@modbot/bot-discord",
-    "start:twitch": "npm run start --workspace=@modbot/bot-twitch",
-    "start:web-api": "npm run start --workspace=@modbot/web-api",
-    "start:web-public": "npm run start --workspace=@modbot/web-public",
-    "start:web-dashboard": "npm run start --workspace=@modbot/web-dashboard",
-    "start:all": "npm-run-all --parallel start:discord start:twitch start:web-api dev:web-public dev:web-dashboard",
-    "test": "tsc --build && npm run start:all",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "type-check": "turbo run type-check",
+    "clean": "turbo run clean",
+    "dev": "turbo run dev",
     "bump-version": "npm version prerelease --preid=beta"
   },
   "repository": {
@@ -51,8 +40,8 @@
     "@typescript-eslint/eslint-plugin": "^8.28.0",
     "@typescript-eslint/parser": "^8.28.0",
     "eslint": "^9.23.0",
-    "npm-run-all": "^4.1.5",
-    "sequelize-cli": "^6.6.2"
+    "sequelize-cli": "^6.6.2",
+    "turbo": "^2.5.3"
   },
   "dependencies": {
     "@pm2/io": "^6.1.0",
