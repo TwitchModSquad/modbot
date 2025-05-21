@@ -4,6 +4,7 @@ import {ActionRowBuilder, ButtonBuilder, EmbedBuilder, ButtonStyle, MessageCreat
 import {twitchUsers} from "../managers";
 import {HelixGame} from "@twurple/api";
 import {getTwitchClient} from "../twitch";
+import {codeBlock} from "../utils";
 
 const gameCache = new Map<string, HelixGame>();
 
@@ -25,34 +26,35 @@ export const createLiveMessageComponent = async (live: RawTwitchLive): Promise<M
     const game = await getGame(live.gameId);
 
     const embed = new EmbedBuilder()
-        .setColor(0x00FF00)
+        .setColor(0x772ce8)
         .setAuthor({
             iconURL: streamer.profile_image_url,
             name: streamer.display_name,
         })
-        .setThumbnail(live.thumbnailUrl
-            .replace("{width}", "256")
-            .replace("{height}", "144") +
+        .setImage(live.thumbnailUrl
+            .replace("{width}", "512")
+            .replace("{height}", "288") +
             `?v=${Date.now()}`
         )
         .setTitle(live.title)
         .setFooter({
             text: "The Mod Squad",
             iconURL: "https://cdn.modsquad.tools/assets/images/logo.webp",
-        });
+        })
+        .setTimestamp(new Date(live.startedDate));
 
     if (game) {
         embed.setThumbnail(game.getBoxArtUrl(225, 300));
         embed.addFields({
             name: "Game",
-            value: game.name,
+            value: codeBlock(game.name),
             inline: true,
         });
     }
 
     embed.addFields({
         name: "Viewers",
-        value: live.viewers.toLocaleString(),
+        value: codeBlock(live.viewers.toLocaleString()),
         inline: true,
     });
 

@@ -1,8 +1,8 @@
-import {createLiveMessageComponent, events, logger} from "@modbot/utils";
+import {createLiveMessageComponent, events, logger, twitchUsers} from "@modbot/utils";
 import {discordChannelManager} from "../managers";
 import {DiscordMessage} from "@modbot/utils/dist/models/discordmessage.model";
 import client from "../app";
-import {MessageEditOptions} from "discord.js";
+import {EmbedBuilder, MessageEditOptions} from "discord.js";
 
 events.register("twitch:live", async live => {
     const channels = await discordChannelManager.getChannelsFor("twitchLiveStartSettings", live.userId);
@@ -54,12 +54,46 @@ events.register("twitch:live-update", async live => {
 });
 
 events.register("twitch:offline", async userId => {
-    await DiscordMessage.update({
-        twitchLiveActive: false,
-    }, {
+    const messages = await DiscordMessage.findAll({
         where: {
             twitchLiveUserId: userId,
             twitchLiveActive: true,
-        },
+        }
     });
+
+    if (messages.length === 0) return;
+
+    const streamer = await twitchUsers.get(userId);
+
+    if (!streamer) return;
+
+    const offlineEmbed = new EmbedBuilder()
+        .setAuthor({
+            iconURL: streamer.profile_image_url,
+            name: streamer.display_name,
+        })
+        .setTitle("Stream Offline!")
+        .setTimestamp(new Date())
+        .setFooter({
+            text: "The Mod Squad",
+            iconURL: "https://cdn.modsquad.tools/assets/images/logo.webp",
+        });
+
+    for (const message of messages) {
+        try {
+            const channel = await client.channels.fetch(message.channelId);
+            if (channel && channel.isTextBased()) {
+                const discordMessage = await channel.messages.fetch(message.id);
+                if (discordMessage && discordMessage.editable) {
+                    await discordMessage.edit({
+                        embeds: [offlineEmbed],
+                        components: [],
+                    });
+                }
+            }
+        } catch(err) {
+            logger.error(`Failed to update message ${message.id}:`);
+            logger.error(err);
+        }
+    }
 });
