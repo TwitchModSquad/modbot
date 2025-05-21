@@ -2,7 +2,7 @@ import {config} from "dotenv";
 config();
 
 import cron from "node-cron";
-import {action} from "@pm2/io";
+import pm2 from "@pm2/io";
 
 import {initialize, ServiceType, logger} from "@modbot/utils";
 import {Job} from "./types";
@@ -20,7 +20,7 @@ initialize(ServiceType.JOBS).then(() => {
         cron.schedule(job.cron, job.execute);
 
         if (process.env.NODE_ENV === "production") {
-            action(job.name, async (reply: unknown) => {
+            pm2.action(job.name, async (reply: unknown) => {
                 logger.info(`Executing job '${job.name}'`);
                 let success = false;
                 try {

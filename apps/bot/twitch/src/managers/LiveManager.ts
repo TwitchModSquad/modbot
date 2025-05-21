@@ -94,7 +94,7 @@ class LiveManager {
         const liveActivity = await TwitchLive.findAll({
             where: {
                 queryAt: {
-                    [Op.lt]: new Date(Date.now() - (10 * 60_000)),
+                    [Op.gte]: new Date(Date.now() - (10 * 60_000)),
                 }
             },
         });
@@ -131,6 +131,10 @@ class LiveManager {
 
         eventManager.register("twitch:part", (user) => {
             this.members = this.members.filter(x => x.id !== user.id);
+        });
+
+        eventManager.register("twitch:live-now", () => {
+            return this.liveStreams;
         });
     }
 

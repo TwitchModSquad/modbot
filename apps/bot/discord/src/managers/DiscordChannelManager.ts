@@ -57,6 +57,8 @@ class DiscordChannelManager extends ModelStore<RawDiscordChannel> {
         let channels: CombinedChannel[] = [];
 
         for (const discordChannel of this.getAll()) {
+            if (!discordChannel[event]) continue;
+
             if (discordChannel[event] === "*" || discordChannel[event].split(",").includes(userId)) {
                 const channel = await client.channels.fetch(discordChannel.id);
                 if (channel.isTextBased()) {
