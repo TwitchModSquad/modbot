@@ -18,18 +18,21 @@ initialize(ServiceType.JOBS).then(() => {
 
     jobs.forEach(job => {
         cron.schedule(job.cron, job.execute);
-        action(job.name, async (reply: unknown) => {
-            logger.info(`Executing job '${job.name}'`);
-            let success = false;
-            try {
-                await job.execute();
-                success = true;
-            } catch(err) {
-                logger.error(err);
-            }
-            if (typeof reply === "function") {
-                reply({ success });
-            }
-        })
+
+        if (process.env.NODE_ENV === "production") {
+            action(job.name, async (reply: unknown) => {
+                logger.info(`Executing job '${job.name}'`);
+                let success = false;
+                try {
+                    await job.execute();
+                    success = true;
+                } catch(err) {
+                    logger.error(err);
+                }
+                if (typeof reply === "function") {
+                    reply({ success });
+                }
+            });
+        }
     });
 });

@@ -27,6 +27,10 @@ export interface EventMap {
         data: RawTwitchLive;
         response: void;
     };
+    "twitch:live-update": {
+        data: RawTwitchLive;
+        response: void;
+    },
     "twitch:offline": {
         data: string;
         response: void;

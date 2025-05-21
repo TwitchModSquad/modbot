@@ -15,6 +15,7 @@ class LiveManager {
 
     private members: RawTwitchUser[] = [];
     private liveMembers: string[] = [];
+    private liveStreams: RawTwitchLive[] = [];
 
     private async refreshMembers() {
         const members = await TwitchUser.findAll({
@@ -46,6 +47,7 @@ class LiveManager {
 
         const live = currentLivestreams.filter(x => !this.liveMembers.includes(x.userId));
         const offline = this.liveMembers.filter(x => !currentLivestreams.find(y => x === y.userId));
+        const stillActive = currentLivestreams.filter(x => this.liveMembers.includes(x.userId));
 
         this.liveMembers = currentLivestreams.map(x => x.userId);
 
@@ -64,6 +66,8 @@ class LiveManager {
             activityRecords.push(twitchLive.raw());
         }
 
+        this.liveStreams = activityRecords;
+
         for (const stream of live) {
             const activity = activityRecords.find(x => x.livestreamId === stream.id);
             logger.info(`${stream.userDisplayName} is now live!`);
@@ -74,9 +78,41 @@ class LiveManager {
             logger.info(`${id} is no longer live!`);
             await eventManager.publish("twitch:offline", id);
         }
+
+        for (const stream of stillActive) {
+            const activity = activityRecords.find(x => x.livestreamId === stream.id);
+            if (activity) {
+                await eventManager.publish("twitch:live-update", activity);
+            } else {
+                logger.warn(`Found a still active stream that isn't in the database: ${stream.userDisplayName} (${stream.id})`);
+            }
+        }
+    }
+
+    private async loadLiveChannels() {
+        // get all twitch live queries within the last 10 minutes
+        const liveActivity = await TwitchLive.findAll({
+            where: {
+                queryAt: {
+                    [Op.lt]: new Date(Date.now() - (10 * 60_000)),
+                }
+            },
+        });
+
+        logger.info(`Loaded ${liveActivity.length} recent live queries`);
+
+        // insert each user ID into liveMembers
+        for (const live of liveActivity) {
+            if (!this.liveMembers.includes(live.userId)) {
+                this.liveMembers.push(live.userId);
+            }
+        }
+
+        logger.info(`Added ${this.liveMembers} active live channels`);
     }
 
     constructor() {
+        this.loadLiveChannels().catch(e => logger.error(e));
         this.refreshMembers().catch(e => logger.error(e));
 
         setInterval(() => {

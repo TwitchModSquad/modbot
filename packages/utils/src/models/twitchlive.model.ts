@@ -1,5 +1,74 @@
 import sequelize from "./database";
 import {CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model} from "sequelize";
+import {ActionRowBuilder, ButtonBuilder, EmbedBuilder, ButtonStyle, MessageCreateOptions} from "discord.js";
+import {twitchUsers} from "../managers";
+import {HelixGame} from "@twurple/api";
+import {getTwitchClient} from "../twitch";
+
+const gameCache = new Map<string, HelixGame>();
+
+export const getGame = async (gameId: string): Promise<HelixGame|null> => {
+    if (gameCache.has(gameId)) {
+        return gameCache.get(gameId);
+    }
+
+    const game = await getTwitchClient().games.getGameById(gameId);
+    if (game) {
+        gameCache.set(gameId, game);
+        return game;
+    }
+    return null;
+}
+
+export const createLiveMessageComponent = async (live: RawTwitchLive): Promise<MessageCreateOptions> => {
+    const streamer = await twitchUsers.get(live.userId);
+    const game = await getGame(live.gameId);
+
+    const embed = new EmbedBuilder()
+        .setColor(0x00FF00)
+        .setAuthor({
+            iconURL: streamer.profile_image_url,
+            name: streamer.display_name,
+        })
+        .setThumbnail(live.thumbnailUrl
+            .replace("{width}", "256")
+            .replace("{height}", "144") +
+            `?v=${Date.now()}`
+        )
+        .setTitle(live.title)
+        .setFooter({
+            text: "The Mod Squad",
+            iconURL: "https://cdn.modsquad.tools/assets/images/logo.webp",
+        });
+
+    if (game) {
+        embed.setThumbnail(game.getBoxArtUrl(225, 300));
+        embed.addFields({
+            name: "Game",
+            value: game.name,
+            inline: true,
+        });
+    }
+
+    embed.addFields({
+        name: "Viewers",
+        value: live.viewers.toLocaleString(),
+        inline: true,
+    });
+
+    const actionRow: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>()
+        .setComponents(
+            new ButtonBuilder()
+                .setStyle(ButtonStyle.Link)
+                .setURL(`https://www.twitch.tv/${streamer.login}`)
+                .setLabel(`Visit ${streamer.display_name} on Twitch`)
+        );
+
+    return {
+        embeds: [embed],
+        components: [actionRow],
+    };
+}
 
 export interface RawTwitchLive {
     id: number;
