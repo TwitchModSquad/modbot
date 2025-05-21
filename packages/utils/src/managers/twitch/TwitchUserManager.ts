@@ -1,6 +1,6 @@
 import {RawTwitchUser, TwitchUser, TwitchUserBroadcasterType, TwitchUserType} from "../../models";
 import {HelixUser} from "@twurple/api";
-import {CacheManager} from "../../classes/CacheManager";
+import {CacheManager} from "../../classes";
 import {getTwitchClient, logger} from "../../index";
 
 const helixToRawUser = (user: HelixUser): RawTwitchUser => {

@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import {RedisObjectManager} from "../classes/RedisObjectManager";
+import {RedisObjectManager} from "../classes";
 
 const SESSION_EXPIRATION = 24 * 60 * 60; // session expiration, in seconds
 

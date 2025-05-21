@@ -1,5 +1,6 @@
-import {CacheManager} from "../../classes/CacheManager";
-import {DiscordUser, logger, RawDiscordUser} from "../../index";
+import {CacheManager} from "../../classes";
+import {DiscordUser} from "../../models";
+import {logger, RawDiscordUser} from "../../index";
 
 async function getUser(userId: string): Promise<RawDiscordUser> {
     const response = await fetch(`https://discord.com/api/v10/users/${userId}`, {
