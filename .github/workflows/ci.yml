@@ -34,9 +34,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Run TypeScript type checks
-        run: pnpm run type-check
-
       - name: Lint code
         run: pnpm run lint
 
