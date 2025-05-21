@@ -4,7 +4,7 @@ import discord from "./discord";
 import logout from "./logout";
 import twitch from "./twitch";
 
-const router = Router();
+const router: Router = Router();
 
 router.use("/discord", discord)
 router.use("/logout", logout);

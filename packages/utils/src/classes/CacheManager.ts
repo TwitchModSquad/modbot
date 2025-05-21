@@ -2,7 +2,6 @@ import logger from "../logger";
 import redis from "../redis";
 import {UpdateOptions} from "sequelize";
 import eventManager from "../managers/events/EventManager";
-import io from "@pm2/io";
 
 type SequelizeModel<T> = {
     raw(): T;
@@ -71,13 +70,6 @@ export class CacheManager<T extends {id: number|string, cachedDate?: string}> {
             logger.debug(`Setting cache for ${data.object.id} due to Redis`);
             this.memoryCache.set(data.object.id, data.object);
             await this.redis.set(this.getRedisKey(data.object.id), JSON.stringify(data.object), "EX", this.cacheTTL);
-        });
-
-        io.metric({
-            id: `cache:${options.cachePrefix}`,
-            name: `${options.cachePrefix} Cache Size`,
-            value: () => this.memoryCache.size,
-            unit: "items",
         });
     }
 

@@ -55,7 +55,7 @@ const updateRoles = async (user: RawTwitchUser, identityRole: IdentityRole): Pro
     return identityRole;
 }
 
-const router = Router();
+const router: Router = Router();
 
 const ROLE_UPDATE_INTERVAL = 7 * 24 * 60 * 60 * 1000; // 7 days
 

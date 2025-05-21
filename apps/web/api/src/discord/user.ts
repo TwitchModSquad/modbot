@@ -1,7 +1,7 @@
 import {Router} from "express";
 import {discordUsers} from "@modbot/utils";
 
-const router = Router();
+const router: Router = Router();
 
 router.get("/:id", async (req, res) => {
     let force = false;

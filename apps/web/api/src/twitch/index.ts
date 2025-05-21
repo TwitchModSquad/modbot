@@ -7,7 +7,7 @@ import streamerSettings from "./streamerSettings";
 import timeouts from "./timeouts";
 import user from "./user";
 
-const router = Router();
+const router: Router = Router();
 
 router.use("/activity", activity);
 router.use("/bans?", bans);

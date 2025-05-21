@@ -1,7 +1,7 @@
 import {Router} from "express";
 import {RawTwitchUser, RoleType, TwitchRole, twitchUsers} from "@modbot/utils";
 
-const router = Router();
+const router: Router = Router();
 
 router.get("/", async (req, res) => {
     let userIds = (Array.isArray(req.query.user_id)

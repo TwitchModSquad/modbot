@@ -1,6 +1,6 @@
 import {Router} from "express";
 import {sessions} from "@modbot/utils";
-const router = Router();
+const router: Router = Router();
 
 router.get("/", async (req, res) => {
     if (req?.session?.id) {

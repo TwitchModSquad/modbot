@@ -2,7 +2,7 @@ import {RawTwitchUser, TwitchChat, twitchUsers} from "@modbot/utils";
 import {Router} from "express";
 import {Op, WhereOptions} from "sequelize";
 
-const router = Router();
+const router: Router = Router();
 
 router.get("/", async (req, res) => {
     let where: WhereOptions<TwitchChat> = {};

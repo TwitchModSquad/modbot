@@ -4,8 +4,10 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --build",
+    "lint": "eslint \"src/**/*.ts\"",
     "type-check": "npx tsc --build",
+    "dev": "ts-node-dev --respawn src/index.ts",
     "start": "node dist/index.js",
     "clean": "rimraf dist tsconfig.tsbuildinfo"
   },
@@ -13,11 +15,12 @@
   "author": "Twijn",
   "license": "SEE LICENSE IN LICENSE",
   "dependencies": {
-    "@modbot/utils": "*",
+    "@modbot/utils": "workspace:*",
     "discord.js": "^14.18.0",
     "sequelize": "^6.37.7"
   },
   "devDependencies": {
+    "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.2"
   }
 }

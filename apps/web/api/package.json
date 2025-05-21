@@ -4,8 +4,10 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --build",
+    "lint": "eslint \"src/**/*.ts\"",
     "type-check": "npx tsc --build",
+    "dev": "ts-node-dev --respawn src/index.ts",
     "start": "node dist/index.js",
     "clean": "rimraf dist tsconfig.tsbuildinfo"
   },
@@ -16,10 +18,11 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.1",
     "@types/node": "^22.13.13",
+    "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.2"
   },
   "dependencies": {
-    "@modbot/utils": "*",
+    "@modbot/utils": "workspace:*",
     "@pm2/io": "^6.1.0",
     "@types/body-parser": "^1.19.5",
     "body-parser": "^1.20.3",

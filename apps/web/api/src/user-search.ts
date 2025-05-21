@@ -2,7 +2,7 @@ import { Router } from "express";
 import {DiscordUser, TwitchUser} from "@modbot/utils";
 import {Op} from "sequelize";
 
-const router = Router();
+const router: Router = Router();
 
 router.get("/", async (req, res) => {
     let query = req.query.query;

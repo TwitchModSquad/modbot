@@ -1,7 +1,7 @@
 import {Router} from "express";
 import {DiscordUser, identities, TwitchUser} from "@modbot/utils";
 
-const router = Router();
+const router: Router = Router();
 
 router.get("/me", async (req, res) => {
     const {identity, users} = req;

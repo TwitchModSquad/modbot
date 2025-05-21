@@ -23,17 +23,22 @@ jobs:
         with:
           node-version: 22
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.11.0
+
       - name: Copy .env.example to .env
         run: cp .env.example .env
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Run TypeScript type checks
-        run: npm run type-check
+        run: pnpm run type-check
 
       - name: Lint code
-        run: npm run lint
+        run: pnpm run lint
 
       - name: Build application
-        run: npm run build:all
+        run: pnpm run build

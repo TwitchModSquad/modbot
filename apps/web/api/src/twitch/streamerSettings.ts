@@ -2,7 +2,7 @@ import {Router} from "express";
 import {events, ListenSetting, logger, RawTwitchUser, TwitchRole, twitchUsers} from "@modbot/utils";
 import bodyParser from "body-parser";
 
-const router = Router();
+const router: Router = Router();
 
 const parseListenSetting = (input: string): ListenSetting | null => {
     if (Object.values(ListenSetting).includes(input as ListenSetting)) {

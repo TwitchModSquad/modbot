@@ -1,7 +1,7 @@
 import {Router} from "express";
 import {discordUsers, getTwitchURL} from "@modbot/utils";
 import discordTokenManager from "@modbot/utils/dist/managers/discord/DiscordTokenManager";
-const router = Router();
+const router: Router = Router();
 
 router.get("/", async (req, res) => {
     const {query, cookies} = req;

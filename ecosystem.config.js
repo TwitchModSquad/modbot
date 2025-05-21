@@ -12,14 +12,12 @@ module.exports = {
         },
         {
             name: 'modbot-web-public',
-            script: 'npm',
-            args: 'run start:web-public',
+            script: './apps/web/public/build/index.js',
             env: { NODE_ENV: 'production', PORT: 3010 }
         },
         {
             name: 'modbot-web-dashboard',
-            script: 'npm',
-            args: 'run start:web-dashboard',
+            script: './apps/web/dashboard/build/index.js',
             env: { NODE_ENV: 'production', PORT: 3030 }
         },
         {
