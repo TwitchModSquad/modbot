@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc --build",
     "lint": "eslint \"src/**/*.ts\"",
-    "type-check": "npx tsc --build",
+    "type-check": "tsc --noEmit",
     "dev": "ts-node-dev --respawn src/index.ts",
     "start": "node dist/index.js",
     "clean": "rimraf dist tsconfig.tsbuildinfo"
