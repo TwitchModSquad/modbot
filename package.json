@@ -10,7 +10,7 @@
     "type-check": "turbo run type-check",
     "clean": "turbo run clean",
     "dev": "turbo run dev",
-    "bump-version": "npm version prerelease --preid=beta"
+    "bump-version": "pnpm version prerelease --preid=beta"
   },
   "repository": {
     "type": "git",

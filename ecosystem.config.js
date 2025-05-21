@@ -27,7 +27,7 @@ module.exports = {
         },
         {
             name: 'modbot-jobs',
-            script: './jobs/index.js',
+            script: './apps/jobs/dist/index.js',
             env: { NODE_ENV: 'production' }
         }
     ]

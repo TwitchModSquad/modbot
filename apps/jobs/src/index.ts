@@ -1,11 +1,16 @@
-require("dotenv").config();
-const cron = require("node-cron");
-const io = require("@pm2/io");
+import {config} from "dotenv";
+config();
 
-const {initialize, ServiceType, logger} = require("@modbot/utils");
+import cron from "node-cron";
+import {action} from "@pm2/io";
 
-const jobs = [
-    require("./updateChatActivity.js"),
+import {initialize, ServiceType, logger} from "@modbot/utils";
+import {Job} from "./types";
+
+import updateChatActivity from "./updateChatActivity";
+
+const jobs: Job[] = [
+    updateChatActivity,
 ];
 
 initialize(ServiceType.JOBS).then(() => {
@@ -13,7 +18,7 @@ initialize(ServiceType.JOBS).then(() => {
 
     jobs.forEach(job => {
         cron.schedule(job.cron, job.execute);
-        io.action(job.name, async (reply) => {
+        action(job.name, async (reply: unknown) => {
             logger.info(`Executing job '${job.name}'`);
             let success = false;
             try {
@@ -22,7 +27,9 @@ initialize(ServiceType.JOBS).then(() => {
             } catch(err) {
                 logger.error(err);
             }
-            reply({ success });
-        });
+            if (typeof reply === "function") {
+                reply({ success });
+            }
+        })
     });
 });
