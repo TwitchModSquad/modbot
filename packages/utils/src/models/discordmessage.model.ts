@@ -70,4 +70,14 @@ DiscordMessage.init({
 }, {
     sequelize,
     tableName: "discord__messages",
+    indexes: [
+        {
+            name: "idx_twitch_ban_id",
+            fields: ["twitchBanId"],
+        },
+        {
+            name: "idx_twitch_live_user",
+            fields: ["twitchLiveUserId", "twitchLiveActive"],
+        },
+    ]
 });
