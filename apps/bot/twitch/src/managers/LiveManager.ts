@@ -29,19 +29,26 @@ class LiveManager {
         this.members = members.map(x => x.raw());
     }
 
-    private async refreshLiveChannels() {
-        logger.debug("Refreshing live channels");
+    private async getLivestreams(): Promise<HelixStream[]> {
         let currentLivestreams: HelixStream[] = [];
         for (let i = 0; i < this.members.length; i += 100) {
             const memberIdBatch = this.members
-                    .slice(i, i + 100)
-                    .map(x => x.id);
+                .slice(i, i + 100)
+                .map(x => x.id);
 
             const streams = await getTwitchClient().streams.getStreamsByUserIds(memberIdBatch);
             currentLivestreams = [
                 ...currentLivestreams,
                 ...streams,
             ]
+        }
+        return currentLivestreams;
+    }
+
+    private async refreshLiveChannels(currentLivestreams: HelixStream[] = null) {
+        if (!currentLivestreams) {
+            logger.debug("Refreshing live channels");
+            currentLivestreams = await this.getLivestreams();
         }
         logger.debug("Found " + currentLivestreams.length + " live channels");
 
@@ -90,12 +97,23 @@ class LiveManager {
     }
 
     private async loadLiveChannels() {
+        const livestreams = await this.getLivestreams();
+
         // get all twitch live queries within the last 10 minutes
         const liveActivity = await TwitchLive.findAll({
             where: {
-                queryAt: {
-                    [Op.gte]: new Date(Date.now() - (10 * 60_000)),
-                }
+                [Op.or]: [
+                    {
+                        queryAt: {
+                            [Op.gte]: new Date(Date.now() - (10 * 60_000)),
+                        }
+                    },
+                    {
+                        livestreamId: {
+                            [Op.in]: livestreams.map(x => x.id),
+                        },
+                    },
+                ],
             },
         });
 
@@ -109,10 +127,11 @@ class LiveManager {
         }
 
         logger.info(`Added ${this.liveMembers} active live channels`);
+
+        await this.refreshLiveChannels(livestreams);
     }
 
     constructor() {
-        this.loadLiveChannels().catch(e => logger.error(e));
         this.refreshMembers().catch(e => logger.error(e));
 
         setInterval(() => {
@@ -120,7 +139,7 @@ class LiveManager {
         }, 2 * 60_000);
 
         setTimeout(() => {
-            this.refreshLiveChannels().catch(e => logger.error(e));
+            this.loadLiveChannels().catch(e => logger.error(e));
         }, 10_000);
 
         eventManager.register("twitch:join", (user) => {
