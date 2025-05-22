@@ -1,5 +1,5 @@
 import {CacheManager} from "../../classes";
-import {DiscordUser} from "../../models";
+import {DiscordUser} from "../../models/discord/discorduser.model";
 import {logger, RawDiscordUser} from "../../index";
 
 async function getUser(userId: string): Promise<RawDiscordUser> {

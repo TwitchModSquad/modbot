@@ -1,5 +1,6 @@
 import {CacheManager} from "../classes";
-import {DiscordUser, Identity, RawDiscordUser, RawIdentity, RawTwitchUser, TwitchUser} from "../models";
+import {DiscordUser, RawDiscordUser, RawIdentity, RawTwitchUser, TwitchUser} from "../models";
+import {Identity} from "../models/identity.model";
 
 class IdentityManager extends CacheManager<RawIdentity> {
     constructor() {

@@ -1,4 +1,5 @@
-import {RawTwitchUser, TwitchUser, TwitchUserBroadcasterType, TwitchUserType} from "../../models";
+import {RawTwitchUser, TwitchUserBroadcasterType, TwitchUserType} from "../../models";
+import {TwitchUser} from "../../models/twitch/twitchuser.model";
 import {HelixUser} from "@twurple/api";
 import {CacheManager} from "../../classes";
 import {getTwitchClient, logger} from "../../index";

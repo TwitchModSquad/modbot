@@ -102,5 +102,4 @@ export const connect = async () => {
     });
 
     logger.info("Synchronization complete!");
-
 }
