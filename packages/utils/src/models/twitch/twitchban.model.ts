@@ -1,6 +1,6 @@
-import sequelize from "./database";
+import sequelize from "../database";
 import {CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model, Op} from "sequelize";
-import {logger, getTwitchClient, twitchUsers, codeBlock, formatChatMessage, TwitchChat} from "../index";
+import {logger, getTwitchClient, twitchUsers, codeBlock, formatChatMessage, TwitchChat} from "../../index";
 import {EmbedBuilder} from "discord.js";
 
 export const createBanEmbed = async (ban: RawTwitchBan): Promise<EmbedBuilder> => {

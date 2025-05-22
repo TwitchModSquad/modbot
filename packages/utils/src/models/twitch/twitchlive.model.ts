@@ -1,10 +1,10 @@
-import sequelize from "./database";
+import sequelize from "../database";
 import {CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model} from "sequelize";
 import {ActionRowBuilder, ButtonBuilder, EmbedBuilder, ButtonStyle, MessageCreateOptions} from "discord.js";
-import {twitchUsers} from "../managers";
+import {twitchUsers} from "../../managers";
 import {HelixGame} from "@twurple/api";
-import {getTwitchClient} from "../twitch";
-import {codeBlock} from "../utils";
+import {getTwitchClient} from "../../twitch";
+import {codeBlock} from "../../utils";
 
 const gameCache = new Map<string, HelixGame>();
 

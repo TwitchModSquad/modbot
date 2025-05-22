@@ -1,4 +1,4 @@
-import sequelize from "./database";
+import sequelize from "../database";
 import {DataTypes, InferAttributes, InferCreationAttributes, Model} from "sequelize";
 
 export interface RawDiscordMessage {

@@ -1,24 +1,15 @@
 import logger from "../logger";
 
 import sequelize from "./database";
-import {TwitchUser} from "./twitchuser.model";
-import {TwitchChat} from "./twitchchat.model";
-import {TwitchRole} from "./twitchrole.model";
-import {TwitchBan} from "./twitchban.model";
-import {TwitchTimeout} from "./twitchtimeout.model";
-import {TwitchChatActivity} from "./twitchchatactivity.model";
 
 export {default as sequelize} from "./database";
-export * from "./discordchannel.model";
-export * from "./discorduser.model";
+
+import {TwitchChat, TwitchChatActivity, TwitchBan, TwitchRole, TwitchTimeout, TwitchUser} from "./twitch";
+
+export * from "./discord";
+export * from "./twitch";
+
 export * from "./identity.model";
-export * from "./twitchuser.model";
-export * from "./twitchban.model";
-export * from "./twitchtimeout.model";
-export * from "./twitchchat.model";
-export * from "./twitchrole.model";
-export * from "./twitchchatactivity.model";
-export * from "./twitchlive.model";
 
 export const connect = async () => {
     logger.info(`Attempting to connect to MariaDB @ ${sequelize.config.host}`);

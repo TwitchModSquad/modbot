@@ -1,4 +1,4 @@
-import sequelize from "./database";
+import sequelize from "../database";
 import {CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model} from "sequelize";
 
 export interface RawTwitchTimeout {

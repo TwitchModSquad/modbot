@@ -1,6 +1,5 @@
-import {createLiveMessageComponent, events, logger, twitchUsers} from "@modbot/utils";
+import {createLiveMessageComponent, events, logger, twitchUsers, DiscordMessage} from "@modbot/utils";
 import {discordChannelManager} from "../managers";
-import {DiscordMessage} from "@modbot/utils/dist/models/discordmessage.model";
 import client from "../app";
 import {EmbedBuilder, MessageEditOptions} from "discord.js";
 
