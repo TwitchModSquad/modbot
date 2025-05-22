@@ -26,8 +26,6 @@ class StatsManager {
                 ...result,
             };
         }
-
-        logger.debug(`Public stats: ${JSON.stringify(this.publicStats)}`);
     }
 
     public register(service: ServiceType): void {
