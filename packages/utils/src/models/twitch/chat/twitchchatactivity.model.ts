@@ -1,11 +1,26 @@
 import sequelize from "../../database";
-import {DataTypes, InferAttributes, InferCreationAttributes, Model} from "sequelize";
+import {DataTypes, InferAttributes, InferCreationAttributes, Model, WhereOptions} from "sequelize";
 
 export interface RawTwitchChatActivity {
     chatterId: string;
     streamerId: string;
     lastMessageTimestamp?: string;
     count: number;
+}
+
+export const getHistory = (type: "chatter"|"streamer", userId: string, limit: number = 1000, page: number = 1, order: ["lastMessageDate"|"count", "ASC"|"DESC"] = ["count", "DESC"]): Promise<TwitchChatActivity[]> => {
+    const where: WhereOptions<TwitchChatActivity> = {};
+
+    if (type === "chatter") {
+        where.chatterId = userId;
+    } else {
+        where.streamerId = userId;
+    }
+
+    return TwitchChatActivity.findAll({
+        where, order: [order],
+        limit, offset: (page - 1) * limit,
+    });
 }
 
 export class TwitchChatActivity extends Model<InferAttributes<TwitchChatActivity>, InferCreationAttributes<TwitchChatActivity>> implements RawTwitchChatActivity {

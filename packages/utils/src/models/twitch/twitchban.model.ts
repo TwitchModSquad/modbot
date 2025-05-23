@@ -1,6 +1,16 @@
 import sequelize from "../database";
 import {CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model, Op} from "sequelize";
-import {logger, getTwitchClient, twitchUsers, codeBlock, formatChatMessage, TwitchChat} from "../../index";
+import {
+    logger,
+    getTwitchClient,
+    twitchUsers,
+    codeBlock,
+    formatChatMessage,
+    TwitchChat,
+    getHistory,
+    RawTwitchChatActivity, TextTableData
+} from "../../index";
+import {textTable} from "../../utils/textTable";
 import {EmbedBuilder} from "discord.js";
 
 export const createBanEmbed = async (ban: RawTwitchBan): Promise<EmbedBuilder> => {
@@ -60,6 +70,62 @@ export const createBanEmbed = async (ban: RawTwitchBan): Promise<EmbedBuilder> =
         value: codeBlock(chatHistoryText),
         inline: false,
     });
+
+    const activity: RawTwitchChatActivity[] = (await getHistory("chatter", ban.chatterId, 1000, 1, ["lastMessageDate", "DESC"]))
+        .map(x => x.raw());
+    const activityBans: TwitchBan[] = await TwitchBan.findAll({
+        where: {
+            chatterId: ban.chatterId,
+            endTime: null,
+        }
+    });
+
+    for (const aBan of activityBans) {
+        if (!activity.find(x => x.streamerId === aBan.streamerId)) {
+            activity.push({
+                streamerId: aBan.streamerId,
+                chatterId: aBan.chatterId,
+                lastMessageDate: null,
+                count: 1,
+            } as RawTwitchChatActivity);
+        }
+    }
+
+    if (activity.length > 0) {
+        const data: TextTableData = {
+            columns: [
+                {
+                    name: "Streamer",
+                    align: "left",
+                }, {
+                    name: "Last Message",
+                    align: "right",
+                }, {
+                    name: "Banned",
+                    align: "right",
+                }],
+            rows: [],
+            padding: 2,
+        };
+        
+        for (const a of activity) {
+            const streamer = await twitchUsers.get(a.streamerId);
+            const lastMessageDate = a.lastMessageTimestamp ? new Date(a.lastMessageTimestamp) : null;
+            const banned = activityBans.some(x => x.streamerId === a.streamerId);
+
+            data.rows.push([
+                streamer.display_name,
+                lastMessageDate ? lastMessageDate.toLocaleDateString() : "Never",
+                banned ? "✅ Yes" : "🚫 No",
+            ]);
+        }
+
+        embed.addFields({
+            name: "Channel Activity",
+            value: codeBlock(textTable(data)),
+            inline: false,
+        });
+    }
 
     return embed;
 }

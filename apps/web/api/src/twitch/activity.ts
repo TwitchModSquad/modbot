@@ -1,6 +1,5 @@
 import {Router} from "express";
-import {WhereOptions} from "sequelize";
-import {RawTwitchUser, TwitchChatActivity, twitchUsers} from "@modbot/utils";
+import {getHistory, RawTwitchUser, twitchUsers} from "@modbot/utils";
 
 const router: Router = Router();
 
@@ -11,12 +10,15 @@ router.get("/", async (req, res) => {
     let page = 1;
     let limit = 100;
 
-    const whereOptions: WhereOptions<TwitchChatActivity> = {};
+    let type: "streamer"|"chatter";
+    let userId: string;
 
     if (streamerId && typeof streamerId === "string" && streamerId.length > 0) {
-        whereOptions.streamerId = streamerId;
+        type = "streamer";
+        userId = streamerId;
     } else if (chatterId && typeof chatterId === "string" && chatterId.length > 0) {
-        whereOptions.chatterId = chatterId;
+        type = "chatter";
+        userId = chatterId;
     }
 
     if (req?.query?.limit) {
@@ -33,15 +35,9 @@ router.get("/", async (req, res) => {
         }
     }
 
-    const offset = (page - 1) * limit;
-    const result = (await TwitchChatActivity.findAll({
-        where: whereOptions,
-        order: [
-            ["count", "DESC"],
-        ],
-        limit,
-        offset,
-    })).map(x => x.raw());
+    const result = (await getHistory(
+        type, userId, limit, page
+    )).map(x => x.raw());
 
     const users = new Map<string, RawTwitchUser>();
     for (const log of result) {
